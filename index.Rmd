@@ -53,10 +53,10 @@ fileInput("biota_preyprop", "Dietary matrix (food web structure)",
 ```{r}
 actionButton("run", "Run!")
 
-htmlOutput("showProgressText")
+verbatimTextOutput("showProgressText")
 
-looptxt <- reactiveValues()
-output$showProgressText <- renderText(reactiveValuesToList(looptxt))  
+output$showProgressText <- renderText(rv$lines)
+rv <- reactiveValues(lines = character(0))
 
 observeEvent(input$run, {
   
@@ -174,8 +174,10 @@ observeEvent(input$run, {
     for (ispecies in 1:nspecies) {
       
       # log
-      looptxt[[as.character(ispecies)]] <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
-
+      isolate({
+        rv$lines <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
+      })
+      
       ## ASSIGN VARIABLES ##
       csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
       Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
