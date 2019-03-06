@@ -53,12 +53,7 @@ fileInput("biota_preyprop", "Dietary matrix (food web structure)",
 ```{r}
 actionButton("run", "Run!")
 
-verbatimTextOutput("showProgressText")
-
-output$showProgressText <- renderText(rv$lines)
-rv <- reactiveValues(lines = character(0))
-
-observeEvent(input$run, {
+bsaf_res <- eventReactive(input$run, {
   
   # input
   biota <- input$biota
@@ -166,85 +161,192 @@ observeEvent(input$run, {
   
   #N.B. the use of for loops is rather inefficient computationally but was easy to code
   #and moderately easy to debug.  Perhaps there is a more efficient way.
-  
+
   # loops over ALL contaminants
-  for (icontam in 1:ncontam){
-  
-    # loop over species
-    for (ispecies in 1:nspecies) {
+  # wrap the loop execution in withProgress
+  withProgress(
+    message='Please wait',
+    detail='Doing important stuff...',
+    value = 0, {
+      for (icontam in 1:ncontam){
       
-      # log
-      isolate({
-        rv$lines <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
-      })
-      
-      ## ASSIGN VARIABLES ##
-      csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
-      Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
-      KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
-      Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
-      
-      ## Multiple water conc options ##
-      #cwater <- contam$cwto_ng.g[icontam]; # water concentration from optional input
-      #cwater <- csed/KowTS; # simulated water concentration using Kow only
-      cwater <- (csed/ocsed)/Koc; # simulated water concentration using %TOC in sediment 
-      
-      #other parameters, most reviewed above; described in Gobas and Arnot 2010
-      beta <- contam$beta[icontam]; 
-      betap <- contam$betap[icontam]; 
-      kM <- contam$kM[icontam];
-      taxa <- biota$taxa[ispecies];
-      lipid <- biota$lipid[ispecies];
-      nloc <- biota$nloc[ispecies];
-      nlom <- biota$nlom[ispecies];
-      wc <- biota_wc[ispecies]; 
-      mp <- biota$mp[ispecies];
-      mo <- biota_mo[ispecies];
-      Wb <- biota$Wb[ispecies];
-      GR <- biota$GR[ispecies];
-      preyprop <- biota_preyprop[ispecies,]; # a vector of prey proportions
-      cbiota <- CBIOTA[,icontam];
-      vld <- biota_vld[ispecies]; # lipid proportions in diet
-      vcd <- biota_vcd[ispecies]; # nonlipid O.C. proportions in diet
-      vnd <- biota_vnd[ispecies]; # nonlipid O.M. proportions in diet
-      vwd <- biota_vwd[ispecies]; # water proportions in diet
-      assimEff_1 <- biota$assimEff_1[ispecies]; # assimilation efficiency for lipid
-      assimEff_2 <- biota$assimEff_2[ispecies]; # assimilation efficiency for non-lipid crabon (nloc) or org matter (nlom)
-      assimEff_3 <- biota$assimEff_3[ispecies]; # assimilation efficiency for water
-      
-      ###########################
-      ### CALL FOOD WEB MODEL ###
-      
-      #call the function, using all the various model input parameters
-      Results <- FoodWeb_SQO_v2MCS(NumSim=1, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
-      alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, 
-      vss, scav, preyprop, cbiota, vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) 
-      
-      #extract the biota and prey contaminant information
-      CBIOTA[ispecies,icontam] <- Results$cbiota;
-      CPREY[ispecies,icontam] <- Results$cprey;
-      # check column headers on Results match dimnames on PARAMS 
-      for (o in 1:(length(Results)-2)) 
-      { if (dimnames(PARAMS)[[3]][o]==colnames(Results)[o+2]) {PARAMS[ispecies,icontam,o] <- Results[[o+2]]} else { print('Error in ordering of parameters')} 
-      };  
-    } #end of loop over species
-  } #end of loop over contaminants
+        # loop over species
+        for (ispecies in 1:nspecies) {
+          
+          # log
+          txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
+    
+          ## ASSIGN VARIABLES ##
+          csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
+          Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
+          KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
+          Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
+          
+          ## Multiple water conc options ##
+          #cwater <- contam$cwto_ng.g[icontam]; # water concentration from optional input
+          #cwater <- csed/KowTS; # simulated water concentration using Kow only
+          cwater <- (csed/ocsed)/Koc; # simulated water concentration using %TOC in sediment 
+          
+          #other parameters, most reviewed above; described in Gobas and Arnot 2010
+          beta <- contam$beta[icontam]; 
+          betap <- contam$betap[icontam]; 
+          kM <- contam$kM[icontam];
+          taxa <- biota$taxa[ispecies];
+          lipid <- biota$lipid[ispecies];
+          nloc <- biota$nloc[ispecies];
+          nlom <- biota$nlom[ispecies];
+          wc <- biota_wc[ispecies]; 
+          mp <- biota$mp[ispecies];
+          mo <- biota_mo[ispecies];
+          Wb <- biota$Wb[ispecies];
+          GR <- biota$GR[ispecies];
+          preyprop <- biota_preyprop[ispecies,]; # a vector of prey proportions
+          cbiota <- CBIOTA[,icontam];
+          vld <- biota_vld[ispecies]; # lipid proportions in diet
+          vcd <- biota_vcd[ispecies]; # nonlipid O.C. proportions in diet
+          vnd <- biota_vnd[ispecies]; # nonlipid O.M. proportions in diet
+          vwd <- biota_vwd[ispecies]; # water proportions in diet
+          assimEff_1 <- biota$assimEff_1[ispecies]; # assimilation efficiency for lipid
+          assimEff_2 <- biota$assimEff_2[ispecies]; # assimilation efficiency for non-lipid crabon (nloc) or org matter (nlom)
+          assimEff_3 <- biota$assimEff_3[ispecies]; # assimilation efficiency for water
+          
+          ###########################
+          ### CALL FOOD WEB MODEL ###
+          
+          #call the function, using all the various model input parameters
+          Results <- FoodWeb_SQO_v2MCS(NumSim=1, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
+          alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, 
+          vss, scav, preyprop, cbiota, vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) 
+          
+          #extract the biota and prey contaminant information
+          CBIOTA[ispecies,icontam] <- Results$cbiota;
+          CPREY[ispecies,icontam] <- Results$cprey;
+          # check column headers on Results match dimnames on PARAMS 
+          for (o in 1:(length(Results)-2)) 
+          { if (dimnames(PARAMS)[[3]][o]==colnames(Results)[o+2]) {PARAMS[ispecies,icontam,o] <- Results[[o+2]]} else { print('Error in ordering of parameters')} 
+          };  
+        } #end of loop over species
+      } #end of loop over contaminants
+      incProgress(amount=1)
+    })
   
   ### CALCULATE BSAF (simple measure of biota versus sediment contamination) ###
   for (i in 1:nspecies) {
-  BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g_dw
+    BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g_dw
   }
-  # 
-  # if(file.exists('log.txt'))
-  #   file.remove('log.txt')
+
+  out <- list(
+    BSAF = BSAF, 
+    CBIOTA = CBIOTA,
+    contam = contam
+    )
+  
+  return(out)
   
 })
 
-# log <- reactive({
-#   if(file.exists('log.txt'))
-#     readLines('log.txt')
-# })
-# renderText({log()})
+renderUI({
+  
+  # input
+  bsaf_res <- bsaf_res()
+  BSAF <- bsaf_res$BSAF
+  
+  selectInput('cntbsaf', 'Select contaminant:', choices = colnames(BSAF))
+  
+})
 
+renderPlot({
+  
+  bsaf_res <- bsaf_res()
+  BSAF <- bsaf_res$BSAF
+  CBIOTA <- bsaf_res$CBIOTA
+  contam <- bsaf_res$contam
+  cntbsaf <- input$cntbsaf
+  
+  req(cntbsaf)
+  
+  toplo <- BSAF %>% 
+    data.frame %>% 
+    rownames_to_column('species') %>% 
+    select(species, !!cntbsaf)
+  
+  p <- ggplot(toplo, aes_string(x = 'species', y = cntbsaf)) + 
+    geom_bar(stat = 'identity') + 
+    ylab('BSAF') + 
+    theme_bw(base_size= 16, base_family = 'serif')+ 
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+      axis.title.x = element_blank()
+      )
+  
+  return(p)
+  
+})
+
+
+renderUI({
+  
+  # input
+  bsaf_res <- bsaf_res()
+  BSAF <- bsaf_res$BSAF
+  
+  selectInput('sppbsaf', 'Select species:', choices = rownames(BSAF))
+  
+})
+
+renderPlot({
+  
+  bsaf_res <- bsaf_res()
+  BSAF <- bsaf_res$BSAF
+  CBIOTA <- bsaf_res$CBIOTA
+  contam <- bsaf_res$contam
+  sppbsaf <- input$sppbsaf
+  
+  req(sppbsaf)
+  
+  toplo <- BSAF %>% 
+    data.frame %>% 
+    rownames_to_column('species') %>% 
+    filter(species %in% sppbsaf) %>% 
+    gather('contam', 'val', -species)
+  
+  p <- ggplot(toplo, aes_string(x = 'contam', y = 'val')) + 
+    geom_bar(stat = 'identity') + 
+    ylab('BSAF') + 
+    theme_bw(base_size= 16, base_family = 'serif')+ 
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+      axis.title.x = element_blank()
+      )
+  
+  return(p)
+  
+})
+
+renderPlot({
+ 
+  bsaf_res <- bsaf_res()
+  BSAF <- bsaf_res$BSAF
+  CBIOTA <- bsaf_res$CBIOTA
+  contam <- bsaf_res$contam
+  sppbsaf <- input$sppbsaf
+
+  toplo <- BSAF %>% 
+    data.frame %>% 
+    rownames_to_column('species') %>% 
+    filter(species %in% sppbsaf) %>% 
+    gather('Chem', 'val', -species) %>%
+    mutate(Chem = factor(Chem)) %>% 
+    left_join(contam, by = 'Chem')
+  
+  p <- ggplot(toplo, aes(x = Kow, y = val)) + 
+    geom_point() + 
+    scale_x_log10('log10 Octanol-water partitioning coeff') + 
+    ylab('BSAF') + 
+    theme_bw(base_size= 16, base_family = 'serif')
+  
+  return(p)
+  
+})
 ```
 
