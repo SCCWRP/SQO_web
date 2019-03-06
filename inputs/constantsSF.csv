@@ -1,0 +1,20 @@
+Constant,Value,SD,Notes
+A,0.00006,6.00E-07,% constants for phytoplankton aqueous uptake rate (1/d)
+B,5.5,5.50E-02,% constants for phytoplankton aqueous uptake rate (1/d)
+Cox,8.09,1.10E+00,% dissolved oxygen concentration (mg O2/L)
+T,14.9,1.30E+00,% mean water temperature (oC)
+salinity,20.2,1.60E+00,% water salinity (PSU)
+MCS,0.5,0.00E+00,% Molar Concentration of Seawater @ 35 ppt (mol/L)
+SPC,0.0018,0.00E+00,% Setschenow Proportionality Constant (L/cm^3)
+ocsed,0.0102,5.00E-03,% organic carbon proportion in sediment (kg/kg)
+ds,0.9,0.00E+00,% density of organic carbon in sediment (kg/L)
+vss,0.0000246,2.50E-06,% concentration of suspended solids (kg/L?)
+xpoc,0.00000185,1.50E-07,% POC concentration in H2O (kg/L)
+xdoc,0.0000021,2.00E-07,% DOC concentration in H2O (kg/L)
+dpoc,1,1.00E-02,% disequilibrium factor for POC partitioning
+ddoc,1,1.00E-02,% disequilibrium factor for DOC partitioning
+alphapoc,0.35,3.50E-03,% proportionality constant describing phase partitioning of POC and DOC
+alphadoc,0.08,8.00E-04,% proportionality constant describing phase partitioning of POC and DOC
+EdA,0.000000085,8.50E-10,% Constant A in dietary uptake efficiency equation
+EdB,2,2.00E-02,% Constant B in dietary uptake efficiency equation
+scav,1,1.00E-02,% scavenging efficiency of particles absorbed from water by filter feeders (percent)
