@@ -1,16 +1,16 @@
-#FoodWeb_SQO_v2.R
+# bioaccumulation function ------------------------------------------------
+
+#FoodWeb_SQO
 # Purpose: To implement the Gobas/Arnot Food Web Bioaccumulation Model
 #          of San Francisco Bay for various species and contaminants.
 # 6.17.2010
 # Michelle Lent
 # edited 6.23.10 & 6.30.10 by BG and ML
-
-
-FoodWeb_SQO_v2MCS <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, 
+FoodWeb_SQO <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, 
                               ddoc, xpoc, dpoc, alphapoc, alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, 
                               nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, vss, scav, preyprop, cbiota, 
-                              vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) #updated 6.30.2010
-{
+                              vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3){ #updated 6.30.2010
+ 
   ## initialize the output variables
   temp <- data.frame(cbiota = NA, cprey = NA, k1=NA, k2=NA, GR=NA, Gv=NA, Gd=NA, 
                      Gf=NA, vlg=NA, vcg=NA, vng=NA, vwg=NA, kgb=NA, ke=NA, kd=NA, Ew=NA, Ed=NA, phi=NA, 
@@ -46,7 +46,7 @@ FoodWeb_SQO_v2MCS <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc,
   ## Now proceed with the biota-specific calculations.
   ##
   ## Calculations are taxa dependant. The main IF loop here represents that dependancy.
-  
+
   if (taxa==0) {Output$cbiota <- csed}; # This is a dummy taxa used by sediment
   
   if (taxa>=1 & taxa<2)
@@ -148,4 +148,207 @@ FoodWeb_SQO_v2MCS <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc,
   }
   return(Output)
   
+}
+
+
+# bioaccumulation batch ---------------------------------------------------
+
+#' Run bioaccumulation model function FoodWeb_SQO in batch for all species, contaminants
+#'
+#' @param biota input biological data
+#' @param contam input contaminant data
+#' @param biota_preyprop input prey proportions
+#' @param constants input constants
+#'
+bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
+  
+  ### HAVE HARD-CODED THE PARAMETER NAMES
+  theParamNames <- c("k1","k2", "GR", "Gv", "Gd", "Gf", "vlg", "vcg", "vng", "vwg", "kgb", 
+                     "ke", "kd", "Ew", "Ed", "phi", "cpw", "assimEff_1", "assimEff_2", "assimEff_3");
+  
+  nspecies = nrow(biota_preyprop); 
+  nprey = ncol(biota_preyprop);
+  ncontam = length(contam$Chem); 
+  nparams = length(theParamNames);
+  
+  #dietary composition (lipid, organic carbon, organic matter, water)
+  biota_vld  = as.matrix(biota_preyprop) %*% biota$lipid;
+  biota_vcd  = as.matrix(biota_preyprop) %*% biota$nloc;
+  biota_vnd  = as.matrix(biota_preyprop) %*% biota$nlom;
+  biota_wc = (1 - biota$lipid - biota$nloc - biota$nlom); #wc = (1 -lipid -nloc -nlom)
+  biota_vwd  = as.matrix(biota_preyprop) %*% biota_wc; 
+  #respiratory uptake of overlying water
+  biota_mo = 1 - biota$mp;
+  
+  ## ASSIGN CONSTANT PARAMETERS from input data##
+  EdA = constants$Value[which(constants$Constant=='EdA')];
+  EdB = constants$Value[which(constants$Constant=='EdB')];
+  xdoc = constants$Value[which(constants$Constant=='xdoc')];
+  ddoc = constants$Value[which(constants$Constant=='ddoc')];
+  xpoc = constants$Value[which(constants$Constant=='xpoc')];
+  dpoc = constants$Value[which(constants$Constant=='dpoc')];
+  alphapoc = constants$Value[which(constants$Constant=='alphapoc')];
+  alphadoc = constants$Value[which(constants$Constant=='alphadoc')];
+  ocsed = constants$Value[which(constants$Constant=='ocsed')]; 
+  ds = constants$Value[which(constants$Constant=='ds')];
+  A = constants$Value[which(constants$Constant=='A')];
+  B = constants$Value[which(constants$Constant=='B')];
+  T = constants$Value[which(constants$Constant=='T')];
+  Cox = constants$Value[which(constants$Constant=='Cox')];
+  vss = constants$Value[which(constants$Constant=='vss')];
+  scav = constants$Value[which(constants$Constant=='scav')];
+  
+  #some descriptions of parameters
+  ## that are used in model
+  #cbiota = 'contaminant concentration in biota';
+  #cprey  = 'contaminant concentration in prey diet';
+  #k1 = 'aqueous uptake rate constant';
+  #k2 = 'elimination rate constant';
+  #GR = 'growth rate coefficient for fish or invertebrates; growth rate for phytoplankton';
+  #Gv = 'gill ventilation rate';
+  #Gd = 'feeding rate';
+  #Gf = 'fecal egestion rate';
+  #vlg = 'lipid fraction of gut';
+  #vcg = 'nloc fraction of gut';
+  #vng = 'nlom fraction of gut';
+  #vwg = 'water fraction of gut';
+  #kgb = 'gut-biota partition coefficient';
+  #ke =  'fecal egestion rate constant (1/d)';
+  #kd =  'dietary uptake rate constant';
+  #Ew =  'gill chemical uptake efficiency';
+  #Ed =  'dietary chemical transfer efficiency (also called gut uptake efficiency)';
+  #phi = 'freely dissolved contaminant fraction in overlying water column';
+  #cpw = 'contaminant concentration in porewater';
+  #assimEff_1  = 'assimilation efficiency for lipid';
+  #assimEff_2  = 'assimilation efficiency for nlom or nloc';
+  #assimEff_3  = 'assimilation efficiency for water';
+  
+  ##Initialize output variables data objects (matrices and an array)
+  #matrix that stores organism contaminant concentrations
+  CBIOTA <- matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
+  #contaminant concentrations of organisms' prey
+  CPREY  <- matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
+  #calculated biota sediment accumulation factor (BSAF)
+  BSAF <-  matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
+  #array stores each parameter specific to species and contaminant type
+  PARAMS <- array(NA, c(nspecies,ncontam,nparams),dimnames=list(biota$Biota,contam$Chem,theParamNames));
+  
+  #PART 1
+  ####Deterministic version###########################################################3
+  
+  #N.B. the use of for loops is rather inefficient computationally but was easy to code
+  #and moderately easy to debug.  Perhaps there is a more efficient way.
+  
+  # loops over ALL contaminants
+  # wrap the loop execution in withProgress
+  withProgress(
+    message='Please wait',
+    detail='Doing important stuff...',
+    value = 0, {
+      for (icontam in 1:ncontam){
+        
+        # loop over species
+        for (ispecies in 1:nspecies) {
+          
+          # log
+          txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
+          
+          ## ASSIGN VARIABLES ##
+          csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
+          Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
+          KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
+          Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
+          
+          ## Multiple water conc options ##
+          #cwater <- contam$cwto_ng.g[icontam]; # water concentration from optional input
+          #cwater <- csed/KowTS; # simulated water concentration using Kow only
+          cwater <- (csed/ocsed)/Koc; # simulated water concentration using %TOC in sediment 
+          
+          #other parameters, most reviewed above; described in Gobas and Arnot 2010
+          beta <- contam$beta[icontam]; 
+          betap <- contam$betap[icontam]; 
+          kM <- contam$kM[icontam];
+          taxa <- biota$taxa[ispecies];
+          lipid <- biota$lipid[ispecies];
+          nloc <- biota$nloc[ispecies];
+          nlom <- biota$nlom[ispecies];
+          wc <- biota_wc[ispecies]; 
+          mp <- biota$mp[ispecies];
+          mo <- biota_mo[ispecies];
+          Wb <- biota$Wb[ispecies];
+          GR <- biota$GR[ispecies];
+          preyprop <- biota_preyprop[ispecies,]; # a vector of prey proportions
+          cbiota <- CBIOTA[,icontam];
+          vld <- biota_vld[ispecies]; # lipid proportions in diet
+          vcd <- biota_vcd[ispecies]; # nonlipid O.C. proportions in diet
+          vnd <- biota_vnd[ispecies]; # nonlipid O.M. proportions in diet
+          vwd <- biota_vwd[ispecies]; # water proportions in diet
+          assimEff_1 <- biota$assimEff_1[ispecies]; # assimilation efficiency for lipid
+          assimEff_2 <- biota$assimEff_2[ispecies]; # assimilation efficiency for non-lipid crabon (nloc) or org matter (nlom)
+          assimEff_3 <- biota$assimEff_3[ispecies]; # assimilation efficiency for water
+          
+          ###########################
+          ### CALL FOOD WEB MODEL ###
+ 
+          #call the function, using all the various model input parameters
+          Results <- FoodWeb_SQO(NumSim=1, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
+                                       alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, 
+                                       vss, scav, preyprop, cbiota, vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) 
+          
+          #extract the biota and prey contaminant information
+          CBIOTA[ispecies,icontam] <- Results$cbiota;
+          CPREY[ispecies,icontam] <- Results$cprey;
+          # check column headers on Results match dimnames on PARAMS 
+          for (o in 1:(length(Results)-2)) 
+          { if (dimnames(PARAMS)[[3]][o]==colnames(Results)[o+2]) {PARAMS[ispecies,icontam,o] <- Results[[o+2]]} else { print('Error in ordering of parameters')} 
+          };  
+        } #end of loop over species
+      } #end of loop over contaminants
+      incProgress(amount=1)
+    })
+  
+  ### CALCULATE BSAF (simple measure of biota versus sediment contamination) ###
+  for (i in 1:nspecies) {
+    BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g_dw
+  }
+  
+  out <- list(BSAF = BSAF, CBIOTA = CBIOTA, contam = contam)
+  
+  return(out)
+
+}
+
+
+
+# format species inputs ---------------------------------------------------
+
+#' format species inputs
+#'
+#' @param inps reactive inputs
+#' @param biota table
+formsppinp <- function(inps, biota){
+  
+  # format names and lips as tibble
+  frminps <- reactiveValuesToList(inps) %>% 
+    enframe('Biota', 'value') %>% 
+    filter(!grepl('selectized', Biota) & grepl('indic', Biota)) %>% 
+    mutate(
+      var = case_when(
+        grepl('lip', Biota) ~ 'lipid', 
+        T ~ 'spp'
+      ), 
+      Biota = gsub('lip', '', Biota)
+    ) %>% 
+    spread(var, value) %>% 
+    unnest
+  
+  # add frminps user input to biota
+  out <- biota %>% 
+    left_join(frminps, by = 'Biota') %>% 
+    mutate(lipid.x = ifelse(is.na(lipid.x), lipid.y, lipid.x)) %>% 
+    rename(lipid = lipid.x) %>% 
+    select(-lipid.y, -spp)
+  
+  return(out)
+
 }

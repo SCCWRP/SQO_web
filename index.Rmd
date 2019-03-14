@@ -9,13 +9,20 @@ runtime: shiny
 
 ```{r, message = F, warning = F, echo = F}
 library(knitr)
-opts_chunk$set(warning = FALSE, message = FALSE, dev.args = list(bg = 'transparent'), eval = T, echo = F)
 library(tidyverse)
 library(shiny)
+opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
 
+# data inputs
 data("indic_lookup")
+biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
+constants <- read.csv('data/constantsSF.csv', stringsAsFactors = FALSE)
+contam <- read.csv('data/contamSF.csv', stringsAsFactors = FALSE)
+biota_preyprop <- read.csv('data/preyprop.csv', stringsAsFactors = FALSE, row.names = 1)
+
+# indicator species lookup format for inputs
 indic_lookup <- indic_lookup %>% 
   group_by(Indicator.number) %>% 
   nest %>% 
@@ -28,41 +35,84 @@ indic_lookup <- indic_lookup %>%
 ## Model inputs
 
 ```{r}
+column(12, 
+  h3('Indicator guild species'),
+  wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 500px; background-color:#daf1da",
+    
+    # indic 1        
+    fluidRow(
+      column(4, h6('1 Piscivore')),
+      column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '40%'))
+    ),
+    
+    # indic 2        
+    fluidRow(
+      column(4, h6('2 Benthic diet with piscivory')),
+      column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '40%'))
+    ),
+    
+    # indic 3        
+    fluidRow(
+      column(4, h6('3 Benthic and pelagic with piscivory')),
+      column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '40%'))
+    ),
 
-selectInput('guild1', 'Select indicator species 1:', choices = indic_lookup[['Indicator species 1']])
-selectInput('guild2', 'Select indicator species 2:', choices = indic_lookup[['Indicator species 2']])
-selectInput('guild3', 'Select indicator species 3:', choices = indic_lookup[['Indicator species 3']])
-selectInput('guild4', 'Select indicator species 4:', choices = indic_lookup[['Indicator species 4']])
-selectInput('guild5', 'Select indicator species 5:', choices = indic_lookup[['Indicator species 5']])
-selectInput('guild6', 'Select indicator species 6:', choices = indic_lookup[['Indicator species 6']])
-selectInput('guild7', 'Select indicator species 7:', choices = indic_lookup[['Indicator species 7']])
-selectInput('guild8', 'Select indicator species 8:', choices = indic_lookup[['Indicator species 8']])
-selectInput('guild9', 'Select indicator species 9:', choices = indic_lookup[['Indicator species 9']])
+    # indic 4        
+    fluidRow(
+      column(4, h6('4 Benthic without piscivory')),
+      column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '40%'))
+    ),
 
-fileInput("biota", "Physiological and life history parameters for organisms",
-                multiple = FALSE,
-                accept = c("text/csv",
-                         "text/comma-separated-values,text/plain",
-                         ".csv"))
+    # indic 5
+    fluidRow(
+      column(4, h6('5 Benthic and pelagic without piscivory')),
+      column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '40%'))
+    ),
 
-fileInput("constants", "water chemistry and other constants",
-                multiple = FALSE,
-                accept = c("text/csv",
-                         "text/comma-separated-values,text/plain",
-                         ".csv"))
+    # indic 6        
+    fluidRow(
+      column(4, h6('6 Benthic with herbivory')),
+      column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '40%'))
+    ),
 
-fileInput("contam", "Contaminant concentrations and partitioning behavior",
-                multiple = FALSE,
-                accept = c("text/csv",
-                         "text/comma-separated-values,text/plain",
-                         ".csv"))
+    # indic 7        
+    fluidRow(
+      column(4, h6('7 Benthic and pelagic with herbivory')),
+      column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '40%'))
+    ),
 
+    # indic 8        
+    fluidRow(
+      column(4, h6('8 Pelagic with benthic herbivory')),
+      column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '40%'))
+    ),
 
-fileInput("biota_preyprop", "Dietary matrix (food web structure)",
-                multiple = FALSE,
-                accept = c("text/csv",
-                         "text/comma-separated-values,text/plain",
-                         ".csv"))
+    # indic 9        
+    fluidRow(
+      column(4, h6('9 Benthic diet with piscivory (white catfish)')),
+      column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']])),
+      column(1, h6('Lipid')),
+      column(4, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '40%'))
+    )
+
+  )
+)
 ```
 
 ## Run bioaccumulation model
@@ -72,193 +122,12 @@ actionButton("run", "Run!")
 
 bsaf_res <- eventReactive(input$run, {
   
-  # input
-  biota <- input$biota
-  constants <- input$constants
-  contam <- input$contam
-  biota_preyprop <- input$biota_preyprop
+  # format biota from input
+  biota <- formsppinp(input, biota)
 
-  # physiological and life history parameters for organisms
-  if(is.null(biota))
-    biota <- read.csv('data/biotaSF.csv',header=TRUE)
-  else
-    biota <- read.csv(biota, header = TRUE)
-  
-  # water chemistry and other constants
-  if(is.null(constants))
-    constants <- read.csv('data/constantsSF.csv', header = TRUE)
-  else
-    constants <- read.csv(constants, header = TRUE)
+  res <- bioaccum_batch(biota, contam, biota_preyprop, constants)
 
-  # contaminant concentrations and partitioning behavior
-  if(is.null(contam))
-    contam <- read.csv('data/contamSF.csv', header = TRUE)
-  else
-    contam <- read.csv(contam, header = TRUE)
-
-  # dietary matrix (food web structure)
-  if(is.null(biota_preyprop))
-    biota_preyprop <- read.csv('data/preypropSF.csv', header = TRUE, row.names = 1)
-  else
-    biota_preyprop <- read.csv(biota_preyprop, header = TRUE)
-
-  ### HAVE HARD-CODED THE PARAMETER NAMES
-  theParamNames <- c("k1","k2", "GR", "Gv", "Gd", "Gf", "vlg", "vcg", "vng", "vwg", "kgb", 
-  "ke", "kd", "Ew", "Ed", "phi", "cpw", "assimEff_1", "assimEff_2", "assimEff_3");
-  
-  nspecies = nrow(biota_preyprop); 
-  nprey = ncol(biota_preyprop);
-  ncontam = length(contam$Chem); 
-  nparams = length(theParamNames);
-  
-  #dietary composition (lipid, organic carbon, organic matter, water)
-  biota_vld  = as.matrix(biota_preyprop) %*% biota$lipid;
-  biota_vcd  = as.matrix(biota_preyprop) %*% biota$nloc;
-  biota_vnd  = as.matrix(biota_preyprop) %*% biota$nlom;
-  biota_wc = (1 - biota$lipid - biota$nloc - biota$nlom); #wc = (1 -lipid -nloc -nlom)
-  biota_vwd  = as.matrix(biota_preyprop) %*% biota_wc; 
-  #respiratory uptake of overlying water
-  biota_mo = 1 - biota$mp;
-  
-  ## ASSIGN CONSTANT PARAMETERS from input data##
-  EdA = constants$Value[which(constants$Constant=='EdA')];
-  EdB = constants$Value[which(constants$Constant=='EdB')];
-  xdoc = constants$Value[which(constants$Constant=='xdoc')];
-  ddoc = constants$Value[which(constants$Constant=='ddoc')];
-  xpoc = constants$Value[which(constants$Constant=='xpoc')];
-  dpoc = constants$Value[which(constants$Constant=='dpoc')];
-  alphapoc = constants$Value[which(constants$Constant=='alphapoc')];
-  alphadoc = constants$Value[which(constants$Constant=='alphadoc')];
-  ocsed = constants$Value[which(constants$Constant=='ocsed')]; 
-  ds = constants$Value[which(constants$Constant=='ds')];
-  A = constants$Value[which(constants$Constant=='A')];
-  B = constants$Value[which(constants$Constant=='B')];
-  T = constants$Value[which(constants$Constant=='T')];
-  Cox = constants$Value[which(constants$Constant=='Cox')];
-  vss = constants$Value[which(constants$Constant=='vss')];
-  scav = constants$Value[which(constants$Constant=='scav')];
-  
-  #some descriptions of parameters
-  ## that are used in model
-  #cbiota = 'contaminant concentration in biota';
-  #cprey  = 'contaminant concentration in prey diet';
-  #k1 = 'aqueous uptake rate constant';
-  #k2 = 'elimination rate constant';
-  #GR = 'growth rate coefficient for fish or invertebrates; growth rate for phytoplankton';
-  #Gv = 'gill ventilation rate';
-  #Gd = 'feeding rate';
-  #Gf = 'fecal egestion rate';
-  #vlg = 'lipid fraction of gut';
-  #vcg = 'nloc fraction of gut';
-  #vng = 'nlom fraction of gut';
-  #vwg = 'water fraction of gut';
-  #kgb = 'gut-biota partition coefficient';
-  #ke =  'fecal egestion rate constant (1/d)';
-  #kd =  'dietary uptake rate constant';
-  #Ew =  'gill chemical uptake efficiency';
-  #Ed =  'dietary chemical transfer efficiency (also called gut uptake efficiency)';
-  #phi = 'freely dissolved contaminant fraction in overlying water column';
-  #cpw = 'contaminant concentration in porewater';
-  #assimEff_1  = 'assimilation efficiency for lipid';
-  #assimEff_2  = 'assimilation efficiency for nlom or nloc';
-  #assimEff_3  = 'assimilation efficiency for water';
-  
-  ##Initialize output variables data objects (matrices and an array)
-  #matrix that stores organism contaminant concentrations
-  CBIOTA <- matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
-  #contaminant concentrations of organisms' prey
-  CPREY  <- matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
-  #calculated biota sediment accumulation factor (BSAF)
-  BSAF <-  matrix(numeric(nspecies*ncontam), nrow=nspecies,dimnames=list(biota$Biota,contam$Chem));
-  #array stores each parameter specific to species and contaminant type
-  PARAMS <- array(NA, c(nspecies,ncontam,nparams),dimnames=list(biota$Biota,contam$Chem,theParamNames));
-  
-  #PART 1
-  ####Deterministic version###########################################################3
-  
-  #N.B. the use of for loops is rather inefficient computationally but was easy to code
-  #and moderately easy to debug.  Perhaps there is a more efficient way.
-
-  # loops over ALL contaminants
-  # wrap the loop execution in withProgress
-  withProgress(
-    message='Please wait',
-    detail='Doing important stuff...',
-    value = 0, {
-      for (icontam in 1:ncontam){
-      
-        # loop over species
-        for (ispecies in 1:nspecies) {
-          
-          # log
-          txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
-    
-          ## ASSIGN VARIABLES ##
-          csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
-          Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
-          KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
-          Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
-          
-          ## Multiple water conc options ##
-          #cwater <- contam$cwto_ng.g[icontam]; # water concentration from optional input
-          #cwater <- csed/KowTS; # simulated water concentration using Kow only
-          cwater <- (csed/ocsed)/Koc; # simulated water concentration using %TOC in sediment 
-          
-          #other parameters, most reviewed above; described in Gobas and Arnot 2010
-          beta <- contam$beta[icontam]; 
-          betap <- contam$betap[icontam]; 
-          kM <- contam$kM[icontam];
-          taxa <- biota$taxa[ispecies];
-          lipid <- biota$lipid[ispecies];
-          nloc <- biota$nloc[ispecies];
-          nlom <- biota$nlom[ispecies];
-          wc <- biota_wc[ispecies]; 
-          mp <- biota$mp[ispecies];
-          mo <- biota_mo[ispecies];
-          Wb <- biota$Wb[ispecies];
-          GR <- biota$GR[ispecies];
-          preyprop <- biota_preyprop[ispecies,]; # a vector of prey proportions
-          cbiota <- CBIOTA[,icontam];
-          vld <- biota_vld[ispecies]; # lipid proportions in diet
-          vcd <- biota_vcd[ispecies]; # nonlipid O.C. proportions in diet
-          vnd <- biota_vnd[ispecies]; # nonlipid O.M. proportions in diet
-          vwd <- biota_vwd[ispecies]; # water proportions in diet
-          assimEff_1 <- biota$assimEff_1[ispecies]; # assimilation efficiency for lipid
-          assimEff_2 <- biota$assimEff_2[ispecies]; # assimilation efficiency for non-lipid crabon (nloc) or org matter (nlom)
-          assimEff_3 <- biota$assimEff_3[ispecies]; # assimilation efficiency for water
-          
-          ###########################
-          ### CALL FOOD WEB MODEL ###
-          
-          #call the function, using all the various model input parameters
-          Results <- FoodWeb_SQO_v2MCS(NumSim=1, csed, cwater, KowTS, Kow, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
-          alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, 
-          vss, scav, preyprop, cbiota, vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) 
-          
-          #extract the biota and prey contaminant information
-          CBIOTA[ispecies,icontam] <- Results$cbiota;
-          CPREY[ispecies,icontam] <- Results$cprey;
-          # check column headers on Results match dimnames on PARAMS 
-          for (o in 1:(length(Results)-2)) 
-          { if (dimnames(PARAMS)[[3]][o]==colnames(Results)[o+2]) {PARAMS[ispecies,icontam,o] <- Results[[o+2]]} else { print('Error in ordering of parameters')} 
-          };  
-        } #end of loop over species
-      } #end of loop over contaminants
-      incProgress(amount=1)
-    })
-  
-  ### CALCULATE BSAF (simple measure of biota versus sediment contamination) ###
-  for (i in 1:nspecies) {
-    BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g_dw
-  }
-
-  out <- list(
-    BSAF = BSAF, 
-    CBIOTA = CBIOTA,
-    contam = contam
-    )
-  
-  return(out)
+  return(res)
   
 })
 
@@ -347,7 +216,7 @@ renderPlot({
   CBIOTA <- bsaf_res$CBIOTA
   contam <- bsaf_res$contam
   sppbsaf <- input$sppbsaf
-# browser()
+
   toplo <- BSAF %>% 
     data.frame %>% 
     rownames_to_column('species') %>% 
@@ -366,16 +235,3 @@ renderPlot({
   
 })
 ```
-
-## BSAF table
-
-```{r}
-renderDataTable({bsaf_res()$BSAF})
-```
-
-## CBIOTA table
-
-```{r}
-renderDataTable({bsaf_res()$CBIOTA})
-```
-
