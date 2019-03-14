@@ -38,76 +38,74 @@ indic_lookup <- indic_lookup %>%
 h3('Indicator guild species')
 wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
   
+  # headers
+  fluidRow(
+    column(4, NULL),
+    column(3, 'Select species'), 
+    column(4, 'Lipid proportion')
+  ),
+  
   # indic 1        
   fluidRow(
     column(4, h6('1 Piscivore')),
     column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   ),
   
   # indic 2        
   fluidRow(
     column(4, h6('2 Benthic diet with piscivory')),
     column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'))
   ),
   
   # indic 3        
   fluidRow(
     column(4, h6('3 Benthic and pelagic with piscivory')),
     column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 4        
   fluidRow(
     column(4, h6('4 Benthic without piscivory')),
     column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 5
   fluidRow(
     column(4, h6('5 Benthic and pelagic without piscivory')),
     column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 6        
   fluidRow(
     column(4, h6('6 Benthic with herbivory')),
     column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 7        
   fluidRow(
     column(4, h6('7 Benthic and pelagic with herbivory')),
     column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 8        
   fluidRow(
     column(4, h6('8 Pelagic with benthic herbivory')),
     column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 9        
   fluidRow(
     column(4, h6('9 Benthic diet with piscivory (white catfish)')),
     column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']])),
-    column(1, h6('Lipid')),
-    column(4, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '40%'))
+    column(2, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   )
 
 )
@@ -118,51 +116,66 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
   # dissolved oxygen       
   fluidRow(
     column(4, h6('Dissolved oxygen (mg/L)')),
-    column(4, numericInput('Cox', NULL, value = 8.09, min = 0, width = '40%'))
+    column(2, numericInput('Cox', NULL, value = 8.09, min = 0, width = '100%'))
   ),
   
   # water temp     
   fluidRow(
     column(4, HTML('<h6>Mean water temperature (&deg;C)</h6>')),
-    column(4, numericInput('T', NULL, value = 14.9, width = '40%'))
+    column(2, numericInput('T', NULL, value = 14.9, width = '100%'))
   ), 
   
   # salinity     
   fluidRow(
     column(4, h6('Water salinity (psu)')),
-    column(4, numericInput('salinity', NULL, value = 20.2, min = 0, width = '40%'))
+    column(2, numericInput('salinity', NULL, value = 20.2, min = 0, width = '100%'))
   ),
     
   # molar conc seawater       
   fluidRow(
     column(4, h6('Molar conc. seawater at 35 ppt (mol/L)')),
-    column(4, numericInput('MCS', NULL, value = 0.5, min = 0, width = '40%'))
+    column(2, numericInput('MCS', NULL, value = 0.5, min = 0, width = '100%'))
   ),   
   
   # organic carb prop in sed      
   fluidRow(
     column(4, h6('Organic carbon in sediment (kg/kg)')),
-    column(4, numericInput('ocsed', NULL, value = 0.0102, width = '40%'))
+    column(2, numericInput('ocsed', NULL, value = 0.0102, width = '100%'))
   ),   
   
   # concentration of suspended solids      
   fluidRow(
     column(4, h6('Conc. of suspended solids (kg/L)')),
-    column(4, numericInput('vss', NULL, value = 0.0000246, min = 0, width = '40%'))
+    column(2, numericInput('vss', NULL, value = 0.0000246, min = 0, width = '100%'))
   ),  
   
   # poc conc in water       
   fluidRow(
     column(4, h6('POC conc. in water (kg/L)')),
-    column(4, numericInput('xpoc', NULL, value = 0.00000185, min = 0, width = '40%'))
+    column(2, numericInput('xpoc', NULL, value = 0.00000185, min = 0, width = '100%'))
   ),
   
   # doc conc in water       
   fluidRow(
     column(4, h6('DOC conc. in water (kg/L)')),
-    column(4, numericInput('xdoc', NULL, value = 0.0000021, min = 0, width = '40%'))
+    column(2, numericInput('xdoc', NULL, value = 0.0000021, min = 0, width = '100%'))
   )
   
+)
+
+
+h3('Contaminants')
+wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
+
+  # doc conc in water       
+  fluidRow(
+    column(2, h6('Chlordanes')),
+    column(2, h6('alphaChlordane')),
+    column(2, numericInput('alphaChlordane_sed', NULL, value = 1, min = 0, width = '100%')),
+    column(2, numericInput('alphaChlordane_sur', NULL, value = 1, min = 0, width = '100%')),
+    column(2, numericInput('alphaChlordane_por', NULL, value = 1, min = 0, width = '100%'))
+  )
+            
 )
 ```
 
