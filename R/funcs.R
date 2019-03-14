@@ -352,3 +352,28 @@ formsppinp <- function(inps, biota){
   return(out)
 
 }
+
+# format constantsinputs ---------------------------------------------------
+
+#' format constants inputs
+#'
+#' @param inps reactive inputs
+#' @param constants table
+formcnsinp <- function(inps, constants){
+
+  # format names and lips as tibble
+  frminps <- reactiveValuesToList(inps) %>% 
+    enframe('Constant', 'Value') %>% 
+    filter(Constant %in% c('Cox', 'T', 'salinity', 'MCS', 'ocsed', 'vss', 'xpoc', 'xdoc')) %>% 
+    unnest
+  
+  # add frminps user input to constants
+  out <- constants %>% 
+    left_join(frminps, by = 'Constant') %>% 
+    mutate(Value.x = ifelse(is.na(Value.x), Value.y, Value.x)) %>% 
+    rename(Value = Value.x) %>% 
+    select(-Value.y)
+  
+  return(out)
+  
+}
