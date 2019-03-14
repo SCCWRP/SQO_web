@@ -11,7 +11,6 @@ FoodWeb_SQO_v2MCS <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc,
                               nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, vss, scav, preyprop, cbiota, 
                               vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) #updated 6.30.2010
 {
-  
   ## initialize the output variables
   temp <- data.frame(cbiota = NA, cprey = NA, k1=NA, k2=NA, GR=NA, Gv=NA, Gd=NA, 
                      Gf=NA, vlg=NA, vcg=NA, vng=NA, vwg=NA, kgb=NA, ke=NA, kd=NA, Ew=NA, Ed=NA, phi=NA, 

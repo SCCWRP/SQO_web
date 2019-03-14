@@ -1,0 +1,37 @@
+Biota,Diet - Sediment,Diet - Phytoplankton,Diet - Submerged Macrophyte,Diet - Zooplankton,"Diet - Small polychaete (e.g., Harmothoe imbricata)","Diet - Large polychaete (e.g., Neanthes)",Diet - Amphipod,Diet - Cumacean,Diet - Mysid,Diet - Bivalve mollusk,Diet - Decapod crab,Diet - Crangon shrimp,Diet - Forage fish - herbivore,Diet - Forage fish - planktivore,Diet - Forage fish  - primarily benthivore,Diet - Forage fish - benthivore,Diet - Forage fish - mixed diet i,Diet - Forage fish - mixed diet ii,Indicator species 1 - Piscivore,Indicator species 2 - Benthic diet with piscivory,Indicator species 3 - Benthic and pelagic with piscivory,Indicator species 4 - Benthic without piscivory,Indicator species 5 - Benthic and pelagic without piscivory,Indicator species 6 - Benthic with herbivory,Indicator species 7 - Benthic and pelagic with herbivory,Indicator species 8 - Pelagic with benthic herbivory,Indicator species 9 - Benthic diet with piscivory (White catfish)
+Sediment,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Phytoplankton,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Submerged Macrophyte,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zooplankton,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Small polychaete (e.g., Harmothoe imbricata)",0.9,0.05,0,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Large polychaete (e.g., Neanthes)",0.9,0.05,0,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Amphipod,0.3,0.35,0,0.35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Cumacean,0.15,0.65,0,0.2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Mysid,0.1,0.45,0,0.45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Bivalve mollusk,0.3,0.65,0,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Decapod crab,0.44,0.01,0.1,0.1,0,0,0.2,0.15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Crangon shrimp,0,0.3,0,0.3,0,0,0,0,0.4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Forage fish - herbivore,0,0.8,0,0.2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Forage fish - planktivore,0,0.2,0,0.35,0,0,0.2,0.15,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Forage fish  - primarily benthivore,0.05,0.05,0,0.2,0.15,0.15,0.1,0.1,0.1,0,0,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Forage fish - benthivore,0,0,0,0,0.2,0.2,0.15,0.15,0,0,0,0.25,0,0,0,0,0.05,0,0,0,0,0,0,0,0,0,0
+Forage fish - mixed diet i,0.05,0.1,0,0.2,0.05,0.05,0.25,0.25,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Forage fish - mixed diet ii,0.05,0,0,0,0.05,0.1,0.15,0.15,0.2,0,0,0.2,0,0.05,0,0,0.05,0,0,0,0,0,0,0,0,0,0
+Indicator species 1 - Piscivore,0,0,0,0,0,0,0,0,0.01,0,0,0.01,0.08,0.45,0.25,0.1,0,0.1,0,0,0,0,0,0,0,0,0
+Indicator species 2 - Benthic diet with piscivory,0,0.01,0,0,0,0,0.01,0,0,0.28,0.35,0,0,0.1,0,0.15,0,0.1,0,0,0,0,0,0,0,0,0
+Indicator species 3 - Benthic and pelagic with piscivory,0,0,0,0,0.06,0.05,0.12,0.02,0.24,0,0,0.03,0,0.48,0,0,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 4 - Benthic without piscivory,0.05,0,0,0,0.2,0.2,0.2,0.2,0.1,0,0,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 5 - Benthic and pelagic without piscivory,0.05,0.1,0,0.1,0.1,0.1,0.2,0.2,0.15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 6 - Benthic with herbivory,0.29,0.04,0.2,0.11,0,0.01,0.1,0,0.06,0.14,0.04,0,0,0,0,0.01,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 7 - Benthic and pelagic with herbivory,0.05,0.2,0.2,0.08,0,0.01,0.4,0.01,0.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 8 - Pelagic with benthic herbivory,0.3,0.1,0.35,0.1,0,0,0.03,0,0.02,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Indicator species 9 - Benthic diet with piscivory (White catfish),0,0,0,0,0,0,0.2,0,0.06,0.08,0.11,0,0,0,0,0.25,0.3,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,
+***Notes: Species as food (diet) are in columns,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"i.e., Row 5: Zooplankton eat a diet of 100% phytoplankton",,,,,,,,,,,,,,,,,,,,,,,,,,,
+***Ask Steve if White catfish is only species from Guild 2 that needs to be linked to new guild (Guild 9),,,,,,,,,,,,,,,,,,,,,,,,,,,

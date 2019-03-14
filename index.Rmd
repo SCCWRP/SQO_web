@@ -15,13 +15,30 @@ library(shiny)
 
 source('R/funcs.R')
 
+data("indic_lookup")
+indic_lookup <- indic_lookup %>% 
+  group_by(Indicator.number) %>% 
+  nest %>% 
+  deframe %>% 
+  map(function(x) pull(x, Guild.species))
 ```
 
 # {.tabset}
 
-## Load inputs
+## Model inputs
 
 ```{r}
+
+selectInput('guild1', 'Select indicator species 1:', choices = indic_lookup[['Indicator species 1']])
+selectInput('guild2', 'Select indicator species 2:', choices = indic_lookup[['Indicator species 2']])
+selectInput('guild3', 'Select indicator species 3:', choices = indic_lookup[['Indicator species 3']])
+selectInput('guild4', 'Select indicator species 4:', choices = indic_lookup[['Indicator species 4']])
+selectInput('guild5', 'Select indicator species 5:', choices = indic_lookup[['Indicator species 5']])
+selectInput('guild6', 'Select indicator species 6:', choices = indic_lookup[['Indicator species 6']])
+selectInput('guild7', 'Select indicator species 7:', choices = indic_lookup[['Indicator species 7']])
+selectInput('guild8', 'Select indicator species 8:', choices = indic_lookup[['Indicator species 8']])
+selectInput('guild9', 'Select indicator species 9:', choices = indic_lookup[['Indicator species 9']])
+
 fileInput("biota", "Physiological and life history parameters for organisms",
                 multiple = FALSE,
                 accept = c("text/csv",
@@ -63,25 +80,25 @@ bsaf_res <- eventReactive(input$run, {
 
   # physiological and life history parameters for organisms
   if(is.null(biota))
-    biota <- read.csv('inputs/biotaSF.csv',header=TRUE)
+    biota <- read.csv('data/biotaSF.csv',header=TRUE)
   else
     biota <- read.csv(biota, header = TRUE)
   
   # water chemistry and other constants
   if(is.null(constants))
-    constants <- read.csv('inputs/constantsSF.csv', header = TRUE)
+    constants <- read.csv('data/constantsSF.csv', header = TRUE)
   else
     constants <- read.csv(constants, header = TRUE)
 
   # contaminant concentrations and partitioning behavior
   if(is.null(contam))
-    contam <- read.csv('inputs/contamSF.csv', header = TRUE)
+    contam <- read.csv('data/contamSF.csv', header = TRUE)
   else
     contam <- read.csv(contam, header = TRUE)
 
   # dietary matrix (food web structure)
   if(is.null(biota_preyprop))
-    biota_preyprop <- read.csv('inputs/preypropSF.csv', header = TRUE, row.names = 1)
+    biota_preyprop <- read.csv('data/preypropSF.csv', header = TRUE, row.names = 1)
   else
     biota_preyprop <- read.csv(biota_preyprop, header = TRUE)
 
@@ -330,7 +347,7 @@ renderPlot({
   CBIOTA <- bsaf_res$CBIOTA
   contam <- bsaf_res$contam
   sppbsaf <- input$sppbsaf
-
+# browser()
   toplo <- BSAF %>% 
     data.frame %>% 
     rownames_to_column('species') %>% 
@@ -348,5 +365,17 @@ renderPlot({
   return(p)
   
 })
+```
+
+## BSAF table
+
+```{r}
+renderDataTable({bsaf_res()$BSAF})
+```
+
+## CBIOTA table
+
+```{r}
+renderDataTable({bsaf_res()$CBIOTA})
 ```
 

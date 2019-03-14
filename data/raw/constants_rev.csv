@@ -1,0 +1,25 @@
+Constant,Value,SD,Notes,DST notation
+A,0.00006,,% constants for phytoplankton aqueous uptake rate (1/d),
+B,5.5,,% constants for phytoplankton aqueous uptake rate (1/d),
+Cox,,,% dissolved oxygen concentration (mg O2/L),User input (DO)
+T,,,% mean water temperature (oC),User input (T)
+salinity,,,% water salinity (PSU),User input (Sal)
+MCS,,,% Molar Concentration of Seawater @ 35 ppt (mol/L),Not used?
+SPC,0.0018,,% Setschenow Proportionality Constant (L/cm^3),"In eqn for Column M, Contaminant Specific page (DST)"
+ocsed,,,% organic carbon proportion in sediment (kg/kg),"User input (TOC), %"
+ds,0.9,,% density of organic carbon in sediment (kg/L),"In R code: ""#corrected to remove density of organic carbon in suspended sediment as per email from Jon Arnot 2/1/06"""
+vss,,,% concentration of suspended solids (kg/L?),User input (SSC)
+xpoc,,,% POC concentration in H2O (kg/L),User input (POCw)
+xdoc,,,% DOC concentration in H2O (kg/L),User input (DOCw)
+dpoc,1,,% disequilibrium factor for POC partitioning,dPOC
+ddoc,1,,% disequilibrium factor for DOC partitioning,dDOC
+alphapoc,0.35,,% proportionality constant describing phase partitioning of POC and DOC,alphaPOC
+alphadoc,0.08,,% proportionality constant describing phase partitioning of POC and DOC,alphaDOC
+EdA,0.000000085,,% Constant A in dietary uptake efficiency equation,A
+EdB,2,,% Constant B in dietary uptake efficiency equation,B
+scav,1,,% scavenging efficiency of particles absorbed from water by filter feeders (percent),scav
+lden,0.9,,This was added to the R script but wasn't in this table.,dlipid
+,,,,
+Missing from this workbook,,,,
+,0.782,,Bioaccumulation Factor SD/Mean,CVBAF
+,0.032,0.032,Daily seafood consumption rate (CR and CRSD) (kg/d),CR
