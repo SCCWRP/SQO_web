@@ -103,7 +103,7 @@ wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; backg
 
   # indic 9        
   fluidRow(
-    column(4, h6('9 Benthic diet with piscivory (white catfish)')),
+    column(4, h6('9 Benthic diet with piscivory: estuarine')),
     column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']])),
     column(2, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   )
