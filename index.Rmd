@@ -175,7 +175,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
     column(2, NULL),
     column(2, NULL),
     column(2, 'Sediment (ng/g dry wt)'), 
-    column(2, 'Surface water (pg/L in unfiltered sample)'),
     column(2, 'Dissolved surface water (pg/L)'),
     column(2, 'Pore water (pg/L)')
   ),          
@@ -185,7 +184,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Chlordane')),
   	column(2, h6('alphaChlordane')),
   	column(2, numericInput('alphaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('alphaChlordane_sur', NULL, value = 0.32, min = 0, width = '100%')),
   	column(2, numericInput('alphaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('alphaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -195,7 +193,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Chlordane')),
   	column(2, h6('gammaChlordane')),
   	column(2, numericInput('gammaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('gammaChlordane_sur', NULL, value = 0.16, min = 0, width = '100%')),
   	column(2, numericInput('gammaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('gammaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -205,7 +202,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Chlordane')),
   	column(2, h6('alphaNonachlor')),
   	column(2, numericInput('alphaNonachlor_sed', NULL, value = 0.49, min = 0, width = '100%')),
-  	column(2, numericInput('alphaNonachlor_sur', NULL, value = 0.28, min = 0, width = '100%')),
   	column(2, numericInput('alphaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('alphaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -215,7 +211,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Chlordane')),
   	column(2, h6('gammaNonachlor')),
   	column(2, numericInput('gammaNonachlor_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('gammaNonachlor_sur', NULL, value = 0.05, min = 0, width = '100%')),
   	column(2, numericInput('gammaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('gammaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -225,7 +220,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Chlordane')),
   	column(2, h6('Oxychlordane')),
   	column(2, numericInput('Oxychlordane_sed', NULL, value = 0.23, min = 0, width = '100%')),
-  	column(2, numericInput('Oxychlordane_sur', NULL, value = 0.09, min = 0, width = '100%')),
   	column(2, numericInput('Oxychlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('Oxychlordane_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -235,7 +229,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('Dieldrin')),
   	column(2, h6('Dieldrin')),
   	column(2, numericInput('Dieldrin_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('Dieldrin_sur', NULL, value = 0.23, min = 0, width = '100%')),
   	column(2, numericInput('Dieldrin_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('Dieldrin_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -245,7 +238,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('op-DDD')),
   	column(2, numericInput('op-DDD_sed', NULL, value = 0.189302326, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDD_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('op-DDD_dis', NULL, value = 9.305665792, min = 0, width = '100%')),
   	column(2, numericInput('op-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -255,7 +247,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('op-DDE')),
   	column(2, numericInput('op-DDE_sed', NULL, value = 6.704795349, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDE_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('op-DDE_dis', NULL, value = 44.88585023, min = 0, width = '100%')),
   	column(2, numericInput('op-DDE_por', NULL, value = 63.87, min = 0, width = '100%'))
   	),
@@ -265,7 +256,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('op-DDT')),
   	column(2, numericInput('op-DDT_sed', NULL, value = 1.2, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDT_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('op-DDT_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('op-DDT_por', NULL, value = 15.68, min = 0, width = '100%'))
   	),
@@ -275,7 +265,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('pp-DDD')),
   	column(2, numericInput('pp-DDD_sed', NULL, value = 3.243651395, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDD_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDD_dis', NULL, value = 19.45333669, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -285,7 +274,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('pp-DDE')),
   	column(2, numericInput('pp-DDE_sed', NULL, value = 44.74623256, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDE_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDE_dis', NULL, value = 306.1044638, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDE_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -295,7 +283,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('DDT')),
   	column(2, h6('pp-DDT')),
   	column(2, numericInput('pp-DDT_sed', NULL, value = 1.099302326, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDT_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDT_dis', NULL, value = 8.092710587, min = 0, width = '100%')),
   	column(2, numericInput('pp-DDT_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -305,7 +292,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 8')),
   	column(2, numericInput('PCB 8_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 8_sur', NULL, value = 16.84, min = 0, width = '100%')),
   	column(2, numericInput('PCB 8_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 8_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -315,7 +301,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 11')),
   	column(2, numericInput('PCB 11_sed', NULL, value = 0.36, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 11_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 11_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 11_por', NULL, value = 47.65, min = 0, width = '100%'))
   	),
@@ -325,7 +310,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 18')),
   	column(2, numericInput('PCB 18_sed', NULL, value = 0.101054884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 18_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 18_dis', NULL, value = 13.185837, min = 0, width = '100%')),
   	column(2, numericInput('PCB 18_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -335,7 +319,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 27')),
   	column(2, numericInput('PCB 27_sed', NULL, value = 0.44, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 27_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 27_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 27_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -345,7 +328,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 28')),
   	column(2, numericInput('PCB 28_sed', NULL, value = 0.166863488, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 28_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 28_dis', NULL, value = 11.43476661, min = 0, width = '100%')),
   	column(2, numericInput('PCB 28_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -355,7 +337,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 29')),
   	column(2, numericInput('PCB 29_sed', NULL, value = 0.72, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 29_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 29_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 29_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -365,7 +346,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 31')),
   	column(2, numericInput('PCB 31_sed', NULL, value = 0.13606575, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 31_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 31_dis', NULL, value = 6.363272245, min = 0, width = '100%')),
   	column(2, numericInput('PCB 31_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -375,7 +355,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 33')),
   	column(2, numericInput('PCB 33_sed', NULL, value = 0.36, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 33_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 33_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 33_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -385,7 +364,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 37')),
   	column(2, numericInput('PCB 37_sed', NULL, value = 0.42, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 37_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 37_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 37_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -395,7 +373,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 44')),
   	column(2, numericInput('PCB 44_sed', NULL, value = 0.405351163, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 44_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 44_dis', NULL, value = 16.2247466, min = 0, width = '100%')),
   	column(2, numericInput('PCB 44_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -405,7 +382,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 49')),
   	column(2, numericInput('PCB 49_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 49_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 49_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 49_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -415,7 +391,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 52')),
   	column(2, numericInput('PCB 52_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 52_sur', NULL, value = 27.86, min = 0, width = '100%')),
   	column(2, numericInput('PCB 52_dis', NULL, value = 17.33, min = 0, width = '100%')),
   	column(2, numericInput('PCB 52_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -425,7 +400,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 56')),
   	column(2, numericInput('PCB 56_sed', NULL, value = 0.54, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 56_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 56_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 56_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -435,7 +409,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 60')),
   	column(2, numericInput('PCB 60_sed', NULL, value = 0.61, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 60_sur', NULL, value = 120.4, min = 0, width = '100%')),
   	column(2, numericInput('PCB 60_dis', NULL, value = 65.32, min = 0, width = '100%')),
   	column(2, numericInput('PCB 60_por', NULL, value = 140.8, min = 0, width = '100%'))
   	),
@@ -445,7 +418,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 64')),
   	column(2, numericInput('PCB 64_sed', NULL, value = 0.38, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 64_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 64_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 64_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -455,7 +427,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 66')),
   	column(2, numericInput('PCB 66_sed', NULL, value = 1.05, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 66_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 66_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 66_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -465,7 +436,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 70')),
   	column(2, numericInput('PCB 70_sed', NULL, value = 1.35, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 70_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 70_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 70_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -475,7 +445,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 74')),
   	column(2, numericInput('PCB 74_sed', NULL, value = 0.194457209, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 74_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 74_dis', NULL, value = 3.470400349, min = 0, width = '100%')),
   	column(2, numericInput('PCB 74_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -485,7 +454,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 77')),
   	column(2, numericInput('PCB 77_sed', NULL, value = 1.12, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 77_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 77_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 77_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -495,7 +463,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 81')),
   	column(2, numericInput('PCB 81_sed', NULL, value = 1.09, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 81_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 81_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 81_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -505,7 +472,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 87')),
   	column(2, numericInput('PCB 87_sed', NULL, value = 1.4, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 87_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 87_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 87_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -515,7 +481,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 95')),
   	column(2, numericInput('PCB 95_sed', NULL, value = 0.77, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 95_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 95_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 95_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -525,7 +490,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 97')),
   	column(2, numericInput('PCB 97_sed', NULL, value = 0.3636925, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 97_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 97_dis', NULL, value = 3.681928399, min = 0, width = '100%')),
   	column(2, numericInput('PCB 97_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -535,7 +499,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 99')),
   	column(2, numericInput('PCB 99_sed', NULL, value = 0.617086047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 99_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 99_dis', NULL, value = 5.897746631, min = 0, width = '100%')),
   	column(2, numericInput('PCB 99_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -545,7 +508,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 101')),
   	column(2, numericInput('PCB 101_sed', NULL, value = 0.181250006, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 101_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 101_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 101_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -555,7 +517,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 105')),
   	column(2, numericInput('PCB 105_sed', NULL, value = 0.454006977, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 105_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 105_dis', NULL, value = 1.599129689, min = 0, width = '100%')),
   	column(2, numericInput('PCB 105_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -565,7 +526,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 110')),
   	column(2, numericInput('PCB 110_sed', NULL, value = 1.601034884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 110_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 110_dis', NULL, value = 9.244741774, min = 0, width = '100%')),
   	column(2, numericInput('PCB 110_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -575,7 +535,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 114')),
   	column(2, numericInput('PCB 114_sed', NULL, value = 0.33, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 114_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 114_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 114_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -585,7 +544,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 118')),
   	column(2, numericInput('PCB 118_sed', NULL, value = 0.275000006, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 118_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 118_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 118_por', NULL, value = 17.98, min = 0, width = '100%'))
   	),
@@ -595,7 +553,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 119')),
   	column(2, numericInput('PCB 119_sed', NULL, value = 0.41, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 119_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 119_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 119_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -605,7 +562,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 123')),
   	column(2, numericInput('PCB 123_sed', NULL, value = 0.63, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 123_sur', NULL, value = 56.74, min = 0, width = '100%')),
   	column(2, numericInput('PCB 123_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 123_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -615,7 +571,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 126')),
   	column(2, numericInput('PCB 126_sed', NULL, value = 0.38, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 126_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 126_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 126_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -625,7 +580,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 128')),
   	column(2, numericInput('PCB 128_sed', NULL, value = 0.71, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 128_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 128_dis', NULL, value = 96.32, min = 0, width = '100%')),
   	column(2, numericInput('PCB 128_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -635,7 +589,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 132')),
   	column(2, numericInput('PCB 132_sed', NULL, value = 0.33, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 132_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 132_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 132_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -645,7 +598,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 137')),
   	column(2, numericInput('PCB 137_sed', NULL, value = 0.56, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 137_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 137_dis', NULL, value = 165.6, min = 0, width = '100%')),
   	column(2, numericInput('PCB 137_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -655,7 +607,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 138')),
   	column(2, numericInput('PCB 138_sed', NULL, value = 0.25384615, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 138_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 138_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 138_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -665,7 +616,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 141')),
   	column(2, numericInput('PCB 141_sed', NULL, value = 0.29, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 141_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 141_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 141_por', NULL, value = 27.86, min = 0, width = '100%'))
   	),
@@ -675,7 +625,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 146')),
   	column(2, numericInput('PCB 146_sed', NULL, value = 1.01, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 146_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 146_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 146_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -685,7 +634,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 149')),
   	column(2, numericInput('PCB 149_sed', NULL, value = 1.25, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 149_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 149_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 149_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -695,7 +643,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 151')),
   	column(2, numericInput('PCB 151_sed', NULL, value = 0.215226512, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 151_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 151_dis', NULL, value = 1.879261719, min = 0, width = '100%')),
   	column(2, numericInput('PCB 151_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -705,7 +652,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 153')),
   	column(2, numericInput('PCB 153_sed', NULL, value = 1.39244, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 153_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 153_dis', NULL, value = 5.251926401, min = 0, width = '100%')),
   	column(2, numericInput('PCB 153_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -715,7 +661,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 156')),
   	column(2, numericInput('PCB 156_sed', NULL, value = 0.148466047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 156_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 156_dis', NULL, value = 0.319787514, min = 0, width = '100%')),
   	column(2, numericInput('PCB 156_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -725,7 +670,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 157')),
   	column(2, numericInput('PCB 157_sed', NULL, value = 0.56, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 157_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 157_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 157_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -735,7 +679,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 158')),
   	column(2, numericInput('PCB 158_sed', NULL, value = 1.3, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 158_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 158_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 158_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -745,7 +688,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 167')),
   	column(2, numericInput('PCB 167_sed', NULL, value = 0.74, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 167_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 167_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 167_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -755,7 +697,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 168')),
   	column(2, numericInput('PCB 168_sed', NULL, value = 0.21, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 168_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 168_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 168_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -765,7 +706,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 169')),
   	column(2, numericInput('PCB 169_sed', NULL, value = 1.11, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 169_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 169_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 169_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -775,7 +715,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 170')),
   	column(2, numericInput('PCB 170_sed', NULL, value = 0.330709302, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 170_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 170_dis', NULL, value = 0.569421342, min = 0, width = '100%')),
   	column(2, numericInput('PCB 170_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -785,7 +724,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 174')),
   	column(2, numericInput('PCB 174_sed', NULL, value = 0.322745, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 174_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 174_dis', NULL, value = 0.894510598, min = 0, width = '100%')),
   	column(2, numericInput('PCB 174_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -795,7 +733,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 177')),
   	column(2, numericInput('PCB 177_sed', NULL, value = 0.121874884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 177_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 177_dis', NULL, value = 0.522629476, min = 0, width = '100%')),
   	column(2, numericInput('PCB 177_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -805,7 +742,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 180')),
   	column(2, numericInput('PCB 180_sed', NULL, value = 0.697543256, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 180_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 180_dis', NULL, value = 1.495032452, min = 0, width = '100%')),
   	column(2, numericInput('PCB 180_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -815,7 +751,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 183')),
   	column(2, numericInput('PCB 183_sed', NULL, value = 0.112256047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 183_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 183_dis', NULL, value = 0.451321306, min = 0, width = '100%')),
   	column(2, numericInput('PCB 183_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -825,7 +760,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 187')),
   	column(2, numericInput('PCB 187_sed', NULL, value = 0.7125, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 187_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 187_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 187_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -835,7 +769,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 189')),
   	column(2, numericInput('PCB 189_sed', NULL, value = 0.64, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 189_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 189_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 189_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -845,7 +778,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 194')),
   	column(2, numericInput('PCB 194_sed', NULL, value = 0.19812907, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 194_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 194_dis', NULL, value = 0.238347374, min = 0, width = '100%')),
   	column(2, numericInput('PCB 194_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -855,7 +787,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 195')),
   	column(2, numericInput('PCB 195_sed', NULL, value = 0.066266, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 195_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 195_dis', NULL, value = 0.10184514, min = 0, width = '100%')),
   	column(2, numericInput('PCB 195_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -865,7 +796,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 198')),
   	column(2, numericInput('PCB 198_sed', NULL, value = 0.45, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 198_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 198_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 198_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -875,7 +805,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 199')),
   	column(2, numericInput('PCB 199_sed', NULL, value = 0.68, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 199_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 199_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 199_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -885,7 +814,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 200')),
   	column(2, numericInput('PCB 200_sed', NULL, value = 0.77, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 200_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 200_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 200_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -895,7 +823,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 201')),
   	column(2, numericInput('PCB 201_sed', NULL, value = 0.015007186, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 201_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 201_dis', NULL, value = 0.04712185, min = 0, width = '100%')),
   	column(2, numericInput('PCB 201_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -905,7 +832,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 203')),
   	column(2, numericInput('PCB 203_sed', NULL, value = 1.15, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 203_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 203_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 203_por', NULL, value = NULL, min = 0, width = '100%'))
   	),
@@ -915,7 +841,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 206')),
   	column(2, numericInput('PCB 206_sed', NULL, value = 1.02, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 206_sur', NULL, value = 117.8, min = 0, width = '100%')),
   	column(2, numericInput('PCB 206_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 206_por', NULL, value = 125.7, min = 0, width = '100%'))
   	),
@@ -925,7 +850,6 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
   	column(2, h6('PCB')),
   	column(2, h6('PCB 209')),
   	column(2, numericInput('PCB 209_sed', NULL, value = 0.86, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 209_sur', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 209_dis', NULL, value = NULL, min = 0, width = '100%')),
   	column(2, numericInput('PCB 209_por', NULL, value = NULL, min = 0, width = '100%'))
   	)

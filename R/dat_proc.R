@@ -25,7 +25,6 @@ for(i in 1:nrow(cnt_bld)){
   grp <- cnt_bld[i, 'ChemGroup', drop = T]
   cnt <- cnt_bld[i, 'Chem', drop = T]
   sed <- cnt_bld[i, 'Sediment.conc', drop = T]
-  sur <- cnt_bld[i, 'Surface', drop = T]
   dis <- cnt_bld[i, 'Dissolved.surface', drop = T]
   por <- cnt_bld[i, 'Porewater', drop = T]
   
@@ -33,7 +32,6 @@ for(i in 1:nrow(cnt_bld)){
                 'fluidRow(\n\tcolumn(2, h6(\'', grp, '\')),\n',
                 '\tcolumn(2, h6(\'', cnt, '\')),\n',
                 '\tcolumn(2, numericInput(\'', cnt, '_sed\', NULL, value = ', sed, ', min = 0, width = \'100%\')),\n',
-                '\tcolumn(2, numericInput(\'', cnt, '_sur\', NULL, value = ', sur, ', min = 0, width = \'100%\')),\n',
                 '\tcolumn(2, numericInput(\'', cnt, '_dis\', NULL, value = ', dis, ', min = 0, width = \'100%\')),\n',
                 '\tcolumn(2, numericInput(\'', cnt, '_por\', NULL, value = ', por, ', min = 0, width = \'100%\'))\n',
                 '\t),\n\n'
