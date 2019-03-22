@@ -19,7 +19,7 @@ source('R/funcs.R')
 data("indic_lookup")
 biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
 constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
-contam <- read.csv('data/contamSF.csv', stringsAsFactors = FALSE)
+contam <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
 biota_preyprop <- read.csv('data/preyprop.csv', stringsAsFactors = FALSE, row.names = 1)
 
 # indicator species lookup format for inputs
@@ -34,8 +34,8 @@ indic_lookup <- indic_lookup %>%
 
 ## Model inputs
 
+### Indcator guild species
 ```{r}
-h3('Indicator guild species')
 wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
   
   # headers
@@ -48,69 +48,71 @@ wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; backg
   # indic 1        
   fluidRow(
     column(4, h6('1 Piscivore')),
-    column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']])),
+    column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])),
     column(2, numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   ),
   
   # indic 2        
   fluidRow(
     column(4, h6('2 Benthic diet with piscivory')),
-    column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']])),
+    column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']], selected = indic_lookup[['Indicator species 2']][14])),
     column(2, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'))
   ),
   
   # indic 3        
   fluidRow(
     column(4, h6('3 Benthic and pelagic with piscivory')),
-    column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']])),
+    column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])),
     column(2, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 4        
   fluidRow(
     column(4, h6('4 Benthic without piscivory')),
-    column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']])),
+    column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])),
     column(2, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 5
   fluidRow(
     column(4, h6('5 Benthic and pelagic without piscivory')),
-    column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']])),
+    column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])),
     column(2, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 6        
   fluidRow(
     column(4, h6('6 Benthic with herbivory')),
-    column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']])),
+    column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])),
     column(2, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 7        
   fluidRow(
     column(4, h6('7 Benthic and pelagic with herbivory')),
-    column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']])),
+    column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])),
     column(2, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 8        
   fluidRow(
     column(4, h6('8 Pelagic with benthic herbivory')),
-    column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']])),
+    column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])),
     column(2, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 9        
   fluidRow(
     column(4, h6('9 Benthic diet with piscivory: estuarine')),
-    column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']])),
+    column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])),
     column(2, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   )
 
 )
+```
 
-h3('Environmental data')
+### Environmental data
+```{r}
 wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
     
   # dissolved oxygen       
@@ -122,13 +124,13 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
   # water temp     
   fluidRow(
     column(4, HTML('<h6>Mean water temperature (&deg;C)</h6>')),
-    column(2, numericInput('T', NULL, value = 14.9, width = '100%'))
+    column(2, numericInput('T', NULL, value = 17.4, width = '100%'))
   ), 
   
   # salinity     
   fluidRow(
     column(4, h6('Water salinity (psu)')),
-    column(2, numericInput('salinity', NULL, value = 20.2, min = 0, width = '100%'))
+    column(2, numericInput('salinity', NULL, value = 25.4, min = 0, width = '100%'))
   ),
     
   # molar conc seawater       
@@ -137,10 +139,10 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
     column(2, numericInput('MCS', NULL, value = 0.5, min = 0, width = '100%'))
   ),   
   
-  # organic carb prop in sed      
+  # organic carb prop in sed (TOC)    
   fluidRow(
     column(4, h6('Organic carbon in sediment (kg/kg)')),
-    column(2, numericInput('ocsed', NULL, value = 0.0102, width = '100%'))
+    column(2, numericInput('ocsed', NULL, value = 0.0163, width = '100%'))
   ),   
   
   # concentration of suspended solids      
@@ -152,19 +154,20 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
   # poc conc in water       
   fluidRow(
     column(4, h6('POC conc. in water (kg/L)')),
-    column(2, numericInput('xpoc', NULL, value = 0.00000185, min = 0, width = '100%'))
+    column(2, numericInput('xpoc', NULL, value = 0.00000157, min = 0, width = '100%'))
   ),
   
   # doc conc in water       
   fluidRow(
     column(4, h6('DOC conc. in water (kg/L)')),
-    column(2, numericInput('xdoc', NULL, value = 0.0000021, min = 0, width = '100%'))
+    column(2, numericInput('xdoc', NULL, value = 0.00000215, min = 0, width = '100%'))
   )
   
 )
+```
 
-
-h3('Contaminants')
+### Contaminants
+```{r}
 wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
 
   # headers
@@ -940,43 +943,58 @@ bsaf_res <- eventReactive(input$run, {
   # format biota from input
   biota <- formsppinp(input, biota)
 
-  # format constants forminput
+  # format constants from input
   constants <- formcnsinp(input, constants)
   
-  res <- bioaccum_batch(biota, contam, biota_preyprop, constants)
+  # format contams from input
+  contam <- formcntinp(input, contam)
+  
+  # calculated contaminant inputs
+  contamcalc <- cntcalc(contam, constants)
+  
+  res <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
 
-  return(res)
+  out <- list(res = res, contamcalc = contamcalc)
+  
+  return(out)
   
 })
 
 renderUI({
   
   # input
-  bsaf_res <- bsaf_res()
+  bsaf_res <- bsaf_res()$res
   BSAF <- bsaf_res$BSAF
-  
+
   selectInput('cntbsaf', 'Select contaminant:', choices = colnames(BSAF))
   
 })
 
 renderPlot({
   
-  bsaf_res <- bsaf_res()
+  bsaf_res <- bsaf_res()$res
   BSAF <- bsaf_res$BSAF
   CBIOTA <- bsaf_res$CBIOTA
   contam <- bsaf_res$contam
   cntbsaf <- input$cntbsaf
-  
+
   req(cntbsaf)
-  
+
+  nms <- colnames(BSAF) 
   toplo <- BSAF %>% 
     data.frame %>% 
-    rownames_to_column('species') %>% 
-    select(species, !!cntbsaf)
+    rownames_to_column('species') 
+  names(toplo) <- c('species', nms)
+  toplo <- toplo %>% 
+    select(species, !!cntbsaf) %>% 
+    rename(
+      val = !!cntbsaf
+    )
   
-  p <- ggplot(toplo, aes_string(x = 'species', y = cntbsaf)) + 
+  p <- ggplot(toplo, aes(x = species, y = val)) + 
     geom_bar(stat = 'identity') + 
     ylab('BSAF') + 
+    xlab(cntbsaf) + 
     theme_bw(base_size= 16, base_family = 'serif')+ 
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
@@ -987,69 +1005,10 @@ renderPlot({
   
 })
 
+```
 
-renderUI({
-  
-  # input
-  bsaf_res <- bsaf_res()
-  BSAF <- bsaf_res$BSAF
-  
-  selectInput('sppbsaf', 'Select species:', choices = rownames(BSAF))
-  
-})
+## Calculated concentrations
 
-renderPlot({
-  
-  bsaf_res <- bsaf_res()
-  BSAF <- bsaf_res$BSAF
-  CBIOTA <- bsaf_res$CBIOTA
-  contam <- bsaf_res$contam
-  sppbsaf <- input$sppbsaf
-  
-  req(sppbsaf)
-  
-  toplo <- BSAF %>% 
-    data.frame %>% 
-    rownames_to_column('species') %>% 
-    filter(species %in% sppbsaf) %>% 
-    gather('contam', 'val', -species)
-  
-  p <- ggplot(toplo, aes_string(x = 'contam', y = 'val')) + 
-    geom_bar(stat = 'identity') + 
-    ylab('BSAF') + 
-    theme_bw(base_size= 16, base_family = 'serif')+ 
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-      axis.title.x = element_blank()
-      )
-  
-  return(p)
-  
-})
-
-renderPlot({
- 
-  bsaf_res <- bsaf_res()
-  BSAF <- bsaf_res$BSAF
-  CBIOTA <- bsaf_res$CBIOTA
-  contam <- bsaf_res$contam
-  sppbsaf <- input$sppbsaf
-
-  toplo <- BSAF %>% 
-    data.frame %>% 
-    rownames_to_column('species') %>% 
-    filter(species %in% sppbsaf) %>% 
-    gather('Chem', 'val', -species) %>%
-    mutate(Chem = factor(Chem)) %>% 
-    left_join(contam, by = 'Chem')
-  
-  p <- ggplot(toplo, aes(x = Kow, y = val)) + 
-    geom_point() + 
-    scale_x_log10('log10 Octanol-water partitioning coeff') + 
-    ylab('BSAF') + 
-    theme_bw(base_size= 16, base_family = 'serif')
-  
-  return(p)
-  
-})
+```{r}
+renderDataTable(({bsaf_res()$contamcalc}))
 ```

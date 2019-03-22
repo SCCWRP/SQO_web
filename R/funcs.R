@@ -18,7 +18,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, KowTS, Kow, EdA, EdB, xdoc,
   Output <- temp[rep(1:nrow(temp), times=NumSim), ]
   
   lden <- 0.9; # lipid density - added 6.30.2010
-  
+
   ##
   ## Calculate contaminant dependant parameters
   ##
@@ -165,7 +165,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
   ### HAVE HARD-CODED THE PARAMETER NAMES
   theParamNames <- c("k1","k2", "GR", "Gv", "Gd", "Gf", "vlg", "vcg", "vng", "vwg", "kgb", 
                      "ke", "kd", "Ew", "Ed", "phi", "cpw", "assimEff_1", "assimEff_2", "assimEff_3");
-  
+
   nspecies = nrow(biota_preyprop); 
   nprey = ncol(biota_preyprop);
   ncontam = length(contam$Chem); 
@@ -254,13 +254,13 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
           
           ## ASSIGN VARIABLES ##
-          csed <- contam$cs_ng.g_dw[icontam];  #sediment contaminant concentration 
+          csed <- contam$cs_ng.g[icontam];  #sediment contaminant concentration 
           Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
           KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
           Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
           
           ## Multiple water conc options ##
-          #cwater <- contam$cwto_ng.g[icontam]; # water concentration from optional input
+          #cwater <- contam$cd_ng.g[icontam]; # water concentration from optional input
           #cwater <- csed/KowTS; # simulated water concentration using Kow only
           cwater <- (csed/ocsed)/Koc; # simulated water concentration using %TOC in sediment 
           
@@ -309,7 +309,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
   
   ### CALCULATE BSAF (simple measure of biota versus sediment contamination) ###
   for (i in 1:nspecies) {
-    BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g_dw
+    BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g
   }
   
   out <- list(BSAF = BSAF, CBIOTA = CBIOTA, contam = contam)
@@ -353,7 +353,7 @@ formsppinp <- function(inps, biota){
 
 }
 
-# format constantsinputs ---------------------------------------------------
+# format constants inputs ---------------------------------------------------
 
 #' format constants inputs
 #'
@@ -375,5 +375,124 @@ formcnsinp <- function(inps, constants){
     select(-Value.y)
   
   return(out)
+  
+}
+
+# format contaminant inputs ---------------------------------------------------
+
+#' format contaminant inputs
+#'
+#' @param inps reactive inputs
+#' @param contam table
+formcntinp <- function(inps, contam){
+
+  # format names and contams as tibble
+  frminps <- reactiveValuesToList(inps) %>% 
+    enframe('Chem', 'Value') %>% 
+    filter(grepl('^alpha|^gamma|^Oxy|^Dieldrin|^op\\-|^pp\\-|^PCB', Chem)) %>% 
+    unnest %>% 
+    separate(Chem, c('Chem', 'loc'), sep = '_') %>% 
+    spread(loc, Value) %>% 
+    rename(
+      `cs_ng.g` = sed,  # sediment concentration
+      `cd_ng.g` = dis,   # dissolved surface water concentration
+      `cw_ng.g` = sur,   # surface water concentration
+      `cp_ng.g` = por    # porewater concentration
+    )
+  
+  # add frminps user input to contaminants
+  out <- contam %>% 
+    left_join(frminps, by = 'Chem') %>% 
+    mutate(
+      cs_ng.g.x = ifelse(is.na(cs_ng.g.x), cs_ng.g.y, cs_ng.g.x),
+      cd_ng.g.x = ifelse(is.na(cd_ng.g.x), cd_ng.g.y, cd_ng.g.x),
+      cw_ng.g.x = ifelse(is.na(cw_ng.g.x), cw_ng.g.y, cw_ng.g.x),
+      cp_ng.g.x = ifelse(is.na(cp_ng.g.x), cp_ng.g.y, cp_ng.g.x)
+      ) %>% 
+    rename(
+      cs_ng.g = cs_ng.g.x,
+      cd_ng.g = cd_ng.g.x,
+      cw_ng.g = cw_ng.g.x,
+      cp_ng.g = cp_ng.g.x
+      ) %>% 
+    select(-cs_ng.g.y, -cd_ng.g.y, -cw_ng.g.y, -cp_ng.g.y)
+  
+  return(out)
+  
+}
+
+# format contaminant concentration data as calculated ---------------------
+
+#' Format calculated contaminant concentrations
+#'
+#' @param contam input contaminants from formatted user inputs
+#' @param constants input constants from formatted user inputs
+cntcalc <- function(contam, constants){
+
+  # total organic carbon input (ocsed)
+  ocsed <- constants %>% 
+    filter(Constant %in% 'ocsed') %>% 
+    pull(Value)
+  
+  # salinity input (Sal)
+  Sal <- constants %>% 
+    filter(Constant %in% 'salinity') %>% 
+    pull(Value)
+  
+  # temperature
+  Temp <- constants %>% 
+    filter(Constant %in% 'T') %>% 
+    pull(Value)
+  
+  # poc concentration in water
+  xpoc <- constants %>% 
+    filter(Constant %in% 'xpoc') %>% 
+    pull(Value)
+  
+  # doc concentration in water
+  xdoc <- constants %>% 
+    filter(Constant %in% 'xdoc') %>% 
+    pull(Value)
+  
+  # disequalibrium factor for poc partitioning
+  dpoc <- constants %>% 
+    filter(Constant %in% 'dpoc') %>% 
+    pull(Value)
+  
+  # disequalibrium factor for doc partitioning
+  ddoc <- constants %>% 
+    filter(Constant %in% 'ddoc') %>% 
+    pull(Value)
+  
+  # proportionality constant describing phase partitioning of poc
+  alphapoc <- constants %>% 
+    filter(Constant %in% 'alphapoc') %>% 
+    pull(Value)
+  
+  # proportionality constant describing phase partitioning of doc
+  alphadoc <- constants %>% 
+    filter(Constant %in% 'alphadoc') %>% 
+    pull(Value)
+  
+  # log kow temp corrected
+  # log kow sal corrected (whic includes temp correction)
+  # phi
+  # calculated dissolved surface water concentration
+  # free dissolved surface water concentration
+  # calculated poreweqter concentration
+  # log koc
+  contam <- contam %>% 
+    mutate(
+      logkow_tempcor = log10(Kow) - ((delt_uow / (log(10) * 0.0083145)) * ((1 / (273 + Temp)) - (1 / 298))),
+      logkow_salcor = log10(10 ^ logkow_tempcor* (10 ^ (0.0018 * LeBas_Molar_Volume * (0.5 * Sal / 35)))),
+      phi = 1 / (1 + (xpoc * dpoc * alphapoc * 10 ^ logkow_salcor) + (xdoc * ddoc * alphadoc * 10 ^ logkow_salcor)),
+      calc_cd_pg.l = ifelse(!is.na(cs_ng.g), 1e6 * (cs_ng.g / (ocsed * (0.35 * 10 ^ logkow_salcor)) / 8), 0),
+      free_cd_ng.ml = ifelse(is.na(cd_ng.g), ifelse(is.na(cw_ng.g), calc_cd_pg.l, ifelse(cw_ng.g * phi <= calc_cd_pg.l, cw_ng.g * phi, calc_cd_pg.l)), ifelse(cd_ng.g <= calc_cd_pg.l, cd_ng.g, calc_cd_pg.l)) / 1e6,
+      calc_cp_ng.ml = ifelse(cp_ng.g > 0 & !is.na(cp_ng.g), cp_ng.g / 1e6, ((cs_ng.g / ocsed) / (0.35 * 10 ^ logkow_salcor))), 
+      log_koc = log10(0.35 * 10 ^ logkow_salcor), 
+      KowTS = logkow_salcor
+    )
+
+  return(contam)
   
 }
