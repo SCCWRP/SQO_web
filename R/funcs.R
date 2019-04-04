@@ -6,9 +6,9 @@
 # 6.17.2010
 # Michelle Lent
 # edited 6.23.10 & 6.30.10 by BG and ML
-FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, KowTS, Kow, EdA, EdB, xdoc, 
+FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, 
                               ddoc, xpoc, dpoc, alphapoc, alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, 
-                              nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, vss, scav, preyprop, cbiota, 
+                              nlom, wc, beta, betap, mo, mp, phi, kM, Wb, Cox, vss, scav, preyprop, cbiota, 
                               vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3){ #updated 6.30.2010
  
   ## initialize the output variables
@@ -19,16 +19,15 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, KowTS, Kow, EdA, EdB, xdoc,
   
   lden <- 0.9; # lipid density - added 6.30.2010
 
+  Kow <- 10^logkow_tempcor # kow temp corrected, arithmetic
+  KowTS <- 10^log_KowTS # Kow temp and salinity corrected, arithmetic
+  
   ##
   ## Calculate contaminant dependant parameters
   ##
   #Ew <- 1/(1.85+1.55/KowTS); # gill chemical uptake efficiency
   Ew <- 1/(1.85+155/KowTS); # gill chemical uptake efficiency #fixed 6.30.2010
   Ed <- 1/(EdA*Kow + EdB); # dietary chemical transfer efficiency (gut uptake efficiency)
-  
-  # freely dissolved contaminant fraction in overlying water column
-  #phi <- 1/(1 + xpoc*dpoc*alphapoc*KowTS + xdoc*ddoc*alphapoc*alphadoc*KowTS);
-  phi <- 1/(1 + xpoc*dpoc*alphapoc*KowTS + xdoc*ddoc*alphadoc*KowTS); #fixed 6.30.2010
   
   ## assign contaminant specific outputs
   Output$Ew <- Ew;
@@ -116,7 +115,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, KowTS, Kow, EdA, EdB, xdoc,
     
     # calculate total concentration available from prey for dietary uptake
     Output$cprey <- as.vector(as.matrix(preyprop) %*% cbiota);
-    
+    # browser()
     # finally, calculate concentration in organism based on uptake/loss pseudo-equilibrium.
     Output$cbiota <- (k1*(mo*phi*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);	
     
@@ -244,14 +243,16 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
         # loop over species
         for (ispecies in 1:nspecies) {
           
+          # if(icontam == 75 & ispecies == 9) browser()
+          
           # log
           txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
-          
+
           ## ASSIGN VARIABLES ##
           csed <- contam$cs_ng.g[icontam];  #sediment contaminant concentration 
-          Kow <- contam$Kow[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
-          KowTS <- contam$KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
-          Koc <- alphapoc*KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
+          logkow_tempcor <- contam$logkow_tempcor[icontam]; #octanol-water partitioning coefficient (affects contaminant partitioning)
+          log_KowTS <- contam$log_KowTS[icontam]; #temperature and salinity corrected octanol water partitioning
+          Koc <- alphapoc*10^log_KowTS; # from Gobas and Arnot, 2010 Supp. pg. 5 (cit. Seth et at., 1999)
           
           ## Multiple water conc options ##
           cwater <- contam$free_cd_ng.ml[icontam]
@@ -261,6 +262,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           beta <- contam$beta[icontam]; 
           betap <- contam$betap[icontam]; 
           kM <- contam$kM[icontam];
+          phi <- contam$phi[icontam];
           taxa <- biota$taxa[ispecies];
           lipid <- biota$lipid[ispecies];
           nloc <- biota$nloc[ispecies];
@@ -282,10 +284,10 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           
           ###########################
           ### CALL FOOD WEB MODEL ###
- 
+    
           #call the function, using all the various model input parameters
-          Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, KowTS, Kow, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
-                                       alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, kM, Wb, Cox, 
+          Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
+                                       alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, phi, kM, Wb, Cox, 
                                        vss, scav, preyprop, cbiota, vld, vcd, vnd, vwd, GR, assimEff_1, assimEff_2, assimEff_3) 
           
           #extract the biota and prey contaminant information
@@ -299,7 +301,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
       } #end of loop over contaminants
       incProgress(amount=1)
     })
-  
+
   ### CALCULATE BSAF (simple measure of biota versus sediment contamination) ###
   for (i in 1:nspecies) {
     BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g
@@ -310,8 +312,6 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
   return(out)
 
 }
-
-
 
 # format species inputs ---------------------------------------------------
 
@@ -474,12 +474,12 @@ cntcalc <- function(contam, constants){
   contam <- contam %>% 
     mutate(
       logkow_tempcor = log10(Kow) - ((delt_uow / (log(10) * 0.0083145)) * ((1 / (273 + Temp)) - (1 / 298))),
-      KowTS = log10(10 ^ logkow_tempcor* (10 ^ (0.0018 * LeBas_Molar_Volume * (0.5 * Sal / 35)))),
-      phi = 1 / (1 + (xpoc * dpoc * alphapoc * 10 ^ KowTS) + (xdoc * ddoc * alphadoc * 10 ^ KowTS)),
-      calc_cd_pg.l = ifelse(!is.na(cs_ng.g), 1e6 * (cs_ng.g / (ocsed * (0.35 * 10 ^ KowTS)) / 8), 0),
+      log_KowTS = log10(10 ^ logkow_tempcor* (10 ^ (0.0018 * LeBas_Molar_Volume * (0.5 * Sal / 35)))),
+      phi = 1 / (1 + (xpoc * dpoc * alphapoc * 10 ^ log_KowTS) + (xdoc * ddoc * alphadoc * 10 ^ log_KowTS)),
+      calc_cd_pg.l = ifelse(!is.na(cs_ng.g), 1e6 * (cs_ng.g / (ocsed * (0.35 * 10 ^ log_KowTS)) / 8), 0),
       free_cd_ng.ml = ifelse(is.na(cd_ng.g), calc_cd_pg.l, ifelse(cd_ng.g <= calc_cd_pg.l, cd_ng.g, calc_cd_pg.l)) / 1e6,
-      calc_cp_ng.ml = ifelse(cp_ng.g > 0 & !is.na(cp_ng.g), cp_ng.g / 1e6, ((cs_ng.g / ocsed) / (0.35 * 10 ^ KowTS))), 
-      log_koc = log10(0.35 * 10 ^ KowTS)
+      calc_cp_ng.ml = ifelse(cp_ng.g > 0 & !is.na(cp_ng.g), cp_ng.g / 1e6, ((cs_ng.g / ocsed) / (0.35 * 10 ^ log_KowTS))), 
+      log_koc = log10(0.35 * 10 ^ log_KowTS)
     )
 
   return(contam)

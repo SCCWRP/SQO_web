@@ -11,6 +11,7 @@ runtime: shiny
 library(knitr)
 library(tidyverse)
 library(shiny)
+library(patchwork)
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
@@ -34,7 +35,7 @@ indic_lookup <- indic_lookup %>%
 
 ## Model inputs
 
-### Indcator guild species
+### Indicator guild species
 ```{r}
 wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
   
@@ -863,7 +864,7 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
 actionButton("run", "Run!")
 
 bsaf_res <- eventReactive(input$run, {
-  
+
   # format biota from input
   biota <- formsppinp(input, biota)
 
@@ -894,28 +895,58 @@ renderUI({
   
 })
 
+
+bsaf <- reactive({
+  
+  # input
+  bsaf_res <- bsaf_res()$res
+  bsaf <- bsaf_res$BSAF
+  
+  # bsaf
+  nms <- colnames(bsaf) 
+  out <- bsaf %>% 
+    data.frame %>% 
+    rownames_to_column('species') 
+  names(out) <- c('species', nms)
+
+  return(out)
+  
+})
+
+cbiota <- reactive({
+  
+  # input
+  bsaf_res <- bsaf_res()$res
+  cbiota <- bsaf_res$CBIOTA
+  
+  # cbiota
+  nms <- colnames(cbiota) 
+  out <- cbiota %>% 
+    data.frame %>% 
+    rownames_to_column('species') 
+  names(out) <- c('species', nms)
+ 
+  return(out)
+  
+})
+
 renderPlot({
   
-  bsaf_res <- bsaf_res()$res
-  BSAF <- bsaf_res$BSAF
-  CBIOTA <- bsaf_res$CBIOTA
-  contam <- bsaf_res$contam
+  # input
   cntbsaf <- input$cntbsaf
+  bsaf <- bsaf()
+  cbiota <- cbiota()
 
   req(cntbsaf)
 
-  nms <- colnames(BSAF) 
-  toplo <- BSAF %>% 
-    data.frame %>% 
-    rownames_to_column('species') 
-  names(toplo) <- c('species', nms)
-  toplo <- toplo %>% 
+  # bsaf
+  toplo1 <- bsaf %>% 
     select(species, !!cntbsaf) %>% 
     rename(
       val = !!cntbsaf
     )
   
-  p <- ggplot(toplo, aes(x = species, y = val)) + 
+  p1 <- ggplot(toplo1, aes(x = species, y = val)) + 
     geom_bar(stat = 'identity') + 
     ylab('BSAF') + 
     xlab(cntbsaf) + 
@@ -925,14 +956,35 @@ renderPlot({
       axis.title.x = element_blank()
       )
   
-  return(p)
+  # cbiota
+  toplo2 <- cbiota %>% 
+    select(species, !!cntbsaf) %>% 
+    rename(
+      val = !!cntbsaf
+    )
   
-})
+  p2 <- ggplot(toplo2, aes(x = species, y = val)) + 
+    geom_bar(stat = 'identity') + 
+    ylab('CBIOTA') + 
+    xlab(cntbsaf) + 
+    theme_bw(base_size= 16, base_family = 'serif')+ 
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+      axis.title.x = element_blank()
+      )
+  
+  p1 + p2 + plot_layout(ncol = 1)
+  
+}, height = 600)
+
+# renderDataTable({
+#   bsaf_res()$contamcalc
+#   })
 
 ```
 
 ## Calculated concentrations
 
 ```{r}
-renderDataTable(({bsaf_res()$contamcalc}))
+renderDataTable({bsaf_res()$contamcalc})
 ```

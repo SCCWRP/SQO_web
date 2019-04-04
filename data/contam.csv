@@ -1,4 +1,4 @@
-ChemGroup,Chem,LeBas_Molar_Volume,delt_uow,Kow,Kow_SD,KowTS,KowTS_SD,cs_ng.g,cs_SD,cd_ng.g,cd_SD,cp_ng.g,cp_SD,kM,kM_SD,beta,beta_SD,betap,betap_SD
+ChemGroup,Chem,LeBas_Molar_Volume,delt_uow,Kow,Kow_SD,log_KowTS,log_KowTS_SD,cs_ng.g,cs_SD,cd_ng.g,cd_SD,cp_ng.g,cp_SD,kM,kM_SD,beta,beta_SD,betap,betap_SD
 Chlordane,alphaChlordane,340.5,-25,1580000,,,,,,,,,,0,,0.035,,0.35,
 Chlordane,gammaChlordane,340.5,-25,1.86E+06,,,,,,,,,,0,,0.035,,0.35,
 Chlordane,alphaNonachlor,361.4,-25,5.01E+05,,,,,,,,,,0,,0.035,,0.35,
