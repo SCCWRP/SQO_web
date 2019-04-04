@@ -31,6 +31,115 @@ indic_lookup <- indic_lookup %>%
   map(function(x) pull(x, Guild.species))
 ```
 
+
+```{r}
+column(12, 
+  column(3, actionButton("run", "Run food web model!"))#, 
+  # column(3, 
+  #   # observeEvent(input$run,{
+  #     downloadHandler(
+  #       filename = function() {"bsaf.csv"},
+  #       content = function(file) {
+  #         write.csv(bsaf(), file, row.names = FALSE)
+  #       }
+  #     )
+  #   # })
+  # )
+)
+```
+<br></br>
+
+```{r reactives}
+res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
+observeEvent(input$run, {
+
+  # format biota from input
+  biota <- formsppinp(input, biota)
+
+  # format constants from input
+  constants <- formcnsinp(input, constants)
+  
+  # format contams from input
+  contam <- formcntinp(input, contam)
+  
+  # calculated contaminant inputs
+  contamcalc <- cntcalc(contam, constants)
+  
+  btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
+
+  # append to reactive output
+  res$cbiota <- btch$CBIOTA
+  res$bsaf <- btch$BSAF
+  res$contamcalc <- contamcalc
+  
+})
+
+bsaf <- reactive({
+
+  # input
+  bsaf <-res$bsaf
+    
+  # bsaf
+  nms <- colnames(bsaf) 
+  out <- bsaf %>% 
+    data.frame %>% 
+    rownames_to_column('species') 
+  names(out) <- c('species', nms)
+
+  return(out)
+  
+})
+
+cbiota <- reactive({
+  
+  # input
+  cbiota <- res$cbiota
+
+  # cbiota
+  nms <- colnames(cbiota) 
+  out <- cbiota %>% 
+    data.frame %>% 
+    rownames_to_column('species') 
+  names(out) <- c('species', nms)
+ 
+  return(out)
+  
+})
+
+rescmb <- reactive({
+  
+  # input
+  cntbsaf <- input$cntbsaf
+  bsaf <- bsaf()
+  cbiota <- cbiota()
+  
+  req(cntbsaf)
+
+  # bsaf
+  bsaf <- bsaf %>% 
+    select(species, !!cntbsaf) %>% 
+    rename(
+      BSAF = !!cntbsaf
+    ) %>% 
+    mutate(species = factor(species, levels = species))
+  
+  # cbiota
+  cbiota <- cbiota %>% 
+    select(species, !!cntbsaf) %>% 
+    rename(
+      `Tissue conc. (ng/g wet)` = !!cntbsaf
+    ) %>% 
+    mutate(species = factor(species, levels = species))
+  
+  out <- bsaf %>% 
+    left_join(cbiota, by = 'species') %>% 
+    gather('var', 'val', -species)
+  
+  return(out)
+  
+})
+```
+
 # {.tabset}
 
 ## Model inputs
@@ -168,6 +277,7 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
 ```
 
 ### Contaminants
+
 ```{r}
 wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
 
@@ -858,133 +968,119 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
 )
 ```
 
-## Run bioaccumulation model
+## Calculated contaminants
 
 ```{r}
-actionButton("run", "Run!")
+renderDataTable({res$contamcalc})
+```
 
-bsaf_res <- eventReactive(input$run, {
+## Food Web calculations {.tabset .tabset-pills}
 
-  # format biota from input
-  biota <- formsppinp(input, biota)
-
-  # format constants from input
-  constants <- formcnsinp(input, constants)
-  
-  # format contams from input
-  contam <- formcntinp(input, contam)
-  
-  # calculated contaminant inputs
-  contamcalc <- cntcalc(contam, constants)
-  
-  res <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
-
-  out <- list(res = res, contamcalc = contamcalc)
-  
-  return(out)
-  
-})
-
+```{r}
 renderUI({
   
   # input
-  bsaf_res <- bsaf_res()$res
-  BSAF <- bsaf_res$BSAF
+  contamcalc <- res$contamcalc
 
-  selectInput('cntbsaf', 'Select contaminant:', choices = colnames(BSAF))
+  selectInput('cntbsaf', 'Select contaminant:', choices = contamcalc$Chem)
   
 })
+```
 
+### Plots
 
-bsaf <- reactive({
-  
-  # input
-  bsaf_res <- bsaf_res()$res
-  bsaf <- bsaf_res$BSAF
-  
-  # bsaf
-  nms <- colnames(bsaf) 
-  out <- bsaf %>% 
-    data.frame %>% 
-    rownames_to_column('species') 
-  names(out) <- c('species', nms)
-
-  return(out)
-  
-})
-
-cbiota <- reactive({
-  
-  # input
-  bsaf_res <- bsaf_res()$res
-  cbiota <- bsaf_res$CBIOTA
-  
-  # cbiota
-  nms <- colnames(cbiota) 
-  out <- cbiota %>% 
-    data.frame %>% 
-    rownames_to_column('species') 
-  names(out) <- c('species', nms)
- 
-  return(out)
-  
-})
-
+```{r}
 renderPlot({
   
   # input
   cntbsaf <- input$cntbsaf
-  bsaf <- bsaf()
-  cbiota <- cbiota()
-
+  rescmb <- rescmb()
+  
   req(cntbsaf)
-
-  # bsaf
-  toplo1 <- bsaf %>% 
-    select(species, !!cntbsaf) %>% 
-    rename(
-      val = !!cntbsaf
-    )
   
-  p1 <- ggplot(toplo1, aes(x = species, y = val)) + 
+  toplo <- rescmb
+  
+  p <- ggplot(toplo, aes(x = species, y = val)) + 
     geom_bar(stat = 'identity') + 
-    ylab('BSAF') + 
     xlab(cntbsaf) + 
-    theme_bw(base_size= 16, base_family = 'serif')+ 
+    facet_wrap(~var, ncol = 1, strip.position = 'left', scales = 'free_y') + 
+    theme_bw(base_size= 16, base_family = 'serif') + 
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-      axis.title.x = element_blank()
+      axis.title = element_blank(),
+      strip.background = element_blank(), 
+      strip.placement = 'outside'
       )
   
-  # cbiota
-  toplo2 <- cbiota %>% 
-    select(species, !!cntbsaf) %>% 
-    rename(
-      val = !!cntbsaf
-    )
-  
-  p2 <- ggplot(toplo2, aes(x = species, y = val)) + 
-    geom_bar(stat = 'identity') + 
-    ylab('CBIOTA') + 
-    xlab(cntbsaf) + 
-    theme_bw(base_size= 16, base_family = 'serif')+ 
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-      axis.title.x = element_blank()
-      )
-  
-  p1 + p2 + plot_layout(ncol = 1)
+  p
   
 }, height = 600)
-
-# renderDataTable({
-#   bsaf_res()$contamcalc
-#   })
-
 ```
 
-## Calculated concentrations
+### Table
 
 ```{r}
-renderDataTable({bsaf_res()$contamcalc})
+renderTable({
+  
+  # input
+  rescmb <- rescmb()
+  
+  totab <- rescmb %>% 
+    mutate(val = round(val, 3)) %>% 
+    spread(species, val) %>% 
+    rename(Output = var) %>% 
+    mutate(Output = factor(Output, levels = c('Tissue conc. (ng/g wet)', 'BSAF'))) %>% 
+    arrange(Output)
+  
+  totab
+  
+  })#, options = list(dom = 't'))
+
 ```
+
+### Comparison
+
+```{r}
+renderPlot({
+  
+  # input 
+  bsaf <- bsaf()
+  cntbsaf <- input$cntbsaf
+  
+  req(cntbsaf)
+  
+  # bsaf from dst
+  dst <- read.csv('data/raw/bsaf_dst.csv', check.names = F, stringsAsFactors = F) %>% 
+    dplyr::select(-`Contaminant class`) %>% 
+    gather('species', 'dst_bsaf', -Contaminant) %>% 
+    mutate(
+      species = case_when(
+        grepl('^Diet\\s\\-\\s', species) ~ gsub('^Diet\\s\\-\\s', '', species), 
+        grepl('[0-9]', species) ~ gsub('^.*([0-9]).*$', 'indic\\1', species), 
+        T ~ species
+      )
+    )
+  
+  # bsaf from here
+  shi <- bsaf %>% 
+    gather('Contaminant', 'shi_bsaf', -species) %>% 
+    filter(!species %in% 'Sediment')
+
+  toeval <- dst %>% 
+    inner_join(shi, by = c('species', 'Contaminant')) %>% 
+    # filter(species %in% 'indic1') %>% 
+    filter(Contaminant %in% !!cntbsaf)
+
+  p <- ggplot(toeval, aes(x = shi_bsaf, y = dst_bsaf)) + 
+    geom_point() + 
+    geom_abline(intercept = 0, slope = 1) + 
+    theme_bw(base_size= 16, base_family = 'serif') + 
+    coord_equal()
+  
+  return(p)
+
+})
+```
+
+
+

@@ -307,7 +307,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
     BSAF[i,] <- CBIOTA[i,]/contam$cs_ng.g
   }
   
-  out <- list(BSAF = BSAF, CBIOTA = CBIOTA, contam = contam)
+  out <- list(BSAF = BSAF, CBIOTA = CBIOTA)
   
   return(out)
 
