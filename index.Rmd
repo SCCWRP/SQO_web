@@ -12,6 +12,7 @@ library(knitr)
 library(tidyverse)
 library(shiny)
 library(patchwork)
+library(plotly)
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
@@ -1041,7 +1042,7 @@ renderTable({
 ### Comparison
 
 ```{r}
-renderPlot({
+output$plo_cmp <- renderPlotly({
   
   # input 
   bsaf <- bsaf()
@@ -1071,15 +1072,16 @@ renderPlot({
     # filter(species %in% 'indic1') %>% 
     filter(Contaminant %in% !!cntbsaf)
 
-  p <- ggplot(toeval, aes(x = shi_bsaf, y = dst_bsaf)) + 
+  p <- ggplot(toeval, aes(x = shi_bsaf, y = dst_bsaf, label = species)) + 
     geom_point() + 
     geom_abline(intercept = 0, slope = 1) + 
     theme_bw(base_size= 16, base_family = 'serif') + 
     coord_equal()
   
-  return(p)
+  ggplotly()
 
 })
+plotlyOutput('plo_cmp', width = '500px', height = '500px')
 ```
 
 

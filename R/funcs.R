@@ -59,7 +59,9 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
     # calculate concentration in organism
     # based on uptake/loss pseudoequilibrium
     # main model equation (only includes plant parameters)
-    Output$cbiota <- k1*(mo*phi*cwater + mp*cpw)/(k2 + kG + kM);
+    
+    # browser()
+    Output$cbiota <- (k1 * cwater) / (k2 + kG)
     # assign output variables
     Output$k1 <- k1;
     Output$k2 <- k2;
@@ -115,7 +117,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
     
     # calculate total concentration available from prey for dietary uptake
     Output$cprey <- as.vector(as.matrix(preyprop) %*% cbiota);
-    # browser()
+
     # finally, calculate concentration in organism based on uptake/loss pseudo-equilibrium.
     Output$cbiota <- (k1*(mo*phi*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);	
     
@@ -243,10 +245,8 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
         # loop over species
         for (ispecies in 1:nspecies) {
           
-          # if(icontam == 75 & ispecies == 9) browser()
-          
-          # log
-          txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
+          # # log
+          # txt <- paste0('Contaminant', icontam, 'of', ncontam, '\n\tspecies', ispecies, 'of', nspecies)
 
           ## ASSIGN VARIABLES ##
           csed <- contam$cs_ng.g[icontam];  #sediment contaminant concentration 
@@ -284,7 +284,9 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           
           ###########################
           ### CALL FOOD WEB MODEL ###
-    
+          
+          # if(icontam == 1 & ispecies == 2) browser()
+          
           #call the function, using all the various model input parameters
           Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
                                        alphadoc, ocsed, ds, taxa, A, B, T, lipid, nloc, nlom, wc, beta, betap, mo, mp, phi, kM, Wb, Cox, 
@@ -473,7 +475,7 @@ cntcalc <- function(contam, constants){
   # log koc
   contam <- contam %>% 
     mutate(
-      logkow_tempcor = log10(Kow) - ((delt_uow / (log(10) * 0.0083145)) * ((1 / (273 + Temp)) - (1 / 298))),
+      logkow_tempcor = round(log10(Kow), 2) - ((delt_uow / (log(10) * 0.0083145)) * ((1 / (273 + Temp)) - (1 / 298))),
       log_KowTS = log10(10 ^ logkow_tempcor* (10 ^ (0.0018 * LeBas_Molar_Volume * (0.5 * Sal / 35)))),
       phi = 1 / (1 + (xpoc * dpoc * alphapoc * 10 ^ log_KowTS) + (xdoc * ddoc * alphadoc * 10 ^ log_KowTS)),
       calc_cd_pg.l = ifelse(!is.na(cs_ng.g), 1e6 * (cs_ng.g / (ocsed * (0.35 * 10 ^ log_KowTS)) / 8), 0),

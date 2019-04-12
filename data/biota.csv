@@ -1,6 +1,6 @@
 Biota,mp,mp SD,lipid,lipid SD,nlom,nlom SD,nloc,nloc SD,Wb,Wb SD,taxa,GR,GR SD,assimEff_1,assimEff_2,assimEff_3,assimEff SD
 Sediment,0,,0,,0,,0,,0,,0,0,,0,0,0,
-Phytoplankton,0,,0.0012,,0,,0.06,,0,,1,0.125,,0,0,0,
+Phytoplankton,0,,0.0012,,0,,0.06,,0,,1,0.08,,0,0,0,
 Submerged Macrophyte,0,,0.0038,,0,,0.06,,0,,1,0.125,,0,0,0,
 Zooplankton,0,,0.01,,0.2,,0,,7.10E-08,,2,0.00035,,0.75,0.75,0.55,
 "Small polychaete (e.g., Harmothoe imbricata)",0.05,,0.0075,,0.2,,0,,1.00E-07,,3,0.00035,,0.75,0.75,0.55,
