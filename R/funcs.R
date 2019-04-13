@@ -69,7 +69,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
   
   if (taxa>=2)  # ML- CHANGED THIS FROM taxa>1 b/c code was trying calculated fecal egestion rate for taxa 1.1 which is sea lettuce (ulva)!!! However, should check that this doesn't cause other problems. ###
   {
-    if (taxa==2|taxa==3|taxa==4|taxa==5) 
+    if (taxa==2|taxa==3|taxa==4|taxa==5|taxa==6) 
     {
       Gv <- (1400*Wb^0.65)/Cox;  # Calculate Gv - gill ventilation rate
       k1 <- Ew*Gv/Wb;  # k1 = aqueous uptake rate constant (L/kg*d)            
@@ -81,7 +81,14 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
       # calculate feeding rate
       if (taxa==3|taxa==5) 
       {
+        
         Gd <- 0.022 * (Wb^0.85) * exp(0.06*T); # non filter feeders
+        
+      }
+      if(taxa==6){
+        
+        Gd <- (0.022 * (Wb^0.85) * exp(0.06*T) + Gv*vss*scav) / 2; # forage fish - herbivore
+        
       }
       if (taxa==2|taxa==4) 
       {
@@ -90,11 +97,6 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
       
       kd <- Ed*Gd/Wb;	# calculate kd dietary uptake rate constant (kg/kg*d)
     }
-    if (taxa>5) 
-    { # seals and birds -- !! NOT READY YET !!
-      #fprintf(' DIETCALC : Model not implemented for taxa > 5 ...\n');
-      Output$cbiota <- NA; 
-    }	
     
     kG <- GR * Wb^-0.2;
     #-----------------
@@ -112,7 +114,6 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
     kgb <- (vlg*Kow/lden + vcg*betap*Kow + vng*beta*Kow + vwg)/
       (lipid*Kow/lden + nlom*beta*Kow + wc); # gut-biota partition coefficient (unitless) - updated 6/30/2010
     
-    kgb <- ((vlg / lden + vcg*betap + vng*beta) * Kow + vwg) / ((lipid / lden + nlom * beta) * Kow + wc)
     ke <- Gf*Ed*kgb/Wb; # fecal egestion rate constant (1/d)
     
     # calculate total concentration available from prey for dietary uptake
@@ -173,7 +174,6 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
   biota_vcd  = as.matrix(biota_preyprop) %*% biota$nloc;
   biota_vnd  = as.matrix(biota_preyprop) %*% biota$nlom;
   biota_wc = (1 - biota$lipid - biota$nloc - biota$nlom); #wc = (1 -lipid -nloc -nlom)
-  biota_vwd  = as.matrix(biota_preyprop) %*% biota_wc; 
   #respiratory uptake of overlying water
   biota_mo = 1 - biota$mp;
   
@@ -279,7 +279,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           vld <- biota_vld[ispecies]; # lipid proportions in diet
           vcd <- biota_preyprop[ispecies, 1] * ocsed + biota_vcd[ispecies]; # nonlipid O.C. proportions in diet
           vnd <- biota_vnd[ispecies]; # nonlipid O.M. proportions in diet
-          vwd <- biota_vwd[ispecies]; # water proportions in diet
+          vwd <- 1 - (vld + vcd + vnd); # water proportions in diet
           assimEff_1 <- biota$assimEff_1[ispecies]; # assimilation efficiency for lipid
           assimEff_2 <- biota$assimEff_2[ispecies]; # assimilation efficiency for non-lipid crabon (nloc) or org matter (nlom)
           assimEff_3 <- biota$assimEff_3[ispecies]; # assimilation efficiency for water
@@ -287,7 +287,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           ###########################
           ### CALL FOOD WEB MODEL ###
           
-          # if(icontam == 1 & ispecies == 5) browser()
+          # if(icontam == 1 & ispecies == 8) browser()
           
           #call the function, using all the various model input parameters
           Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
