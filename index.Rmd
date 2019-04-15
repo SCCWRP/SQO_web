@@ -65,7 +65,7 @@ observeEvent(input$run, {
   
   # calculated contaminant inputs
   contamcalc <- cntcalc(contam, constants)
-  
+
   btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
 
   # append to reactive output
