@@ -287,7 +287,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           ###########################
           ### CALL FOOD WEB MODEL ###
           
-          # if(icontam == 1 & ispecies == 8) browser()
+          # if(icontam == 1 & ispecies == 16) browser()
           
           #call the function, using all the various model input parameters
           Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
