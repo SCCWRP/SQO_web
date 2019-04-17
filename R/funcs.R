@@ -121,7 +121,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
 
     # finally, calculate concentration in organism based on uptake/loss pseudo-equilibrium.
     # Output$cbiota <- (k1*(mo*phi*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);
-
+# browser()
     Output$cbiota <- (k1*((1 - mp)*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);	
     
     # assign results to out variable
@@ -176,7 +176,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
   biota_wc = (1 - biota$lipid - biota$nloc - biota$nlom); #wc = (1 -lipid -nloc -nlom)
   #respiratory uptake of overlying water
   biota_mo = 1 - biota$mp;
-  
+
   ## ASSIGN CONSTANT PARAMETERS from input data##
   EdA = constants$Value[which(constants$Constant=='EdA')];
   EdB = constants$Value[which(constants$Constant=='EdB')];
@@ -287,7 +287,7 @@ bioaccum_batch <- function(biota, contam, biota_preyprop, constants){
           ###########################
           ### CALL FOOD WEB MODEL ###
 
-          # if(icontam == 5 & ispecies == 19) browser()
+          # if(icontam == 1 & ispecies == 10) browser()
           
           #call the function, using all the various model input parameters
           Results <- FoodWeb_SQO(NumSim=1, csed, cwater, cpw, log_KowTS, logkow_tempcor, EdA, EdB, xdoc, ddoc, xpoc, dpoc, alphapoc, 
