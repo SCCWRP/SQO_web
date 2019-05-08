@@ -3,11 +3,10 @@ title: "Sediment Quality Objectives: Web tool"
 author: ""
 output: 
   html_document
-self_contained: yes
 runtime: shiny
 ---
 
-```{r, message = F, warning = F, echo = F}
+```{r setup, message = F, warning = F, echo = F}
 library(knitr)
 library(tidyverse)
 library(shiny)
@@ -16,9 +15,12 @@ library(plotly)
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
+```
 
+```{r data}
 # data inputs
-data("indic_lookup")
+load(file = 'data/indic_lookup.RData')
+
 biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
 constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
 contam <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
@@ -50,7 +52,7 @@ column(12,
 ```
 <br></br>
 
-```{r reactives}
+```{r, context = 'server'}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 observeEvent(input$run, {
 
@@ -244,12 +246,6 @@ wellPanel(id = "envdat", style = "overflow-y:scroll; max-height: 300px; backgrou
     column(2, numericInput('salinity', NULL, value = 25.4, min = 0, width = '100%'))
   ),
     
-  # molar conc seawater       
-  fluidRow(
-    column(4, h6('Molar conc. seawater at 35 ppt (mol/L)')),
-    column(2, numericInput('MCS', NULL, value = 0.5, min = 0, width = '100%'))
-  ),   
-  
   # organic carb prop in sed (TOC)    
   fluidRow(
     column(4, h6('Organic carbon in sediment (kg/kg)')),
@@ -971,14 +967,17 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
 
 ## Calculated contaminants
 
+```{r, context = 'server'}
+output$calccont <- renderDataTable({res$contamcalc})
+```
 ```{r}
-renderDataTable({res$contamcalc})
+dataTableOutput('calccont')
 ```
 
 ## Food Web calculations {.tabset .tabset-pills}
 
-```{r}
-renderUI({
+```{r, context = 'server'}
+output$cntbsaf <- renderUI({
   
   # input
   contamcalc <- res$contamcalc
@@ -987,11 +986,14 @@ renderUI({
   
 })
 ```
+```{r}
+uiOutput('cntbsaf')
+```
 
 ### Plots
 
-```{r}
-renderPlot({
+```{r, context = 'server'}
+output$plobsaf <- renderPlot({
   
   # input
   cntbsaf <- input$cntbsaf
@@ -1017,11 +1019,14 @@ renderPlot({
   
 }, height = 600)
 ```
+```{r}
+plotOutput('plobsaf')
+```
 
 ### Table
 
-```{r}
-renderTable({
+```{r, context = 'server'}
+output$tabbsaf <- renderTable({
   
   # input
   rescmb <- rescmb()
@@ -1038,10 +1043,14 @@ renderTable({
   })#, options = list(dom = 't'))
 
 ```
+```{r}
+tableOutput('tabbsaf')
+```
+
 
 ### Comparison
 
-```{r}
+```{r, context = 'server'}
 output$plo_cmp <- renderPlotly({
   
   # input 
@@ -1081,6 +1090,8 @@ output$plo_cmp <- renderPlotly({
   ggplotly()
 
 })
+```
+```{r}
 plotlyOutput('plo_cmp', width = '500px', height = '500px')
 ```
 

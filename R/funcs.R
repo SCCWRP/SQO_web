@@ -361,7 +361,7 @@ formcnsinp <- function(inps, constants){
   # format names and lips as tibble
   frminps <- reactiveValuesToList(inps) %>% 
     enframe('Constant', 'Value') %>% 
-    filter(Constant %in% c('Cox', 'T', 'salinity', 'MCS', 'ocsed', 'vss', 'xpoc', 'xdoc')) %>% 
+    filter(Constant %in% c('Cox', 'T', 'salinity', 'ocsed', 'vss', 'xpoc', 'xdoc')) %>% 
     unnest
   
   # add frminps user input to constants
