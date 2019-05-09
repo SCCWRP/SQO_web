@@ -328,7 +328,7 @@ formsppinp <- function(inps, biota){
   # format names and lips as tibble
   frminps <- reactiveValuesToList(inps) %>% 
     enframe('Biota', 'value') %>% 
-    filter(!grepl('selectized', Biota) & grepl('indic', Biota)) %>% 
+    filter(!grepl('selectized', Biota) & grepl('indic[0-9]lip', Biota)) %>% 
     mutate(
       var = case_when(
         grepl('lip', Biota) ~ 'lipid', 
@@ -344,7 +344,7 @@ formsppinp <- function(inps, biota){
     left_join(frminps, by = 'Biota') %>% 
     mutate(lipid.x = ifelse(is.na(lipid.x), lipid.y, lipid.x)) %>% 
     rename(lipid = lipid.x) %>% 
-    select(-lipid.y, -spp)
+    select(-lipid.y)
   
   return(out)
 

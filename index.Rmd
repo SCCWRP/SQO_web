@@ -155,13 +155,15 @@ wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; backg
   fluidRow(
     column(4, NULL),
     column(3, 'Select species'), 
-    column(4, 'Lipid proportion')
+    column(2, 'Portion of human seafood'),
+    column(2, 'Lipid proportion')
   ),
   
   # indic 1        
   fluidRow(
     column(4, h6('1 Piscivore')),
-    column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])),
+    column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])), 
+    column(2, numericInput('indic1seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   ),
   
@@ -169,60 +171,170 @@ wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; backg
   fluidRow(
     column(4, h6('2 Benthic diet with piscivory')),
     column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']], selected = indic_lookup[['Indicator species 2']][14])),
+    column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)),
     column(2, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'))
   ),
   
   # indic 3        
   fluidRow(
     column(4, h6('3 Benthic and pelagic with piscivory')),
-    column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])),
+    column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])), 
+    column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 4        
   fluidRow(
     column(4, h6('4 Benthic without piscivory')),
-    column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])),
+    column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])), 
+    column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 5
   fluidRow(
     column(4, h6('5 Benthic and pelagic without piscivory')),
-    column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])),
+    column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])), 
+    column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)),
     column(2, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 6        
   fluidRow(
     column(4, h6('6 Benthic with herbivory')),
-    column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])),
+    column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])), 
+    column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 7        
   fluidRow(
     column(4, h6('7 Benthic and pelagic with herbivory')),
-    column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])),
+    column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])), 
+    column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 8        
   fluidRow(
     column(4, h6('8 Pelagic with benthic herbivory')),
-    column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])),
+    column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])), 
+    column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'))
   ),
 
   # indic 9        
   fluidRow(
     column(4, h6('9 Benthic diet with piscivory: estuarine')),
-    column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])),
+    column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])), 
+    column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)),
     column(2, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'))
   )
 
 )
 ```
+
+<!-- ### Indicator guild species - tissue concentrations -->
+<!-- ```{r} -->
+<!-- # tssinp <- read.csv(here('data/tabinps', 'tissueinp.csv'), stringsAsFactors = F) -->
+<!-- #  -->
+<!-- # output$tssinptab <- renderDT({datatable(tssinp, editable = T)}) -->
+
+
+<!-- wellPanel(id = "indicspec", style = "overflow-y:scroll; max-height: 300px; overflow-x:scroll; 2000px; background-color:#daf1da", -->
+
+<!--   # headers -->
+<!--   fluidRow( -->
+<!--     column(4, NULL), -->
+<!--     column(2, 'Chlordane (ng/g)'), -->
+<!--     column(2, 'Dieldrin (ng/g)'), -->
+<!--     column(2, 'DDT (ng/g)'), -->
+<!--     column(2, 'PCB (ng/g)') -->
+<!--   ), -->
+
+<!--   fluidRow( -->
+<!--     column(4, NULL), -->
+<!--     column(1, 'mean'), -->
+<!--     column(1, 'SE'), -->
+<!--     column(1, 'mean'), -->
+<!--     column(1, 'SE'), -->
+<!--     column(1, 'mean'), -->
+<!--     column(1, 'SE'), -->
+<!--     column(1, 'mean'), -->
+<!--     column(1, 'SE') -->
+<!--   ), -->
+
+<!--   # indic 1 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('1 Piscivore:', input$indic1)})), -->
+<!--     column(1, numericInput('indic1chlormean', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1chlorse', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1dieldmean', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1dieldse', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1ddtmean', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1ddtse', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1pcbmean', NULL, value = NULL, min = 0, width = '100%')), -->
+<!--     column(1, numericInput('indic1pcbse', NULL, value = NULL, min = 0, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 2 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('2 Benthic diet with piscivory:', input$indic2)})), -->
+<!--     column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 3 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('3 Benthic and pelagic with piscivory:', input$indic3)})), -->
+<!--     column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 4 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('4 Benthic without piscivory:', input$indic4)})), -->
+<!--     column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 5 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('5 Benthic and pelagic without piscivory:', input$indic5)})), -->
+<!--     column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 6 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('6 Benthic with herbivory:', input$indic6)})), -->
+<!--     column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 7 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('7 Benthic and pelagic with herbivory:', input$indic7)})), -->
+<!--     column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 8 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('8 Pelagic with benthic herbivory:', input$indic8)})), -->
+<!--     column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%')) -->
+<!--   ), -->
+
+<!--   # indic 9 -->
+<!--   fluidRow( -->
+<!--     column(4, renderUI({h6('9 Benthic diet with piscivory: estuarine:', input$indic9)})), -->
+<!--     column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)), -->
+<!--     column(2, numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%')) -->
+<!--   ) -->
+
+<!-- ) -->
+<!-- ``` -->
 
 ### Environmental data
 ```{r}
