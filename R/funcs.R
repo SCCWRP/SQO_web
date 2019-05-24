@@ -489,3 +489,34 @@ cntcalc <- function(contam, constants){
   return(contam)
   
 }
+
+# format mcs inputs -------------------------------------------------------
+
+#' Format mcs inputs
+#'
+#' @param inps reactive inputs
+#' @param contam table
+formmcsinp <- function(inps, mcsparms){
+
+  # format names and input mean/sd as tibble
+  frminps <- reactiveValuesToList(inps) %>% 
+    enframe('MCSvar', 'Value') %>% 
+    filter(grepl('X$|SD$', MCSvar)) %>% 
+    unnest
+  
+  # default parameters from table
+  mcsparms <- mcsparms %>% 
+    dplyr::select(name, value) %>% 
+    rename(
+      MCSvar = name, 
+      Value = value
+    )
+  
+  # combine
+  out <- mcsparms %>% 
+    bind_rows(frminps)
+  
+  return(out)
+  
+}
+    
