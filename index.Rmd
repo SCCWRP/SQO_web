@@ -54,6 +54,8 @@ column(12,
 
 ```{r, context = 'server'}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
+
+# run bioaccumulation model with inputs
 observeEvent(input$run, {
 
   # format biota from input
@@ -77,6 +79,7 @@ observeEvent(input$run, {
   
 })
 
+# bsaf results
 bsaf <- reactive({
 
   # input
@@ -93,6 +96,7 @@ bsaf <- reactive({
   
 })
 
+# concentration in biota
 cbiota <- reactive({
   
   # input
@@ -109,6 +113,7 @@ cbiota <- reactive({
   
 })
 
+# combine bsaf and cbiota output
 rescmb <- reactive({
   
   # input
