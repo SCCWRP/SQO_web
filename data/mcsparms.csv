@@ -1,0 +1,22 @@
+description,statistic,name,value
+Linear Movement Range For 1Piscivore (km),mean,HR1X,29.3
+Home Range For 2Benthic diet with piscivory (km^2),mean,HR2X,0.0071
+Home Range For 3Benthic and pelagic with piscivory (km^2),mean,HR3X,3
+Home Range For 4Benthic without piscivory (km^2),mean,HR4X,3
+Home Range For 5Benthic and pelagic without piscivory (km^2),mean,HR5X,0.0012
+Linear Movement Range For 6Benthic with herbivory (km),mean,HR6X,1.05
+Home Range For 7Benthic and pelagic with herbivory (km^2),mean,HR7X,0.0012
+Linear Movement Range For 8Pelagic with benthic herbivory (km),mean,HR8X,28.2
+Home Range For 9Benthic diet with piscivory (km),mean,HR9X,6.92
+Linear Movement Range For 1Piscivore (km),sd,HR1SD,60
+Home Range For 2Benthic diet with piscivory (km^2),sd,HR2SD,0.0073
+Home Range For 3Benthic and pelagic with piscivory (km^2),sd,HR3SD,4.689
+Home Range For 4Benthic without piscivory (km^2),sd,HR4SD,4.689
+Home Range For 5Benthic and pelagic without piscivory (km^2),sd,HR5SD,0.000804
+Linear Movement Range For 6Benthic with herbivory (km),sd,HR6SD,9904
+Home Range For 7Benthic and pelagic with herbivory (km^2),sd,HR7SD,0.000804
+Linear Movement Range For 8Pelagic with benthic herbivory (km),sd,HR8SD,80.34
+Home Range For 9Benthic diet with piscivory (km),sd,HR9SD,9.6
+Daily seafood consumption rate (kg/d),mean,CRX,0.032
+"Daily seafood consumption rate (kg/d), sd",sd,CRSD,0.032
+Bioaccumulation factor CV,cv,CVBAF,0.782

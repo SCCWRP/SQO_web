@@ -25,6 +25,7 @@ biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
 constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
 contam <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
 biota_preyprop <- read.csv('data/preyprop.csv', stringsAsFactors = FALSE, row.names = 1)
+mcsparms <- read.csv('data/mcsparms.csv', stringAsFactors = F)
 
 # indicator species lookup format for inputs
 indic_lookup <- indic_lookup %>% 
