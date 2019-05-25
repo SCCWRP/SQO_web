@@ -152,6 +152,21 @@ rescmb <- reactive({
   return(out)
   
 })
+
+# summary of contaminants across indicator guilds
+indic_sum <- reactive({
+  
+  # input
+  cbiota <- cbiota()
+  contamcalc <- res$contamcalc
+  
+  req(!is.null(res$contamcalc))
+  
+  out <- indic_sum_fun(cbiota, contamcalc)
+  
+  return(out)
+  
+})
 ```
 
 # {.tabset}
@@ -1256,6 +1271,15 @@ output$plo_cmp <- renderPlotly({
 ```
 ```{r}
 plotlyOutput('plo_cmp', width = '500px', height = '500px')
+```
+
+## Assessment summary
+
+```{r}
+output$tabsum <- renderTable({indic_sum()})
+```
+```{r}
+tableOutput('tabsum')
 ```
 
 

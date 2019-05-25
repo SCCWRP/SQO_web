@@ -520,3 +520,40 @@ formmcsinp <- function(inps, mcsparms){
   
 }
     
+
+# summary function for contaminants in each guild species -----------------
+
+#' Summary function for calculating bsaf and cbiota totals for each indicator species
+#'
+#' @param bsaf 
+#' @param cbiota 
+#' @param contamcalc contaminants fom inputs
+#'
+indic_sum_fun <- function(cbiota, contamcalc){
+ 
+  # cbiota long format
+  cbiota_lng <- cbiota %>% 
+    gather('Chem', 'val', -species)
+
+  # contaminant inputs
+  contams <- contamcalc %>% 
+    dplyr::select(ChemGroup, Chem, cs_ng.g)
+  
+  # combine, add group, summarize by indic, est, chemgroup
+  sumdat <- cbiota_lng %>% 
+    filter(grepl('^indic', species)) %>% 
+    left_join(contams, by = 'Chem') %>% 
+    group_by(species, ChemGroup) %>% 
+    summarise(
+      calc = sum(val)/sum(cs_ng.g), 
+      conc = sum(val)
+    ) %>% 
+    ungroup %>% 
+    gather('var', 'val', calc, conc) %>% 
+    unite('var', ChemGroup, var) %>% 
+    spread(var, val)
+  
+  return(sumdat)
+
+}
+
