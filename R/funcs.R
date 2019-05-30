@@ -350,9 +350,9 @@ formsppinp <- function(inps, biota){
 
 }
 
-# format constants inputs ---------------------------------------------------
+# format site/env constants inputs ---------------------------------------------------
 
-#' format constants inputs
+#' format site/env constants inputs
 #'
 #' @param inps reactive inputs
 #' @param constants table
@@ -557,3 +557,63 @@ indic_sum_fun <- function(cbiota, contamcalc){
 
 }
 
+
+# weighted average observed tissue concentration (ng/g) -------------------
+
+#' Calculate weighted average observed tissue concentration (ng/g)
+#'
+#' @param mcsparms input mcsparms data frame, observed average concentrations extracted
+#' @param inps shiny reactives, extracts proportion seafood
+#'
+wgt_avg_fun <- function(mcsparms, inps){
+  
+  # propseaf for guild species
+  propseaf <- reactiveValuesToList(inps) %>% 
+    enframe('Biota', 'value') %>% 
+    filter(!grepl('selectized', Biota) & grepl('indic[0-9]seaf$', Biota)) %>% 
+    unnest %>% 
+    mutate(Biota = gsub('seaf$', '', Biota)) %>% 
+    arrange(Biota) %>% 
+    pull(value)
+  propseaf[is.na(propseaf)] <- 0
+  
+  # observed contaminants from user input, mean only
+  contobs <- mcsparms %>% 
+    filter(grepl('^indic.*X$', MCSvar)) %>% 
+    mutate(
+      contstat = gsub('^indic[0-9](.*)X$', '\\1', MCSvar), 
+      MCSvar = gsub('(^indic[0-9]).*$', '\\1', MCSvar), 
+      Value = case_when(
+        is.na(Value) ~ 0, 
+        T ~ Value
+      )
+    ) %>% 
+    arrange(contstat, MCSvar)
+  
+  # weighted average observed tissue conc
+  wgt_avg <- contobs %>% 
+    group_by(contstat) %>%
+    summarise(
+      wgt_obs = Value %*% propseaf
+    )
+  
+  return(wgt_avg)
+  
+}
+
+# MCS function --------------------------------------------------------------
+ 
+mcs_fun <- function(nsim, indic_sum, mcsparms, constants){
+  
+  return(NULL)
+  
+  # get lognorm rv from nsim and mcsparms mean/se for contam class, this will get me weighted avg observed tissue
+  # get lognorm rv from nsim and mcsparms mean/se for sed contam class
+  # get lognorm rv from nsim and indic_sum bsaf calc for each contam class
+  # figure out indic species SUF values based on MCSparms for home range and site characteristics
+  # return site linkages for each nsim for all of the above steps
+  
+  # this is the output for this function, next functions will summarize output from this
+  # browser()
+  
+}

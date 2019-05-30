@@ -37,20 +37,12 @@ indic_lookup <- indic_lookup %>%
 
 
 ```{r}
+# top controllers
 column(12, 
   column(3, actionButton("run", "Run food web model!")), 
-  column(2, h6('Number of iterations')), 
-  column(2, numericInput('nsim', NULL, value = 1, min = 1, max = 1000))
-  # column(3, 
-  #   # observeEvent(input$run,{
-  #     downloadHandler(
-  #       filename = function() {"bsaf.csv"},
-  #       content = function(file) {
-  #         write.csv(bsaf(), file, row.names = FALSE)
-  #       }
-  #     )
-  #   # })
-  # )
+  column(3, actionButton("runmcs", "Run MC sims!")),
+  column(2, h6('Number of MC sims')), 
+  column(2, numericInput('nsim', NULL, value = 100, min = 1, max = 10000))
 )
 ```
 <br></br>
@@ -72,9 +64,6 @@ observeEvent(input$run, {
   
   # calculated contaminant inputs
   contamcalc <- cntcalc(contam, constants)
-
-  # format mcs inputs
-  mcsparms <- formmcsinp(input, mcsparms)
 
   btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
 
@@ -167,6 +156,50 @@ indic_sum <- reactive({
   return(out)
   
 })
+
+# get weighted average observed tissue concentrations from input, by contaminant category
+wgtavg <- eventReactive(input$run, {
+  
+  # format mcs inputs
+  mcsparms <- formmcsinp(input, mcsparms)
+  
+  out <- wgt_avg_fun(mcsparms, input)
+
+  return(out)
+  
+})
+
+# run MCS
+MCSres <- eventReactive(input$runmcs, {
+  
+  # validate from indic_sum
+  validate(
+    need(!is.null(res$contamcalc), "Run food web model before MCS!")
+  )
+
+  ##
+  # inputs
+  
+  # number of sims
+  nsim <- input$nsim
+  
+  # estimated tissue concentrations for site linkages
+  indic_sum <- indic_sum()
+  
+  # format mcs inputs
+  mcsparms <- formmcsinp(input, mcsparms)
+
+  # format constants from input
+  constants <- formcnsinp(input, constants)
+  
+  ## 
+  # calcs
+  out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
+  
+  return(out)
+  
+})
+
 ```
 
 # {.tabset}
@@ -225,14 +258,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic1seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds,
       numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
-      numericInput('indic1chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic1ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic1PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
   
@@ -243,14 +276,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)),
     splitLayout(cellWidths = wds,
       numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'),
-      numericInput('indic2chlorX', NULL, value = 2.0425, min = 0, width = '100%'),
-      numericInput('indic2chlorSD', NULL, value = 0.909979488352973, min = 0, width = '100%'),
-      numericInput('indic2dieldX', NULL, value = 0.25, min = 0, width = '100%'),
-      numericInput('indic2dieldSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('indic2ddtX', NULL, value = 2.40733333333333, min = 0, width = '100%'),
-      numericInput('indic2ddtSD', NULL, value = 1.30059647460184, min = 0, width = '100%'),
-      numericInput('indic2pcbX', NULL, value = 71.0791428571429, min = 0, width = '100%'),
-      numericInput('indic2pcbSD', NULL, value = 36.3098108973698, min = 0, width = '100%')
+      numericInput('indic2ChlordaneX', NULL, value = 2.0425, min = 0, width = '100%'),
+      numericInput('indic2ChlordaneSD', NULL, value = 0.909979488352973, min = 0, width = '100%'),
+      numericInput('indic2DieldrindX', NULL, value = 0.25, min = 0, width = '100%'),
+      numericInput('indic2DieldrindSD', NULL, value = 0, min = 0, width = '100%'),
+      numericInput('indic2DDTX', NULL, value = 2.40733333333333, min = 0, width = '100%'),
+      numericInput('indic2DDTSD', NULL, value = 1.30059647460184, min = 0, width = '100%'),
+      numericInput('indic2PCBX', NULL, value = 71.0791428571429, min = 0, width = '100%'),
+      numericInput('indic2PCBSD', NULL, value = 36.3098108973698, min = 0, width = '100%')
     )
   ),
   
@@ -261,14 +294,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'),
-      numericInput('indic3chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic3ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic3PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
 
@@ -279,14 +312,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'),
-      numericInput('indic4chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic4ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic4PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
 
@@ -297,14 +330,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'),
-      numericInput('indic5chlorX', NULL, value = 2.5275, min = 0, width = '100%'),
-      numericInput('indic5chlorSD', NULL, value = 0.4157433102288, min = 0, width = '100%'),
-      numericInput('indic5dieldX', NULL, value = 0.25, min = 0, width = '100%'),
-      numericInput('indic5dieldSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('indic5ddtX', NULL, value = 7.283, min = 0, width = '100%'),
-      numericInput('indic5ddtSD', NULL, value = 2.51069636948402, min = 0, width = '100%'),
-      numericInput('indic5pcbX', NULL, value = 1.9195, min = 0, width = '100%'),
-      numericInput('indic5pcbSD', NULL, value = 0.976160911428029, min = 0, width = '100%')
+      numericInput('indic5ChlordaneX', NULL, value = 2.5275, min = 0, width = '100%'),
+      numericInput('indic5ChlordaneSD', NULL, value = 0.4157433102288, min = 0, width = '100%'),
+      numericInput('indic5DieldrindX', NULL, value = 0.25, min = 0, width = '100%'),
+      numericInput('indic5DieldrindSD', NULL, value = 0, min = 0, width = '100%'),
+      numericInput('indic5DDTX', NULL, value = 7.283, min = 0, width = '100%'),
+      numericInput('indic5DDTSD', NULL, value = 2.51069636948402, min = 0, width = '100%'),
+      numericInput('indic5PCBX', NULL, value = 1.9195, min = 0, width = '100%'),
+      numericInput('indic5PCBSD', NULL, value = 0.976160911428029, min = 0, width = '100%')
     )
   ),
 
@@ -315,14 +348,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'),
-      numericInput('indic6chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic6ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic6PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
 
@@ -333,14 +366,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'),
-      numericInput('indic7chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic7ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic7PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
 
@@ -351,14 +384,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'),
-      numericInput('indic8chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic8ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic8PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
 
@@ -369,14 +402,14 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)),
     splitLayout(cellWidths = wds, 
       numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
-      numericInput('indic9chlorX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9chlorSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9dieldX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9dieldSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9ddtX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9ddtSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9pcbX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9pcbSD', NULL, value = NULL, min = 0, width = '100%')
+      numericInput('indic9ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9DieldrindX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9DieldrindSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9DDTX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9PCBX', NULL, value = NULL, min = 0, width = '100%'),
+      numericInput('indic9PCBSD', NULL, value = NULL, min = 0, width = '100%')
     )
   ),
   
@@ -387,22 +420,22 @@ wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da
     column(2, NULL),
     splitLayout(cellWidths = wds, 
       renderText(NULL),
-      numericInput('sedchlorX', NULL, value = 0.5, min = 0, width = '100%'),
-      numericInput('sedchlorSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('seddieldX', NULL, value = 0.5, min = 0, width = '100%'),
-      numericInput('seddieldSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('sedddtX', NULL, value = 1.19166666666667, min = 0, width = '100%'),
-      numericInput('sedddtSD', NULL, value = 0.765187658537288, min = 0, width = '100%'),
-      numericInput('sedpcbX', NULL, value = 1.33454545454546, min = 0, width = '100%'),
-      numericInput('sedpcbSD', NULL, value = 1.60216108332035, min = 0, width = '100%')
+      numericInput('sedChlordaneX', NULL, value = 0.5, min = 0, width = '100%'),
+      numericInput('sedChlordaneSD', NULL, value = 0, min = 0, width = '100%'),
+      numericInput('sedDieldrindX', NULL, value = 0.5, min = 0, width = '100%'),
+      numericInput('sedDieldrindSD', NULL, value = 0, min = 0, width = '100%'),
+      numericInput('sedDDTX', NULL, value = 1.19166666666667, min = 0, width = '100%'),
+      numericInput('sedDDTSD', NULL, value = 0.765187658537288, min = 0, width = '100%'),
+      numericInput('sedPCBX', NULL, value = 1.33454545454546, min = 0, width = '100%'),
+      numericInput('sedPCBSD', NULL, value = 1.60216108332035, min = 0, width = '100%')
     )
   )
   
-
 )
 ```
 
 ### Site and environmental data
+
 ```{r}
 wellPanel(id = "envdat", style = "background-color:#daf1da",
     
@@ -1237,7 +1270,6 @@ output$tabbsaf <- renderTable({
 tableOutput('tabbsaf')
 ```
 
-
 ### Comparison
 
 ```{r, context = 'server'}
@@ -1283,6 +1315,17 @@ output$plo_cmp <- renderPlotly({
 ```
 ```{r}
 plotlyOutput('plo_cmp', width = '500px', height = '500px')
+```
+
+## Output summary
+
+```{r}
+output$wgtavg <- renderTable({wgtavg()})
+output$mcsres <- renderTable({MCSres()})
+```
+```{r}
+tableOutput('wgtavg')
+tableOutput('mcsres')
 ```
 
 ## Assessment summary
