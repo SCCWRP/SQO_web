@@ -121,7 +121,7 @@ FoodWeb_SQO <- function(NumSim, csed, cwater, cpw, log_KowTS, logkow_tempcor, Ed
 
     # finally, calculate concentration in organism based on uptake/loss pseudo-equilibrium.
     # Output$cbiota <- (k1*(mo*phi*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);
-# browser()
+
     Output$cbiota <- (k1*((1 - mp)*cwater + mp*cpw)+kd*Output$cprey[1])/(k2 + ke + kG + kM);	
     
     # assign results to out variable
@@ -558,9 +558,32 @@ indic_sum_fun <- function(cbiota, contamcalc){
 }
 
 
-# weighted average observed tissue concentration (ng/g) -------------------
+# format seafood proportions in diet from user inputs ---------------------
 
-#' Calculate weighted average observed tissue concentration (ng/g)
+#' Format seafood proportions in diet from user inputs
+#'
+#' @param inps reactive input list
+#'
+formpropseaf <- function(inps){
+  
+  out <- reactiveValuesToList(inps) %>% 
+    enframe('Biota', 'value') %>% 
+    filter(!grepl('selectized', Biota) & grepl('indic[0-9]seaf$', Biota)) %>% 
+    unnest %>% 
+    mutate(
+      Biota = gsub('seaf$', '', Biota),
+      value = ifelse(is.na(value), 0, value)
+      ) %>% 
+    arrange(Biota) %>% 
+    pull(value)
+  
+  return(out)
+
+}
+
+# weighted average observed tissue concentration (ng/g), from empirical data -------------------
+
+#' Calculate weighted average observed tissue concentration (ng/g), from empirical data
 #'
 #' @param mcsparms input mcsparms data frame, observed average concentrations extracted
 #' @param inps shiny reactives, extracts proportion seafood
@@ -568,14 +591,7 @@ indic_sum_fun <- function(cbiota, contamcalc){
 wgt_avg_fun <- function(mcsparms, inps){
   
   # propseaf for guild species
-  propseaf <- reactiveValuesToList(inps) %>% 
-    enframe('Biota', 'value') %>% 
-    filter(!grepl('selectized', Biota) & grepl('indic[0-9]seaf$', Biota)) %>% 
-    unnest %>% 
-    mutate(Biota = gsub('seaf$', '', Biota)) %>% 
-    arrange(Biota) %>% 
-    pull(value)
-  propseaf[is.na(propseaf)] <- 0
+  propseaf <- formpropseaf(inps) 
   
   # observed contaminants from user input, mean only
   contobs <- mcsparms %>% 
@@ -601,19 +617,215 @@ wgt_avg_fun <- function(mcsparms, inps){
   
 }
 
+# generate log normal variables from mean and sd inputs -------------------
+
+#' Generate log normal variables from mean and sd inputs
+#'
+#' @param nsim number of simulations
+#' @param X mean value from user input for single contaminant
+#' @param SD SD value from user input for single contaminant
+#' 
+genlognorm_fun <- function(nsim, X, SD){
+  
+  # this part could be wrong
+  sims <- suppressWarnings(rlnorm(nsim, meanlog = X, sdlog = SD)) %>% 
+    log10(.) %>% 
+    pmax(0, .)
+  simi <- seq(1:nsim)
+  out <- data.frame(i = simi, sims = sims)
+  return(out)
+  
+}
+
+# mcs function for modelled tissue concentration --------------------------
+
+#' mcs function for modelled tissue concentration
+#'
+#' @param nsim number of simulations
+#' @param meanse mean and se values from user input for each guild species and contaminant class
+#' @param propseaf proportion of seafood diet, output from formpropseaf
+#'
+modtiscon_mcs_fun <- function(nsim, meanse, propseaf){
+  
+  # simulated tissue concentrations across guild species, all sims
+  sims <- meanse %>%  
+    group_by(MCSvar, contam) %>% 
+    mutate(
+      ests = purrr::pmap(list(nsim, X, SD), genlognorm_fun)
+    ) %>% 
+    dplyr::select(-SD, -X) %>% 
+    unnest
+  
+  # weighted tissue concentrations across guilds for each contam, all sims
+  out <- sims %>% 
+    dplyr::group_by(i) %>% 
+    nest() %>% 
+    mutate(
+      wgtave = purrr::map(data, function(x){
+        
+        sumprod <- x %>% 
+          arrange(contam, MCSvar) %>% 
+          mutate(
+            sims = case_when(
+              is.na(sims) ~ 0, 
+              T ~ sims
+            )
+          ) %>% 
+          group_by(contam) %>% 
+          summarise(
+            wgtave = sims %*% propseaf
+          )
+        
+        return(sumprod)
+        
+      })
+    ) %>% 
+    dplyr::select(-data)
+  
+  return(out)
+
+}
+
+# mcs function for sediment concentration ---------------------------------
+
+#' mcs function for sediment concentration
+#'
+#' @param nsim number of simulations
+#' @param sedmeanse sediment mean and se values from user input for each contaminant class
+#' @param propseaf proportion of seafood diet, output from formpropseaf
+#' @param SUF site use factor
+#' @param CVBAF bioaccumulation factor sd/mean from mcsparms
+#' @param indic_sum indicator guild concentrations sums across contaminants
+#'
+modsedcon_mcs_fun <- function(nsim, sedmeanse, propseaf, SUF, CVBAF, indic_sum){
+
+  # simulated sediment concentrations, all contams
+  sedsims <- sedmeanse %>%  
+    group_by(contam) %>% 
+    mutate(
+      ests = purrr::pmap(list(nsim, X, SD), genlognorm_fun) 
+    ) %>% 
+    dplyr::select(-SD, -X) %>% 
+    unnest %>% 
+    dplyr::ungroup()
+   
+  # bioaccumulation sims
+  biosims <- indic_sum %>% 
+    tidyr::gather('contam', 'val', -species) %>% 
+    filter(grepl('\\_calc$', contam)) %>% 
+    mutate(
+      contam = gsub('\\_calc$', '', contam)
+    ) %>% 
+    dplyr::group_by(species, contam) %>% 
+    mutate(
+      ests = purrr::pmap(list(nsim, val, CVBAF * val), genlognorm_fun)
+    ) %>% 
+    dplyr::select(-val) %>% 
+    dplyr::ungroup()
+    
+  # combine sediment sims with biosims and SUF
+  estcncsims <- biosims %>% 
+    unnest %>% 
+    full_join(sedsims, ., by = c('contam', 'i')) %>% 
+    mutate(
+      estcnc = sims.x * SUF * sims.y
+    ) %>% 
+    dplyr::select(-MCSvar, -sims.x, -sims.y)
+  
+  # weighted sediment concentrations across guilds for each contam, all sims
+  out <- estcncsims %>% 
+    dplyr::group_by(i) %>% 
+    nest() %>% 
+    mutate(
+      wgtave = purrr::map(data, function(x){
+        
+        sumprod <- x %>% 
+          arrange(contam, species) %>% 
+          mutate(
+            estcnc = case_when(
+              is.na(estcnc) ~ 0, 
+              T ~ estcnc
+            )
+          ) %>% 
+          group_by(contam) %>% 
+          summarise(
+            wgtave = estcnc %*% propseaf
+          )
+        
+        return(sumprod)
+        
+      })
+    ) %>% 
+    dplyr::select(-data)
+
+  return(out)
+  
+}
+
 # MCS function --------------------------------------------------------------
  
-mcs_fun <- function(nsim, indic_sum, mcsparms, constants){
+mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   
-  return(NULL)
+  # return(NULL)
+
+  ##
+  # inputs 
   
-  # get lognorm rv from nsim and mcsparms mean/se for contam class, this will get me weighted avg observed tissue
-  # get lognorm rv from nsim and mcsparms mean/se for sed contam class
-  # get lognorm rv from nsim and indic_sum bsaf calc for each contam class
-  # figure out indic species SUF values based on MCSparms for home range and site characteristics
-  # return site linkages for each nsim for all of the above steps
+  # SUF
+  SUF <- 1
   
-  # this is the output for this function, next functions will summarize output from this
-  # browser()
+  # CVBAF
+  CVBAF <- mcsparms %>% 
+    filter(MCSvar == 'CVBAF') %>% 
+    pull
   
+  # seafood diet proportion
+  propseaf <- formpropseaf(inps) 
+
+  # mean and se values from observed contaminants, from user inputs
+  meanse <- mcsparms %>% 
+    filter(grepl('^indic', MCSvar)) %>% 
+    mutate(
+      var = case_when(
+        grepl('X$', MCSvar) ~ 'X', 
+        grepl('SD$', MCSvar) ~ 'SD'
+      ),
+      contam = gsub('^indic[0-9]|X$|SD$', '', MCSvar), 
+      MCSvar = gsub('(^indic[0-9]).*$', '\\1', MCSvar)
+    ) %>% 
+    spread(var, Value)
+  
+  # mean and se values for sediment contaminants, from user inputs
+  sedmeanse <- mcsparms %>% 
+    filter(grepl('^sed', MCSvar)) %>% 
+    mutate(
+      var = case_when(
+        grepl('X$', MCSvar) ~ 'X', 
+        grepl('SD$', MCSvar) ~ 'SD'
+      ),
+      contam = gsub('^sed|X$|SD$', '', MCSvar), 
+      MCSvar = gsub('(^sed).*$', '\\1', MCSvar)
+    ) %>% 
+    spread(var, Value)
+  
+  ##
+  # modeled tissue concentration for consumption risk, mcs
+  # returns weighted concentrations across all sims
+  modtiscon <- modtiscon_mcs_fun(nsim, meanse, propseaf)
+  
+  ##
+  # modeled sediment contribution to tissue concentration, mcs
+  # returns weighted concentrations across all sims
+  modsedcon <- modsedcon_mcs_fun(nsim, sedmeanse, propseaf, SUF, CVBAF, indic_sum)
+  
+  ## 
+  # combine modeled tissue and sediment concentrations to get site linkages
+  out <- modtiscon %>% 
+    full_join(modsedcon, by = 'i') %>% 
+    tidyr::unnest() %>% 
+    mutate(sitsedlnk = wgtave1 / wgtave) %>% 
+    dplyr::select(-wgtave, -contam1, -wgtave1)
+    
+  return(out)
+
 }
