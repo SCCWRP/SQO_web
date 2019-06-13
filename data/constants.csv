@@ -1,21 +1,22 @@
-Constant,Value,SD,Notes
-A,0.00006,,% constants for phytoplankton aqueous uptake rate (1/d)
-B,5.5,,% constants for phytoplankton aqueous uptake rate (1/d)
-Cox,,,% dissolved oxygen concentration (mg O2/L)
-T,,,% mean water temperature (oC)
-salinity,,,% water salinity (PSU)
-MCS,,,% Molar Concentration of Seawater @ 35 ppt (mol/L)
-SPC,0.0018,,% Setschenow Proportionality Constant (L/cm^3)
-ocsed,,,% organic carbon proportion in sediment (kg/kg)
-ds,0.9,,% density of organic carbon in sediment (kg/L)
-vss,,,% concentration of suspended solids (kg/L?)
-xpoc,,,% POC concentration in H2O (kg/L)
-xdoc,,,% DOC concentration in H2O (kg/L)
-dpoc,1,,% disequilibrium factor for POC partitioning
-ddoc,1,,% disequilibrium factor for DOC partitioning
-alphapoc,0.35,,% proportionality constant describing phase partitioning of POC and DOC
-alphadoc,0.08,,% proportionality constant describing phase partitioning of POC and DOC
-EdA,0.000000085,,% Constant A in dietary uptake efficiency equation
-EdB,2,,% Constant B in dietary uptake efficiency equation
-scav,1,,% scavenging efficiency of particles absorbed from water by filter feeders (percent)
-lden,0.9,,This was added to the R script but wasn't in this table.
+Constant,Value,Notes
+A,0.00006,% constants for phytoplankton aqueous uptake rate (1/d)
+B,5.5,% constants for phytoplankton aqueous uptake rate (1/d)
+Cox,,% dissolved oxygen concentration (mg O2/L)
+T,,% mean water temperature (oC)
+salinity,,% water salinity (PSU)
+SPC,0.0018,% Setschenow Proportionality Constant (L/cm^3)
+ocsed,,% organic carbon proportion in sediment (kg/kg)
+ds,0.9,% density of organic carbon in sediment (kg/L)
+vss,,% concentration of suspended solids (kg/L?)
+xpoc,,% POC concentration in H2O (kg/L)
+xdoc,,% DOC concentration in H2O (kg/L)
+dpoc,1,% disequilibrium factor for POC partitioning
+ddoc,1,% disequilibrium factor for DOC partitioning
+alphapoc,0.35,% proportionality constant describing phase partitioning of POC and DOC
+alphadoc,0.08,% proportionality constant describing phase partitioning of POC and DOC
+EdA,0.000000085,% Constant A in dietary uptake efficiency equation
+EdB,2,% Constant B in dietary uptake efficiency equation
+scav,1,% scavenging efficiency of particles absorbed from water by filter feeders (percent)
+lden,0.9,% This was added to the R script but wasn't in this table.
+SA,,% site area (km2)
+SL,,% site length (km)
