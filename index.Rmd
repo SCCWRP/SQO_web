@@ -1330,33 +1330,89 @@ output$plo_cmp <- renderPlotly({
 plotlyOutput('plo_cmp', width = '500px', height = '500px')
 ```
 
-## Output summary
+## Output summary {.tabset .tabset-pills}
 
 ```{r}
+# calcalated and observed concentrations
+output$tabsum <- renderTable({
+  
+  totab <- indic_sum() %>% 
+    select(species, Chlordane_calc, Dieldrin_calc, DDT_calc, PCB_calc, Chlordane_conc, Dieldrin_conc, DDT_conc, PCB_conc) %>% 
+    rename(
+      Guild = species, 
+      `Chlordanes BSAF (calc)` = Chlordane_calc,
+      `Dieldrin BSAF (calc)` = Dieldrin_calc,
+      `DDTs BSAF (calc)` = DDT_calc,
+      `PCBs BSAF (calc)` = PCB_calc,
+      `Chlordanes Conc (ng/g)` = Chlordane_conc,
+      `Dieldrin Conc (ng/g)` = Dieldrin_conc,
+      `DDTs Conc (ng/g)` = DDT_conc,
+      `PCBs Conc (ng/g)` = PCB_conc
+    )
+  
+  return(totab)
+  
+  })
+
+# weighted observed tissue concentrations
 output$wgtavg <- renderTable({
-  wgtavg()
+  
+  totab <- wgtavg() %>% 
+    rename(
+      Compound = contstat, 
+      `Weighted observed tissue conc. (ng/g)` = wgt_obs
+    )
+  
+  return(totab)
+  
   })
+
+# mcs summary table for site linkages
 output$mcssum <- renderTable({
-  MCSsum() %>% spread(name, value)
+  
+  totab <- MCSsum() %>% 
+    spread(name, value) %>% 
+    rename(Compound = contam)
+  
+  return(totab)
+  
   })
+
+# sediment site linkage values for all simulations
 output$mcsres <- renderTable({
-  MCSres() %>% spread(contam, sitsedlnk)
+  
+  totab <- MCSres() %>% 
+    spread(contam, sitsedlnk) 
+  
+  return(totab)
+  
   })
 ```
-```{r}
-tableOutput('wgtavg')
-tableOutput('mcssum')
-tableOutput('mcsres')
-```
 
-## Assessment summary
+### Assessment summary
 
-```{r}
-output$tabsum <- renderTable({indic_sum()})
-```
 ```{r}
 tableOutput('tabsum')
 ```
+
+### Weighted observed tissue concentrations
+
+```{r}
+tableOutput('wgtavg')
+```
+
+### MCS summary of sediment site linkages
+
+```{r}
+tableOutput('mcssum')
+```
+
+### Detailed MCS output of sediment site linkages
+
+```{r}
+tableOutput('mcsres')
+```
+
 
 
 
