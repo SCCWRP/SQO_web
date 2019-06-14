@@ -169,7 +169,7 @@ wgtavg <- eventReactive(input$run, {
   
 })
 
-# run MCS
+# run MCS to get site linkage values for nsim
 MCSres <- eventReactive(input$runmcs, {
   
   # validate from indic_sum
@@ -195,6 +195,19 @@ MCSres <- eventReactive(input$runmcs, {
   ## 
   # calcs
   out <- mcs_fun(input, nsim, indic_sum, mcsparms, constants)
+  
+  return(out)
+  
+})
+
+# summarize MCres to get percentiles of site linkage values
+MCSsum <- reactive({
+  
+  # inputs
+  MCSres <- MCSres()
+  wgtavg <- wgtavg()
+  
+  out <- mcs_sum_fun(wgtavg, MCSres)
   
   return(out)
   
@@ -1320,11 +1333,19 @@ plotlyOutput('plo_cmp', width = '500px', height = '500px')
 ## Output summary
 
 ```{r}
-output$wgtavg <- renderTable({wgtavg()})
-output$mcsres <- renderTable({MCSres()})
+output$wgtavg <- renderTable({
+  wgtavg()
+  })
+output$mcssum <- renderTable({
+  MCSsum() %>% spread(name, value)
+  })
+output$mcsres <- renderTable({
+  MCSres() %>% spread(contam, sitsedlnk)
+  })
 ```
 ```{r}
 tableOutput('wgtavg')
+tableOutput('mcssum')
 tableOutput('mcsres')
 ```
 

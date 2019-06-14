@@ -625,11 +625,12 @@ wgt_avg_fun <- function(mcsparms, inps){
 #' @param X mean value from user input for single contaminant
 #' @param SD SD value from user input for single contaminant
 #' 
+#' @details http://yasai.rutgers.edu/yasai-guide-27.html
 genlognorm_fun <- function(nsim, X, SD){
   
-  # this part could be wrong
+  # genlognormal, see link for doc
   sims <- suppressWarnings(rlnorm(nsim, meanlog = X, sdlog = SD)) %>% 
-    log10(.) %>% 
+    log(.) %>% 
     pmax(0, .)
   simi <- seq(1:nsim)
   out <- data.frame(i = simi, sims = sims)
@@ -727,10 +728,11 @@ modsedcon_mcs_fun <- function(nsim, sedmeanse, propseaf, SUF, CVBAF, indic_sum){
   estcncsims <- biosims %>% 
     unnest %>% 
     full_join(sedsims, ., by = c('contam', 'i')) %>% 
+    full_join(SUF, by = c('i', 'species')) %>% 
     mutate(
-      estcnc = sims.x * SUF * sims.y
+      estcnc = sims.x * suf * sims.y
     ) %>% 
-    dplyr::select(-MCSvar, -sims.x, -sims.y)
+    dplyr::select(-MCSvar, -sims.x, -sims.y, -suf)
   
   # weighted sediment concentrations across guilds for each contam, all sims
   out <- estcncsims %>% 
@@ -762,17 +764,83 @@ modsedcon_mcs_fun <- function(nsim, sedmeanse, propseaf, SUF, CVBAF, indic_sum){
   
 }
 
+
+# site use factor sims ----------------------------------------------------
+
+suf_mcs_fun <- function(nsim, constants, mcsparms){
+  
+  # site area and length
+  SA <- constants %>% 
+    filter(Constant %in% 'SA') %>% 
+    pull(Value)
+  SL <- constants %>% 
+    filter(Constant %in% 'SL') %>%
+    pull(Value)
+  
+  # home range mean and sd for guild species
+  hrvals <- mcsparms %>% 
+    filter(grepl('^HR[0-9]', MCSvar)) %>% 
+    rename(species = MCSvar) %>% 
+    mutate(
+      var = case_when(
+        grepl('X$', species) ~ 'X', 
+        grepl('SD$', species) ~ 'SD'
+      ),
+      species = gsub('^HR', 'indic', species),
+      species = gsub('X$|SD$', '', species)
+    ) %>% 
+    spread(var, Value)
+  
+  # home range sims
+  sufsims <- hrvals %>% 
+    group_by(species) %>% 
+    mutate(
+      suf = purrr::map(list(species), function(...){
+
+        # indic1, indic8, indic9
+        if(grepl('1$|8$|9$', species))
+          out <- genlognorm_fun(nsim, X, SD) %>% 
+            mutate(
+              sims = SL / sims,
+              sims = ifelse(is.infinite(sims), 0, sims)
+              )
+        
+        # indic2, indic3, indic4, indic5, indic7
+        if(grepl('2$|3$|4$|5$|7$', species))
+          out <- genlognorm_fun(nsim, X, SD) %>% 
+            mutate(
+              sims = SA / sims,
+              sims = ifelse(is.infinite(sims), 0, sims)
+            )
+        
+        # indic6
+        if(grepl('6$', species)){
+          out <- (SL * 1000) / pgamma(runif(nsim, 0, 1), shape = X, scale = SD) 
+          simi <- seq(1:nsim)
+          out <- tibble(i = simi, sims = out)
+        }
+        
+        return(out)
+        
+      })
+    ) %>% 
+    dplyr::select(-SD, -X) %>% 
+    unnest %>% 
+    mutate(
+      sims = pmin(1, sims)
+    ) %>% 
+    rename(suf = sims)
+  
+  return(sufsims)
+  
+}
+
 # MCS function --------------------------------------------------------------
  
 mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   
-  # return(NULL)
-
   ##
   # inputs 
-  
-  # SUF
-  SUF <- 1
   
   # CVBAF
   CVBAF <- mcsparms %>% 
@@ -814,6 +882,10 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   modtiscon <- modtiscon_mcs_fun(nsim, meanse, propseaf)
   
   ##
+  # site use function sims
+  SUF <- suf_mcs_fun(nsim, constants, mcsparms)
+  
+  ##
   # modeled sediment contribution to tissue concentration, mcs
   # returns weighted concentrations across all sims
   modsedcon <- modsedcon_mcs_fun(nsim, sedmeanse, propseaf, SUF, CVBAF, indic_sum)
@@ -828,4 +900,39 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
     
   return(out)
 
+}
+
+# MCS summary function ----------------------------------------------------
+
+#' Summarize MCS results, compare with observed
+#'
+#' @param wgtavg 
+#' @param mcsres 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mcs_sum_fun <- function(wgtavg, mcsres){
+  
+  # get percentiles
+  persitsed <- mcsres %>% 
+    group_by(contam) %>% 
+    nest %>% 
+    mutate(
+      percnt = purrr::map(data, function(x){
+        
+        prc <- quantile(x$sitsedlnk, c(0, .01, .05, .1, 0.25, .5, .75, 0.9, .95, .99, 1)) %>% 
+          enframe 
+        
+        return(prc)
+        
+      })
+    ) %>% 
+    dplyr::select(-data) %>% 
+    unnest %>% 
+    mutate(name = factor(name, levels = c('0%', '1%', '5%', '10%', '25%', '50%', '75%', '90%', '95%', '99%', '100%')))
+  
+  return(persitsed)
+  
 }
