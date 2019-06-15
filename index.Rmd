@@ -20,6 +20,7 @@ source('R/funcs.R')
 ```{r data}
 # data inputs
 load(file = 'data/indic_lookup.RData')
+load(file = 'data/tischmthr.RData')
 
 biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
 constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
@@ -205,14 +206,25 @@ MCSsum <- reactive({
   
   # inputs
   MCSres <- MCSres()
-  wgtavg <- wgtavg()
   
-  out <- mcs_sum_fun(wgtavg, MCSres)
+  out <- mcs_sum_fun(MCSres)
   
   return(out)
   
 })
 
+# SQO assessment summary
+sqosum <- reactive({
+  
+  # inputs
+  MCSsum <- MCSsum()
+  wgtavg <- wgtavg()
+  
+  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr)
+  
+  return(out)
+  
+})
 ```
 
 # {.tabset}
@@ -1201,18 +1213,9 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
 )
 ```
 
-## Calculated contaminants
-
-```{r, context = 'server'}
-output$calccont <- renderDataTable({res$contamcalc})
-```
-```{r}
-dataTableOutput('calccont')
-```
-
 ## Food Web calculations {.tabset .tabset-pills}
 
-```{r, context = 'server'}
+```{r}
 output$cntbsaf <- renderUI({
   
   # input
@@ -1226,9 +1229,37 @@ output$cntbsaf <- renderUI({
 uiOutput('cntbsaf')
 ```
 
-### Plots
+### Guild species results
 
-```{r, context = 'server'}
+```{r}
+# calculated and observed concentrations
+output$tabsum <- renderTable({
+  
+  totab <- indic_sum() %>% 
+    select(species, Chlordane_calc, Dieldrin_calc, DDT_calc, PCB_calc, Chlordane_conc, Dieldrin_conc, DDT_conc, PCB_conc) %>% 
+    rename(
+      Guild = species, 
+      `Chlordanes BSAF (calc)` = Chlordane_calc,
+      `Dieldrin BSAF (calc)` = Dieldrin_calc,
+      `DDTs BSAF (calc)` = DDT_calc,
+      `PCBs BSAF (calc)` = PCB_calc,
+      `Chlordanes Conc (ng/g)` = Chlordane_conc,
+      `Dieldrin Conc (ng/g)` = Dieldrin_conc,
+      `DDTs Conc (ng/g)` = DDT_conc,
+      `PCBs Conc (ng/g)` = PCB_conc
+    )
+  
+  return(totab)
+  
+  })
+```
+```{r}
+tableOutput('tabsum')
+```
+
+### All food web species, plot
+
+```{r}
 output$plobsaf <- renderPlot({
   
   # input
@@ -1259,9 +1290,9 @@ output$plobsaf <- renderPlot({
 plotOutput('plobsaf')
 ```
 
-### Table
+### All food web species table
 
-```{r, context = 'server'}
+```{r}
 output$tabbsaf <- renderTable({
   
   # input
@@ -1283,85 +1314,14 @@ output$tabbsaf <- renderTable({
 tableOutput('tabbsaf')
 ```
 
-### Comparison
-
-```{r, context = 'server'}
-output$plo_cmp <- renderPlotly({
-  
-  # input 
-  bsaf <- bsaf()
-  cntbsaf <- input$cntbsaf
-  
-  req(cntbsaf)
-  
-  # bsaf from dst
-  dst <- read.csv('data/raw/bsaf_dst.csv', check.names = F, stringsAsFactors = F) %>% 
-    dplyr::select(-`Contaminant class`) %>% 
-    gather('species', 'dst_bsaf', -Contaminant) %>% 
-    mutate(
-      species = case_when(
-        grepl('^Diet\\s\\-\\s', species) ~ gsub('^Diet\\s\\-\\s', '', species), 
-        grepl('[0-9]', species) ~ gsub('^.*([0-9]).*$', 'indic\\1', species), 
-        T ~ species
-      )
-    )
-  
-  # bsaf from here
-  shi <- bsaf %>% 
-    gather('Contaminant', 'shi_bsaf', -species) %>% 
-    filter(!species %in% 'Sediment')
-
-  toeval <- dst %>% 
-    inner_join(shi, by = c('species', 'Contaminant')) %>% 
-    # filter(species %in% 'indic1') %>% 
-    filter(Contaminant %in% !!cntbsaf)
-
-  p <- ggplot(toeval, aes(x = shi_bsaf, y = dst_bsaf, label = species)) + 
-    geom_point() + 
-    geom_abline(intercept = 0, slope = 1) + 
-    theme_bw(base_size= 16, base_family = 'serif') + 
-    coord_equal()
-  
-  ggplotly()
-
-})
-```
-```{r}
-plotlyOutput('plo_cmp', width = '500px', height = '500px')
-```
-
 ## Output summary {.tabset .tabset-pills}
 
 ```{r}
-# calcalated and observed concentrations
-output$tabsum <- renderTable({
-  
-  totab <- indic_sum() %>% 
-    select(species, Chlordane_calc, Dieldrin_calc, DDT_calc, PCB_calc, Chlordane_conc, Dieldrin_conc, DDT_conc, PCB_conc) %>% 
-    rename(
-      Guild = species, 
-      `Chlordanes BSAF (calc)` = Chlordane_calc,
-      `Dieldrin BSAF (calc)` = Dieldrin_calc,
-      `DDTs BSAF (calc)` = DDT_calc,
-      `PCBs BSAF (calc)` = PCB_calc,
-      `Chlordanes Conc (ng/g)` = Chlordane_conc,
-      `Dieldrin Conc (ng/g)` = Dieldrin_conc,
-      `DDTs Conc (ng/g)` = DDT_conc,
-      `PCBs Conc (ng/g)` = PCB_conc
-    )
-  
-  return(totab)
-  
-  })
 
-# weighted observed tissue concentrations
-output$wgtavg <- renderTable({
+# sqo assessment summary
+output$sqosum <- renderTable({
   
-  totab <- wgtavg() %>% 
-    rename(
-      Compound = contstat, 
-      `Weighted observed tissue conc. (ng/g)` = wgt_obs
-    )
+  totab <- sqosum()
   
   return(totab)
   
@@ -1371,7 +1331,7 @@ output$wgtavg <- renderTable({
 output$mcssum <- renderTable({
   
   totab <- MCSsum() %>% 
-    spread(name, value) %>% 
+    spread(percentile, value) %>% 
     rename(Compound = contam)
   
   return(totab)
@@ -1389,16 +1349,10 @@ output$mcsres <- renderTable({
   })
 ```
 
-### Assessment summary
+### SQO assessment summary
 
 ```{r}
-tableOutput('tabsum')
-```
-
-### Weighted observed tissue concentrations
-
-```{r}
-tableOutput('wgtavg')
+tableOutput('sqosum')
 ```
 
 ### MCS summary of sediment site linkages
@@ -1413,6 +1367,15 @@ tableOutput('mcssum')
 tableOutput('mcsres')
 ```
 
+## Additional output {.tabset .tabset-pills}
 
+### Calculated contaminants
+
+```{r, context = 'server'}
+output$calccont <- renderDataTable({res$contamcalc})
+```
+```{r}
+dataTableOutput('calccont')
+```
 
 

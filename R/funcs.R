@@ -597,18 +597,18 @@ wgt_avg_fun <- function(mcsparms, inps){
   contobs <- mcsparms %>% 
     filter(grepl('^indic.*X$', MCSvar)) %>% 
     mutate(
-      contstat = gsub('^indic[0-9](.*)X$', '\\1', MCSvar), 
+      contam = gsub('^indic[0-9](.*)X$', '\\1', MCSvar), 
       MCSvar = gsub('(^indic[0-9]).*$', '\\1', MCSvar), 
       Value = case_when(
         is.na(Value) ~ 0, 
         T ~ Value
       )
     ) %>% 
-    arrange(contstat, MCSvar)
+    arrange(contam, MCSvar)
   
   # weighted average observed tissue conc
   wgt_avg <- contobs %>% 
-    group_by(contstat) %>%
+    group_by(contam) %>%
     summarise(
       wgt_obs = Value %*% propseaf
     )
@@ -837,6 +837,14 @@ suf_mcs_fun <- function(nsim, constants, mcsparms){
 
 # MCS function --------------------------------------------------------------
  
+#' MCS function
+#'
+#' @param inps reactive inputs
+#' @param nsim number of MC sims
+#' @param indic_sum output from indic_sum_fun
+#' @param mcsparms MCS parameter inputs
+#' @param constants constants inputs
+#'
 mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   
   ##
@@ -906,14 +914,13 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
 
 #' Summarize MCS results, compare with observed
 #'
-#' @param wgtavg 
 #' @param mcsres 
 #'
 #' @return
 #' @export
 #'
 #' @examples
-mcs_sum_fun <- function(wgtavg, mcsres){
+mcs_sum_fun <- function(mcsres){
   
   # get percentiles
   persitsed <- mcsres %>% 
@@ -931,8 +938,58 @@ mcs_sum_fun <- function(wgtavg, mcsres){
     ) %>% 
     dplyr::select(-data) %>% 
     unnest %>% 
-    mutate(name = factor(name, levels = c('0%', '1%', '5%', '10%', '25%', '50%', '75%', '90%', '95%', '99%', '100%')))
+    mutate(name = factor(name, levels = c('0%', '1%', '5%', '10%', '25%', '50%', '75%', '90%', '95%', '99%', '100%'))) %>% 
+    rename(percentile = name)
   
   return(persitsed)
+  
+}
+
+# SQO assessment summary --------------------------------------------------
+
+sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr){
+
+  # category scores and labels
+  levs <- c('1', '2', '3', '4', '5')
+  labs <- c('Very Low', 'Low', 'Moderate', 'High', 'Very High')
+  
+  # thresholds in nested format for join
+  tischmthr <- tischmthr %>% 
+    group_by(contam) %>% 
+    nest(.key = 'thr')
+  
+  # quartiles from MCSsum
+  mcsres <- MCSsum %>% 
+    filter(grepl('25|50|75', percentile))
+  
+  # join with wgtavg
+  sums <- wgtavg %>% 
+    full_join(mcsres, by = 'contam') %>% 
+    spread(percentile, value) %>% 
+    full_join(tischmthr, by = 'contam') %>% 
+    mutate(
+      wgt_est = wgt_obs * `50%`,
+      catscr = purrr::pmap(list(wgt_obs, thr), function(wgt_obs, thr){
+   
+        val <- thr %>% pull(val)
+        scr <- 1 + findInterval(wgt_obs, val)
+        
+        return(scr)
+        
+      }),
+      catlab = factor(as.character(catscr), levels = levs, labels = labs), 
+      catlab = as.character(catlab)
+    ) %>% 
+    select(-thr) %>% 
+    unnest %>% 
+    rename(
+      Compound = contam,
+      `Weighted observed tissue conc. (ng/g)` = wgt_obs,
+      `Weighted estimated tissue conc. (ng/g)` = wgt_est,
+      `Category outcome` = catscr, 
+      `Category` = catlab
+    )
+  
+  return(sums)
   
 }
