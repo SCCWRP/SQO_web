@@ -55,16 +55,16 @@ res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 observeEvent(input$run, {
 
   # format biota from input
-  biota <- formsppinp(input, biota)
+  biota <<- formsppinp(input, biota)
 
   # format constants from input
-  constants <- formcnsinp(input, constants)
+  constants <<- formcnsinp(input, constants)
   
   # format contams from input
-  contam <- formcntinp(input, contam)
+  contam <<- formcntinp(input, contam)
   
   # calculated contaminant inputs
-  contamcalc <- cntcalc(contam, constants)
+  contamcalc <<- cntcalc(contam, constants)
 
   btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
 
@@ -220,7 +220,7 @@ sqosum <- reactive({
   MCSsum <- MCSsum()
   wgtavg <- wgtavg()
   
-  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr)
+  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr, constants)
   
   return(out)
   
@@ -1372,7 +1372,11 @@ tableOutput('mcsres')
 ### Calculated contaminants
 
 ```{r, context = 'server'}
-output$calccont <- renderDataTable({res$contamcalc})
+output$calccont <- renderDataTable({
+
+  res$contamcalc
+  
+})
 ```
 ```{r}
 dataTableOutput('calccont')

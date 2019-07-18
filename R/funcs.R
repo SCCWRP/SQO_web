@@ -914,7 +914,7 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
 
 #' Summarize MCS results, compare with observed
 #'
-#' @param mcsres 
+#' @param mcsres MC results, output from \code{mcs_fun}
 #'
 #' @return
 #' @export
@@ -947,11 +947,27 @@ mcs_sum_fun <- function(mcsres){
 
 # SQO assessment summary --------------------------------------------------
 
-sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr){
+#' SQO assessment summary
+#'
+#' @param wgtavg weighted average observed tissue concentrations from input, by contaminant category, output from \code{wgt_avg_fun}
+#' @param MCSsum summary results by percentiles of MC analyses, output from \code{mcs_sum_fun}
+#' @param tischmthr lookup table for tissue chemistry thresholds
+#' @param constants constants from user inputs and lookup table, only SCT is used (sediment linkage threshold)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants){
 
   # category scores and labels
   levs <- c('1', '2', '3', '4', '5')
   labs <- c('Very Low', 'Low', 'Moderate', 'High', 'Very High')
+  
+  # sediment linkage threshold
+  SCT <- constants %>% 
+    filter(Constant %in% 'SCT') %>% 
+    pull(Value)
   
   # thresholds in nested format for join
   tischmthr <- tischmthr %>% 
@@ -961,15 +977,20 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr){
   # quartiles from MCSsum
   mcsres <- MCSsum %>% 
     filter(grepl('25|50|75', percentile))
-  
-  # join with wgtavg
-  sums <- wgtavg %>% 
+
+  # combined data to get category outcomes
+  cmb <- wgtavg %>% 
     full_join(mcsres, by = 'contam') %>% 
     spread(percentile, value) %>% 
-    full_join(tischmthr, by = 'contam') %>% 
+    full_join(tischmthr, by = 'contam') 
+  
+  # get category outcomes
+  # chmscr/chmlab - chemical exposure category score
+  # lnkscr/lnklab - site linkage category score
+  sums <- cmb %>% 
     mutate(
       wgt_est = wgt_obs * `50%`,
-      catscr = purrr::pmap(list(wgt_obs, thr), function(wgt_obs, thr){
+      chmscr = purrr::pmap(list(wgt_obs, thr), function(wgt_obs, thr){
    
         val <- thr %>% pull(val)
         scr <- 1 + findInterval(wgt_obs, val)
@@ -977,19 +998,31 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr){
         return(scr)
         
       }),
-      catlab = factor(as.character(catscr), levels = levs, labels = labs), 
-      catlab = as.character(catlab)
+      chmlab = factor(as.character(chmscr), levels = levs, labels = labs), 
+      chmlab = as.character(chmlab)
     ) %>% 
+    rowwise() %>% 
+    mutate(
+      lnkscr = 4 - findInterval(SCT, c(`25%`, `50%`, `75%`)), 
+      lnklab = factor(as.character(lnkscr), levels = levs, labels = labs), 
+      lnklab = as.character(lnklab)
+    )
+  
+  # final formatting (no calcs)
+  out <- sums %>% 
     select(-thr) %>% 
     unnest %>% 
+    select(contam, wgt_obs, `25%`, `50%`, `75%`, wgt_est, chmscr, chmlab, lnkscr, lnklab) %>% 
     rename(
       Compound = contam,
       `Weighted observed tissue conc. (ng/g)` = wgt_obs,
       `Weighted estimated tissue conc. (ng/g)` = wgt_est,
-      `Category outcome` = catscr, 
-      `Category` = catlab
+      `Chemical exposure score` = chmscr, 
+      `Chemical exposure category` = chmlab, 
+      `Site linkage score` = lnkscr, 
+      `Site linkage category` = lnklab
     )
   
-  return(sums)
+  return(out)
   
 }

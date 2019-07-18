@@ -20,3 +20,4 @@ scav,1,% scavenging efficiency of particles absorbed from water by filter feeder
 lden,0.9,% This was added to the R script but wasn't in this table.
 SA,,% site area (km2)
 SL,,% site length (km)
+SCT,0.45,% sediment linkage threshold
