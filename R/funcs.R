@@ -953,16 +953,18 @@ mcs_sum_fun <- function(mcsres){
 #' @param MCSsum summary results by percentiles of MC analyses, output from \code{mcs_sum_fun}
 #' @param tischmthr lookup table for tissue chemistry thresholds
 #' @param constants constants from user inputs and lookup table, only SCT is used (sediment linkage threshold)
+#' @param finalsiteassess final site assessment lookup table
 #'
 #' @return
 #' @export
 #'
 #' @examples
-sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants){
+sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants, finalsiteassess){
 
-  # category scores and labels
+  # category scores and labels, final labels
   levs <- c('1', '2', '3', '4', '5')
   labs <- c('Very Low', 'Low', 'Moderate', 'High', 'Very High')
+  flabs <- c('Unimpacted', 'Likely Unimpacted', 'Possibly Impacted', 'Likely Impacted', 'Clearly Impacted')
   
   # sediment linkage threshold
   SCT <- constants %>% 
@@ -987,6 +989,7 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants){
   # get category outcomes
   # chmscr/chmlab - chemical exposure category score
   # lnkscr/lnklab - site linkage category score
+  # sitscr/sitlab - final site assessment category score
   sums <- cmb %>% 
     mutate(
       wgt_est = wgt_obs * `50%`,
@@ -1006,13 +1009,20 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants){
       lnkscr = 4 - findInterval(SCT, c(`25%`, `50%`, `75%`)), 
       lnklab = factor(as.character(lnkscr), levels = levs, labels = labs), 
       lnklab = as.character(lnklab)
+    ) %>% 
+    unite('cmbscr', chmscr, lnkscr, sep = ', ', remove = F) %>% 
+    mutate(
+      sitscr = factor(cmbscr, levels = finalsiteassess[[1]], labels = finalsiteassess[[2]]), 
+      sitscr = as.numeric(as.character(sitscr)), 
+      sitlab = factor(sitscr, levels = levs, labels = labs), 
+      sitlab = as.character(sitlab)
     )
   
   # final formatting (no calcs)
   out <- sums %>% 
     select(-thr) %>% 
     unnest %>% 
-    select(contam, wgt_obs, `25%`, `50%`, `75%`, wgt_est, chmscr, chmlab, lnkscr, lnklab) %>% 
+    select(contam, wgt_obs, `25%`, `50%`, `75%`, wgt_est, chmscr, chmlab, lnkscr, lnklab, sitscr, sitlab) %>% 
     rename(
       Compound = contam,
       `Weighted observed tissue conc. (ng/g)` = wgt_obs,
@@ -1020,7 +1030,9 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants){
       `Chemical exposure score` = chmscr, 
       `Chemical exposure category` = chmlab, 
       `Site linkage score` = lnkscr, 
-      `Site linkage category` = lnklab
+      `Site linkage category` = lnklab, 
+      `Site assessment score` = sitscr, 
+      `Site assessment category` = sitlab
     )
   
   return(out)

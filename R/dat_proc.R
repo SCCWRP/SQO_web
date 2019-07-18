@@ -10,6 +10,11 @@ indic_lookup <- read.csv('data/raw/indic_lookup.csv', stringsAsFactors = F)
 
 save(indic_lookup, file = 'data/indic_lookup.RData', compress = 'xz')
 
+# final site assessment categories ----------------------------------------
+
+finalsiteassess <- read.csv("data/raw/finalsiteassess.csv", stringsAsFactors = F)
+
+save(finalsiteassess, file = 'data/finalsiteassess.RData', compress = 'xz')
 
 # write shiny contaminant widgets to txt ----------------------------------
 

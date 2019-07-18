@@ -21,6 +21,7 @@ source('R/funcs.R')
 # data inputs
 load(file = 'data/indic_lookup.RData')
 load(file = 'data/tischmthr.RData')
+load(file = 'data/finalsiteassess.RData')
 
 biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
 constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
@@ -220,7 +221,7 @@ sqosum <- reactive({
   MCSsum <- MCSsum()
   wgtavg <- wgtavg()
   
-  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr, constants)
+  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr, constants, finalsiteassess)
   
   return(out)
   
