@@ -197,7 +197,7 @@ MCSres <- eventReactive(input$runmcs, {
   ## 
   # calcs
   out <- mcs_fun(input, nsim, indic_sum, mcsparms, constants)
-  
+
   return(out)
   
 })
@@ -1339,6 +1339,45 @@ output$mcssum <- renderTable({
   
   })
 
+## adding plot here
+
+output$mcspl <- renderPlot({
+  
+  # input
+  # nFactor <- input$nFactor
+  # 
+  # req(nFactor)
+  
+  toplo <- MCSres()
+  nFactor <- quantile(toplo$sitsedlnk, 0.95)[[1]]
+  al = 0.2
+  p = toplo %>%
+    ggplot() +
+    scale_x_continuous(expand = c(0.01, 0), limits = c(0,nFactor)) + 
+    scale_y_continuous(expand = c(0.01, 0), limits = c(0,1)) +
+    annotate("rect", xmin = 0, xmax = nFactor, ymin = 0,    ymax = 0.25, alpha = al, fill = "red") +
+    annotate("rect", xmin = 0, xmax = nFactor, ymin = 0.25, ymax = 0.5,  alpha = al, fill = "green") +
+    annotate("rect", xmin = 0, xmax = nFactor, ymin = 0.5,  ymax = 0.75, alpha = al, fill = "blue") +
+    annotate("rect", xmin = 0, xmax = nFactor, ymin = 0.75, ymax = 1,    alpha = al, fill = "purple") +
+    stat_ecdf(aes(sitsedlnk, color = contam),
+              geom = "line", size = 1.5) +
+    geom_vline(xintercept = 0.5, lty = "dashed", color = "blue") +
+    annotate("text", x = nFactor-1, y = .875, label = "Very Low") +
+    annotate("text", x = nFactor-1, y = .615, label = "Low") +
+    annotate("text", x = nFactor-1, y = .375, label = "Moderate") +
+    annotate("text", x = nFactor-1, y = .125, label = "High") +
+    labs(x = 'Site Linkage Factor',
+         y = 'Cumulative Proportion',
+         title = 'Site Linkage',
+         fill = '') +
+    theme(legend.position="bottom", legend.title = element_blank()) +
+    theme_bw(base_family = 'serif')
+  
+  
+  return(p)
+  
+}, height = 400, width = 500)
+
 # sediment site linkage values for all simulations
 output$mcsres <- renderTable({
   
@@ -1348,6 +1387,7 @@ output$mcsres <- renderTable({
   return(totab)
   
   })
+
 ```
 
 ### SQO assessment summary
@@ -1360,6 +1400,7 @@ tableOutput('sqosum')
 
 ```{r}
 tableOutput('mcssum')
+plotOutput('mcspl')
 ```
 
 ### Detailed MCS output of sediment site linkages
