@@ -11,7 +11,8 @@ library(knitr)
 library(tidyverse)
 library(shiny)
 library(patchwork)
-library(plotly)
+library(SQObioaccumulation)
+
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
@@ -69,8 +70,8 @@ observeEvent(input$run, {
   btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
 
   # append to reactive output
-  res$cbiota <- btch$CBIOTA
-  res$bsaf <- btch$BSAF
+  res$cbiota <- btch$cbiota
+  res$bsaf <- btch$bsaf
   res$contamcalc <- contamcalc
   
 })
@@ -80,15 +81,8 @@ bsaf <- reactive({
 
   # input
   bsaf <-res$bsaf
-    
-  # bsaf
-  nms <- colnames(bsaf) 
-  out <- bsaf %>% 
-    data.frame %>% 
-    rownames_to_column('species') 
-  names(out) <- c('species', nms)
-
-  return(out)
+  
+  return(bsaf)
   
 })
 
@@ -98,48 +92,7 @@ cbiota <- reactive({
   # input
   cbiota <- res$cbiota
 
-  # cbiota
-  nms <- colnames(cbiota) 
-  out <- cbiota %>% 
-    data.frame %>% 
-    rownames_to_column('species') 
-  names(out) <- c('species', nms)
- 
-  return(out)
-  
-})
-
-# combine bsaf and cbiota output
-rescmb <- reactive({
-  
-  # input
-  cntbsaf <- input$cntbsaf
-  bsaf <- bsaf()
-  cbiota <- cbiota()
-  
-  req(cntbsaf)
-
-  # bsaf
-  bsaf <- bsaf %>% 
-    select(species, !!cntbsaf) %>% 
-    rename(
-      BSAF = !!cntbsaf
-    ) %>% 
-    mutate(species = factor(species, levels = species))
-  
-  # cbiota
-  cbiota <- cbiota %>% 
-    select(species, !!cntbsaf) %>% 
-    rename(
-      `Tissue conc. (ng/g wet)` = !!cntbsaf
-    ) %>% 
-    mutate(species = factor(species, levels = species))
-  
-  out <- bsaf %>% 
-    left_join(cbiota, by = 'species') %>% 
-    gather('var', 'val', -species)
-  
-  return(out)
+  return(cbiota)
   
 })
 
@@ -151,7 +104,7 @@ indic_sum <- reactive({
   contamcalc <- res$contamcalc
   
   req(!is.null(res$contamcalc))
-  
+
   out <- indic_sum_fun(cbiota, contamcalc)
   
   return(out)
@@ -192,6 +145,20 @@ MCSres <- eventReactive(input$runmcs, {
 
   # format constants from input
   constants <- formcnsinp(input, constants)
+  
+  # rename columsn in indic_sum
+  indic_sum <- indic_sum %>% 
+    rename(
+      species = Guild,
+      Chlordane_calc = `Chlordanes BSAF (calc)`,
+      Dieldrin_calc = `Dieldrin BSAF (calc)`,
+      DDT_calc = `DDTs BSAF (calc)`,
+      PCB_calc = `PCBs BSAF (calc)`,
+      Chlordane_conc = `Chlordanes Conc (ng/g)`,
+      Dieldrin_conc = `Dieldrin Conc (ng/g)`,
+      DDT_conc = `DDTs Conc (ng/g)`,
+      PCB_conc = `PCBs Conc (ng/g)`
+    )
   
   ## 
   # calcs
@@ -1233,25 +1200,7 @@ uiOutput('cntbsaf')
 
 ```{r}
 # calculated and observed concentrations
-output$tabsum <- renderTable({
-  
-  totab <- indic_sum() %>% 
-    select(species, Chlordane_calc, Dieldrin_calc, DDT_calc, PCB_calc, Chlordane_conc, Dieldrin_conc, DDT_conc, PCB_conc) %>% 
-    rename(
-      Guild = species, 
-      `Chlordanes BSAF (calc)` = Chlordane_calc,
-      `Dieldrin BSAF (calc)` = Dieldrin_calc,
-      `DDTs BSAF (calc)` = DDT_calc,
-      `PCBs BSAF (calc)` = PCB_calc,
-      `Chlordanes Conc (ng/g)` = Chlordane_conc,
-      `Dieldrin Conc (ng/g)` = Dieldrin_conc,
-      `DDTs Conc (ng/g)` = DDT_conc,
-      `PCBs Conc (ng/g)` = PCB_conc
-    )
-  
-  return(totab)
-  
-  })
+output$tabsum <- renderTable({indic_sum()})
 ```
 ```{r}
 tableOutput('tabsum')
@@ -1263,26 +1212,15 @@ tableOutput('tabsum')
 output$plobsaf <- renderPlot({
   
   # input
+  bsaf <- bsaf()
+  cbiota <- cbiota()
   cntbsaf <- input$cntbsaf
-  rescmb <- rescmb()
-  
+ 
   req(cntbsaf)
   
-  toplo <- rescmb
+  p <- plo_bsaf(bsaf, cbiota, cntbsaf)
   
-  p <- ggplot(toplo, aes(x = species, y = val)) + 
-    geom_bar(stat = 'identity') + 
-    xlab(cntbsaf) + 
-    facet_wrap(~var, ncol = 1, strip.position = 'left', scales = 'free_y') + 
-    theme_bw(base_size= 16, base_family = 'serif') + 
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-      axis.title = element_blank(),
-      strip.background = element_blank(), 
-      strip.placement = 'outside'
-      )
-  
-  p
+  return(p)
   
 }, height = 600)
 ```
@@ -1296,16 +1234,15 @@ plotOutput('plobsaf')
 output$tabbsaf <- renderTable({
   
   # input
-  rescmb <- rescmb()
+  bsaf <- bsaf()
+  cbiota <- cbiota()
+  cntbsaf <- input$cntbsaf
+ 
+  req(cntbsaf)
   
-  totab <- rescmb %>% 
-    mutate(val = round(val, 3)) %>% 
-    spread(species, val) %>% 
-    rename(Output = var) %>% 
-    mutate(Output = factor(Output, levels = c('Tissue conc. (ng/g wet)', 'BSAF'))) %>% 
-    arrange(Output)
+  totab <- tab_bsaf(bsaf, cbiota, cntbsaf)
   
-  totab
+  return(totab)
   
   })#, options = list(dom = 't'))
 
