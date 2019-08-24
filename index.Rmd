@@ -131,49 +131,55 @@ wgtavg <- eventReactive(input$run, {
 })
 
 # run MCS to get site linkage values for nsim
-MCSres <- eventReactive(input$runmcs, {
-  
-  # validate from indic_sum
-  validate(
-    need(!is.null(res$contamcalc), "Run food web model before MCS!")
+MCSres <- eventReactive(input$runmcs,
+  withProgress(
+    message='Please wait',
+    detail='Running simulations..',
+    value = 0, {
+    
+      # validate from indic_sum
+      validate(
+        need(!is.null(res$contamcalc), "Run food web model before MCS!")
+      )
+    
+      ##
+      # inputs
+      
+      # number of sims
+      nsim <- input$nsim
+      
+      # estimated tissue concentrations for site linkages
+      indic_sum <- indic_sum()
+      
+      # format mcs inputs
+      mcsparms <- formmcsinp(input, mcsparms)
+    
+      # format constants from input
+      constants <- formcnsinp(input, constants)
+      
+      # rename columns in indic_sum
+      indic_sum <- indic_sum %>% 
+        rename(
+          species = Guild,
+          Chlordane_calc = `Chlordanes BSAF (calc)`,
+          Dieldrin_calc = `Dieldrin BSAF (calc)`,
+          DDT_calc = `DDTs BSAF (calc)`,
+          PCB_calc = `PCBs BSAF (calc)`,
+          Chlordane_conc = `Chlordanes Conc (ng/g)`,
+          Dieldrin_conc = `Dieldrin Conc (ng/g)`,
+          DDT_conc = `DDTs Conc (ng/g)`,
+          PCB_conc = `PCBs Conc (ng/g)`
+        )
+      
+      ## 
+      # calcs
+      out <- mcs_fun(input, nsim, indic_sum, mcsparms, constants)
+    
+      return(out)
+ 
+    }
   )
-
-  ##
-  # inputs
-  
-  # number of sims
-  nsim <- input$nsim
-  
-  # estimated tissue concentrations for site linkages
-  indic_sum <- indic_sum()
-  
-  # format mcs inputs
-  mcsparms <- formmcsinp(input, mcsparms)
-
-  # format constants from input
-  constants <- formcnsinp(input, constants)
-  
-  # rename columsn in indic_sum
-  indic_sum <- indic_sum %>% 
-    rename(
-      species = Guild,
-      Chlordane_calc = `Chlordanes BSAF (calc)`,
-      Dieldrin_calc = `Dieldrin BSAF (calc)`,
-      DDT_calc = `DDTs BSAF (calc)`,
-      PCB_calc = `PCBs BSAF (calc)`,
-      Chlordane_conc = `Chlordanes Conc (ng/g)`,
-      Dieldrin_conc = `Dieldrin Conc (ng/g)`,
-      DDT_conc = `DDTs Conc (ng/g)`,
-      PCB_conc = `PCBs Conc (ng/g)`
-    )
-  
-  ## 
-  # calcs
-  out <- mcs_fun(input, nsim, indic_sum, mcsparms, constants)
-
-  return(out)
-  
-})
+)
 
 # summarize MCres to get percentiles of site linkage values
 MCSsum <- reactive({
