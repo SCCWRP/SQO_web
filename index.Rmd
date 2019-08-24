@@ -53,28 +53,35 @@ column(12,
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 
 # run bioaccumulation model with inputs
-observeEvent(input$run, {
-
-  # format biota from input
-  biota <<- formsppinp(input, biota)
-
-  # format constants from input
-  constants <<- formcnsinp(input, constants)
+observeEvent(input$run, 
+  withProgress(
+    message='Please wait',
+    detail='Running bioaccumulation model...',
+    value = 0, 
+    {
+          
+      # format biota from input
+      biota <<- formsppinp(input, biota)
+    
+      # format constants from input
+      constants <<- formcnsinp(input, constants)
+      
+      # format contams from input
+      contam <<- formcntinp(input, contam)
+      
+      # calculated contaminant inputs
+      contamcalc <<- cntcalc(contam, constants)
+    
+      btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
+    
+      # append to reactive output
+      res$cbiota <- btch$cbiota
+      res$bsaf <- btch$bsaf
+      res$contamcalc <- contamcalc
   
-  # format contams from input
-  contam <<- formcntinp(input, contam)
-  
-  # calculated contaminant inputs
-  contamcalc <<- cntcalc(contam, constants)
-
-  btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
-
-  # append to reactive output
-  res$cbiota <- btch$cbiota
-  res$bsaf <- btch$bsaf
-  res$contamcalc <- contamcalc
-  
-})
+    }
+  )
+)
 
 # bsaf results
 bsaf <- reactive({
