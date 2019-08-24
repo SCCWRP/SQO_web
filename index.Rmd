@@ -157,6 +157,7 @@ MCSres <- eventReactive(input$runmcs,
       # format constants from input
       constants <- formcnsinp(input, constants)
       
+      ##
       # rename columns in indic_sum
       indic_sum <- indic_sum %>% 
         rename(

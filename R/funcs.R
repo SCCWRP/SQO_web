@@ -196,10 +196,16 @@ wgt_avg_fun <- function(mcsparms, inps){
 #' @details http://yasai.rutgers.edu/yasai-guide-27.html
 genlognorm_fun <- function(nsim, X, SD){
   
+  # # genlognormal, see link for doc
+  # sims <- suppressWarnings(rlnorm(nsim, meanlog = X, sdlog = SD)) %>% 
+  #   log(.) %>% 
+  #   pmax(0, .)
+  
   # genlognormal, see link for doc
-  sims <- suppressWarnings(rlnorm(nsim, meanlog = X, sdlog = SD)) %>% 
-    log(.) %>% 
-    pmax(0, .)
+  mu <- log(X) - 0.5 * log(1 + SD ^ 2 / X ^ 2)
+  sigma <- (log(SD ^ 2 / X ^ 2 + 1)) ^ 0.5
+  sims <- exp(rnorm(nsim, mu, sigma))
+  
   simi <- seq(1:nsim)
   out <- data.frame(i = simi, sims = sims)
   return(out)
