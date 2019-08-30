@@ -588,7 +588,7 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants, finalsiteassess){
     mutate(
       sitscr = factor(cmbscr, levels = finalsiteassess[[1]], labels = finalsiteassess[[2]]), 
       sitscr = as.numeric(as.character(sitscr)), 
-      sitlab = factor(sitscr, levels = levs, labels = labs), 
+      sitlab = factor(sitscr, levels = levs, labels = flabs), 
       sitlab = as.character(sitlab)
     )
   
