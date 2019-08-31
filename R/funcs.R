@@ -144,7 +144,7 @@ formpropseaf <- function(inps){
       ) %>% 
     arrange(Biota) %>% 
     pull(value)
-  
+
   return(out)
 
 }
@@ -154,12 +154,13 @@ formpropseaf <- function(inps){
 #' Calculate weighted average observed tissue concentration (ng/g), from empirical data
 #'
 #' @param mcsparms input mcsparms data frame, observed average concentrations extracted
-#' @param inps shiny reactives, extracts proportion seafood
+#' @param propseaf output from \code{\link{formpropseaf}}
 #'
-wgt_avg_fun <- function(mcsparms, inps){
+wgt_avg_fun <- function(mcsparms, propseaf){
   
-  # propseaf for guild species
-  propseaf <- formpropseaf(inps) 
+  # sanity checks
+  stopifnot(length(propseaf) == 9)
+  stopifnot(sum(propseaf) == 1)
   
   # observed contaminants from user input, mean only
   contobs <- mcsparms %>% 
@@ -195,11 +196,6 @@ wgt_avg_fun <- function(mcsparms, inps){
 #' 
 #' @details http://yasai.rutgers.edu/yasai-guide-27.html
 genlognorm_fun <- function(nsim, X, SD){
-  
-  # # genlognormal, see link for doc
-  # sims <- suppressWarnings(rlnorm(nsim, meanlog = X, sdlog = SD)) %>% 
-  #   log(.) %>% 
-  #   pmax(0, .)
   
   # genlognormal, see link for doc
   mu <- log(X) - 0.5 * log(1 + SD ^ 2 / X ^ 2)
@@ -413,13 +409,18 @@ suf_mcs_fun <- function(nsim, constants, mcsparms){
  
 #' MCS function
 #'
-#' @param inps reactive inputs
 #' @param nsim number of MC sims
 #' @param indic_sum output from indic_sum_fun
 #' @param mcsparms MCS parameter inputs
 #' @param constants constants inputs
+#' @param propseaf proportion of seafood in diet
 #'
-mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
+mcs_fun <- function(nsim, indic_sum, mcsparms, constants, propseaf){
+  
+  ##
+  # sanity checks
+  stopifnot(length(propseaf) == 9)
+  stopifnot(sum(propseaf) == 1)
   
   ##
   # inputs 
@@ -428,9 +429,6 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   CVBAF <- mcsparms %>% 
     filter(MCSvar == 'CVBAF') %>% 
     pull
-  
-  # seafood diet proportion
-  propseaf <- formpropseaf(inps) 
 
   # mean and se values from observed contaminants, from user inputs
   meanse <- mcsparms %>% 
@@ -467,6 +465,22 @@ mcs_fun <- function(inps, nsim, indic_sum, mcsparms, constants){
   # site use function sims
   SUF <- suf_mcs_fun(nsim, constants, mcsparms)
   
+  ##
+  # rename columns in indic_sum
+  indic_sum <- indic_sum %>% 
+    rename(
+      species = Guild,
+      Chlordane_calc = `Chlordanes BSAF (calc)`,
+      Dieldrin_calc = `Dieldrin BSAF (calc)`,
+      DDT_calc = `DDTs BSAF (calc)`,
+      PCB_calc = `PCBs BSAF (calc)`,
+      Chlordane_conc = `Chlordanes Conc (ng/g)`,
+      Dieldrin_conc = `Dieldrin Conc (ng/g)`,
+      DDT_conc = `DDTs Conc (ng/g)`,
+      PCB_conc = `PCBs Conc (ng/g)`
+    )
+  
+  ##
   ##
   # modeled sediment contribution to tissue concentration, mcs
   # returns weighted concentrations across all sims
@@ -513,7 +527,11 @@ mcs_sum_fun <- function(mcsres){
     dplyr::select(-data) %>% 
     unnest %>% 
     mutate(name = factor(name, levels = c('0%', '1%', '5%', '10%', '25%', '50%', '75%', '90%', '95%', '99%', '100%'))) %>% 
-    rename(percentile = name)
+    rename(
+      percentile = name,
+      Compound = contam
+      ) %>% 
+    spread(percentile, value)
   
   return(persitsed)
   
@@ -533,7 +551,7 @@ mcs_sum_fun <- function(mcsres){
 #' @export
 #'
 #' @examples
-sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants, finalsiteassess){
+sqo_sum_fun <- function(wgtavg, mcsres, tischmthr, constants, finalsiteassess){
 
   # category scores and labels, final labels
   levs <- c('1', '2', '3', '4', '5')
@@ -551,7 +569,10 @@ sqo_sum_fun <- function(wgtavg, MCSsum, tischmthr, constants, finalsiteassess){
     nest(.key = 'thr')
   
   # quartiles from MCSsum
-  mcsres <- MCSsum %>% 
+  mcsres <- mcsres %>% 
+    mcs_sum_fun %>% 
+    gather('percentile', 'value', -Compound) %>% 
+    rename(contam = Compound) %>% 
     filter(grepl('25|50|75', percentile))
 
   # combined data to get category outcomes

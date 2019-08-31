@@ -44,7 +44,7 @@ column(12,
   column(3, actionButton("run", "Run food web model!")), 
   column(3, actionButton("runmcs", "Run MC sims!")),
   column(2, h6('Number of MC sims')), 
-  column(2, numericInput('nsim', NULL, value = 100, min = 1, max = 10000))
+  column(2, numericInput('nsim', NULL, value = 1000, min = 1, max = 20000))
 )
 ```
 <br></br>
@@ -120,11 +120,12 @@ indic_sum <- reactive({
 
 # get weighted average observed tissue concentrations from input, by contaminant category
 wgtavg <- eventReactive(input$run, {
-  
+
   # format mcs inputs
   mcsparms <- formmcsinp(input, mcsparms)
+  propseaf <- formpropseaf(input)
   
-  out <- wgt_avg_fun(mcsparms, input)
+  out <- wgt_avg_fun(mcsparms, propseaf)
 
   return(out)
   
@@ -157,24 +158,12 @@ MCSres <- eventReactive(input$runmcs,
       # format constants from input
       constants <- formcnsinp(input, constants)
       
-      ##
-      # rename columns in indic_sum
-      indic_sum <- indic_sum %>% 
-        rename(
-          species = Guild,
-          Chlordane_calc = `Chlordanes BSAF (calc)`,
-          Dieldrin_calc = `Dieldrin BSAF (calc)`,
-          DDT_calc = `DDTs BSAF (calc)`,
-          PCB_calc = `PCBs BSAF (calc)`,
-          Chlordane_conc = `Chlordanes Conc (ng/g)`,
-          Dieldrin_conc = `Dieldrin Conc (ng/g)`,
-          DDT_conc = `DDTs Conc (ng/g)`,
-          PCB_conc = `PCBs Conc (ng/g)`
-        )
+      # format seafood proportion of dieat
+      propseaf <- formpropseaf(input)
       
       ## 
       # calcs
-      out <- mcs_fun(input, nsim, indic_sum, mcsparms, constants)
+      out <- mcs_fun(nsim, indic_sum, mcsparms, constants, propseaf)
     
       return(out)
  
@@ -198,10 +187,10 @@ MCSsum <- reactive({
 sqosum <- reactive({
   
   # inputs
-  MCSsum <- MCSsum()
+  MCSres <- MCSres()
   wgtavg <- wgtavg()
   
-  out <- sqo_sum_fun(wgtavg, MCSsum, tischmthr, constants, finalsiteassess)
+  out <- sqo_sum_fun(wgtavg, MCSres, tischmthr, constants, finalsiteassess)
   
   return(out)
   
@@ -1281,9 +1270,7 @@ output$sqosum <- renderTable({
 # mcs summary table for site linkages
 output$mcssum <- renderTable({
   
-  totab <- MCSsum() %>% 
-    spread(percentile, value) %>% 
-    rename(Compound = contam)
+  totab <- MCSsum()
   
   return(totab)
   
@@ -1295,8 +1282,8 @@ output$mcspl <- renderPlot({
   # input
   MCSres <- MCSres()
   
-  toplo <- MCSres() %>% 
-    mutate()
+  toplo <- MCSres()
+  
   nFactor <- quantile(toplo$sitsedlnk, 0.95)[[1]]
   al <- 0.4
   
