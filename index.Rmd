@@ -55,7 +55,7 @@ column(12,
 ```
 <br></br>
 
-```{r, context = 'server'}
+```{r reactives}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 
 # run bioaccumulation model with inputs
@@ -65,15 +65,34 @@ observeEvent(input$run,
     detail='Running bioaccumulation model...',
     value = 0, 
     {
-          
-      # format biota from input
-      biota <<- formsppinp(input, biota)
-    
-      # format constants from input
-      constants <<- formcnsinp(input, constants)
+         
+      # input
+      inptyp <- input$inptyp
       
-      # format contams from input
-      contam <<- formcntinp(input, contam)
+      if(inptyp == 'Manual entry'){
+    
+        # format biota from input
+        biota <<- formsppinp(input, biota)
+      
+        # format constants from input
+        constants <<- formcnsinp(input, constants)
+        
+        # format contams from input
+        contam <<- formcntinp(input, contam)
+        
+      }
+      
+      if(inptyp == 'File upload'){
+        
+        biota <<- input$biotaupl
+        constants <<- input$constantsupl
+        contam <<- input$contamupl
+        
+        # validate(
+        #   need(any(e))
+        # )
+        
+      }
       
       # calculated contaminant inputs
       contamcalc <<- cntcalc(contam, constants)
@@ -158,8 +177,17 @@ tabbsaf <- reactive({
 # get weighted average observed tissue concentrations from input, by contaminant category
 wgtavg <- eventReactive(input$run, {
 
+  # input
+  inptyp <- input$inptyp
+  
   # format mcs inputs
-  mcsparms <- formmcsinp(input, mcsparms)
+  if(inptyp == 'Manual entry'){
+    mcsparms <- formmcsinp(input, mcsparms)
+  }
+  if(inptyp == 'File upload'){
+    mcsparms <- input$mcsparmsupl
+  }
+  
   propseaf <- formpropseaf(input)
 
   out <- wgt_avg_fun(mcsparms, propseaf)
@@ -185,12 +213,10 @@ MCSres <- eventReactive(input$runmcs,
       
       # number of sims
       nsim <- input$nsim
+      inptyp <- input$inptyp
       
       # estimated tissue concentrations for site linkages
       indic_sum <- indic_sum()
-      
-      # format mcs inputs
-      mcsparms <- formmcsinp(input, mcsparms)
     
       # format constants from input
       constants <- formcnsinp(input, constants)
@@ -198,7 +224,16 @@ MCSres <- eventReactive(input$runmcs,
       # format seafood proportion of dieat
       propseaf <- formpropseaf(input)
       
-      ## 
+      # format mcs inputs
+      if(inptyp == 'Manual entry'){
+        mcsparms <- formmcsinp(input, mcsparms)
+      }
+      
+      if(inptyp == 'File upload'){
+        mcsparms <- input$mcsparmsupl
+      }
+        
+      ##
       # calcs
       out <- mcs_fun(nsim, indic_sum, mcsparms, constants, propseaf)
     
@@ -328,6 +363,43 @@ output$dlcalccont <- downloadHandler(
     write.csv(res$contamcalc, file, quote = T, row.names = F)
   }
 )
+
+# dl biota template
+output$dlbiotatmpl <- downloadHandler(
+  filename = function(){'biota.csv'},
+  content = function(file){
+    fl <- read.csv('data/inptmp/biota.csv', stringsAsFactors = F)
+    write.csv(fl, file, quote = T, row.names = F)
+  }
+)
+
+# dl constants template
+output$dlconsantstmpl <- downloadHandler(
+  filename = function(){'constants.csv'},
+  content = function(file){
+    fl <- read.csv('data/inptmp/constants.csv', stringsAsFactors = F)
+    write.csv(fl, file, quote = T, row.names = F)
+  }
+)
+
+# dl contam template
+output$dlbiotatmpl <- downloadHandler(
+  filename = function(){'contam.csv'},
+  content = function(file){
+    fl <- read.csv('data/inptmp/contam.csv', stringsAsFactors = F)
+    write.csv(fl, file, quote = T, row.names = F)
+  }
+)
+
+# dl mcsparms template
+output$dlmcsparmstmpl <- downloadHandler(
+  filename = function(){'mcsparms.csv'},
+  content = function(file){
+    fl <- read.csv('data/inptmp/mcsparms.csv', stringsAsFactors = F)
+    write.csv(fl, file, quote = T, row.names = F)
+  }
+)
+
 ```
 
 # {.tabset}
@@ -1329,7 +1401,28 @@ output$entry <- renderUI({
   
   if(inptyp == 'File upload'){
     
-    out <- NULL
+    out <- div(
+      column(12, 
+        h3('Indicator guild species and sediment contaminant concentrations'), 
+        column(3, downloadButtonRmd('dlbiotatmpl', 'Download template')),
+        column(3, fileInput('biotaupl', NULL, accept = '.csv'))
+      ), 
+      column(12, 
+        h3('Site and environmental data'),
+        column(3, downloadButtonRmd('dlconstantstmpl', 'Download template')),
+        column(3, fileInput('constantsupl', NULL, accept = '.csv'))
+      ),
+      column(12, 
+        h3('Contaminants'), 
+        column(3, downloadButtonRmd('dlcontamtmpl', 'Download template')),
+        column(3, fileInput('contamupl', NULL, accept = '.csv'))
+      ), 
+      column(12,
+        h3('MCS parameters'),
+        column(3, downloadButtonRmd('dlmcsparmstmpl', 'Download template')),
+        column(3, fileInput('mcsparmsupl', NULL, accept = '.csv'))
+      )
+    )
     
   }
   
@@ -1354,7 +1447,7 @@ column(12,
   column(4, downloadButtonRmd('dlindicsum', 'Download table'))
 )
 column(12, 
- tableOutput('tabsum')
+  tableOutput('tabsum')
 )
 ```
 
@@ -1397,7 +1490,6 @@ column(12,
 ## Output summary {.tabset .tabset-pills}
 
 ```{r}
-
 # sqo assessment summary
 output$sqosum <- renderTable({sqosum()})
 
