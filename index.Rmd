@@ -44,7 +44,6 @@ indic_lookup <- indic_lookup %>%
   map(function(x) pull(x, Guild.species))
 ```
 
-
 ```{r}
 # top controllers
 column(12, 
@@ -333,988 +332,1013 @@ output$dlcalccont <- downloadHandler(
 
 # {.tabset}
 
-## Model inputs
+## Model inputs 
 
-### Indicator guild species and sediment contaminant concentrations
 ```{r}
-
-# splitlayout widths
-wds <- 100
-
-wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da",
-
-  # headers 1
-  fluidRow(
-    column(3, renderText(NULL)),
-    column(3, renderText(NULL)),
-    column(2, renderText(NULL)),
-    splitLayout(cellWidths = wds,
-      renderText(NULL),
-      h6('Chlordane (ng/g)'),
-      renderText(NULL),
-      h6('Dieldrin (ng/g)'),
-      renderText(NULL),
-      h6('DDT (ng/g)'),
-      renderText(NULL),
-      h6('PCB (ng/g)'),
-      renderText(NULL)
-    )
-  ),
-  
-  # headers 2
-  fluidRow(
-    column(3, renderText(NULL)),
-    column(3, h6('Select species')), 
-    column(2, h6('Portion seafood')),
-    splitLayout(cellWidths = wds,
-      h6('Lipid proportion'),
-      h6('Mean'),
-      h6('SE'),
-      h6('Mean'),
-      h6('SE'),
-      h6('Mean'),
-      h6('SE'),
-      h6('Mean'),
-      h6('SE')
-    )
-  ),
-  
-  # indic 1        
-  fluidRow(
-    column(3, h6('1 Piscivore')),
-    column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])
-           ), 
-    column(2, numericInput('indic1seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds,
-      numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
-      numericInput('indic1ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic1PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-  
-  # indic 2        
-  fluidRow(
-    column(3, h6('2 Benthic diet with piscivory')),
-    column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']], selected = indic_lookup[['Indicator species 2']][14])),
-    column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)),
-    splitLayout(cellWidths = wds,
-      numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'),
-      numericInput('indic2ChlordaneX', NULL, value = 2.0425, min = 0, width = '100%'),
-      numericInput('indic2ChlordaneSD', NULL, value = 0.909979488352973, min = 0, width = '100%'),
-      numericInput('indic2DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
-      numericInput('indic2DieldrinSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('indic2DDTX', NULL, value = 2.40733333333333, min = 0, width = '100%'),
-      numericInput('indic2DDTSD', NULL, value = 1.30059647460184, min = 0, width = '100%'),
-      numericInput('indic2PCBX', NULL, value = 71.0791428571429, min = 0, width = '100%'),
-      numericInput('indic2PCBSD', NULL, value = 36.3098108973698, min = 0, width = '100%')
-    )
-  ),
-  
-  # indic 3        
-  fluidRow(
-    column(3, h6('3 Benthic and pelagic with piscivory')),
-    column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])), 
-    column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'),
-      numericInput('indic3ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic3PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 4        
-  fluidRow(
-    column(3, h6('4 Benthic without piscivory')),
-    column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])), 
-    column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'),
-      numericInput('indic4ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic4PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 5
-  fluidRow(
-    column(3, h6('5 Benthic and pelagic without piscivory')),
-    column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])), 
-    column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'),
-      numericInput('indic5ChlordaneX', NULL, value = 2.5275, min = 0, width = '100%'),
-      numericInput('indic5ChlordaneSD', NULL, value = 0.4157433102288, min = 0, width = '100%'),
-      numericInput('indic5DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
-      numericInput('indic5DieldrinSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('indic5DDTX', NULL, value = 7.283, min = 0, width = '100%'),
-      numericInput('indic5DDTSD', NULL, value = 2.51069636948402, min = 0, width = '100%'),
-      numericInput('indic5PCBX', NULL, value = 1.9195, min = 0, width = '100%'),
-      numericInput('indic5PCBSD', NULL, value = 0.976160911428029, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 6        
-  fluidRow(
-    column(3, h6('6 Benthic with herbivory')),
-    column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])), 
-    column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'),
-      numericInput('indic6ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic6PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 7        
-  fluidRow(
-    column(3, h6('7 Benthic and pelagic with herbivory')),
-    column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])), 
-    column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'),
-      numericInput('indic7ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic7PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 8        
-  fluidRow(
-    column(3, h6('8 Pelagic with benthic herbivory')),
-    column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])), 
-    column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'),
-      numericInput('indic8ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic8PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-
-  # indic 9        
-  fluidRow(
-    column(3, h6('9 Benthic diet with piscivory: estuarine')),
-    column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])), 
-    column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)),
-    splitLayout(cellWidths = wds, 
-      numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
-      numericInput('indic9ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9DDTX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9DDTSD', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9PCBX', NULL, value = NULL, min = 0, width = '100%'),
-      numericInput('indic9PCBSD', NULL, value = NULL, min = 0, width = '100%')
-    )
-  ),
-  
-  # sediment contaminant concentration
-  fluidRow(
-    column(6, h5('Sediment contaminant concentration')),
-    # column(3, NULL), 
-    column(2, NULL),
-    splitLayout(cellWidths = wds, 
-      renderText(NULL),
-      numericInput('sedChlordaneX', NULL, value = 0.5, min = 0, width = '100%'),
-      numericInput('sedChlordaneSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('sedDieldrinX', NULL, value = 0.5, min = 0, width = '100%'),
-      numericInput('sedDieldrinSD', NULL, value = 0, min = 0, width = '100%'),
-      numericInput('sedDDTX', NULL, value = 1.19166666666667, min = 0, width = '100%'),
-      numericInput('sedDDTSD', NULL, value = 0.765187658537288, min = 0, width = '100%'),
-      numericInput('sedPCBX', NULL, value = 1.33454545454546, min = 0, width = '100%'),
-      numericInput('sedPCBSD', NULL, value = 1.60216108332035, min = 0, width = '100%')
-    )
-  )
-  
-)
+selectInput('inptyp', label = 'Select input type:', choices = c('Manual entry', 'File upload'))
 ```
 
-### Site and environmental data
-
 ```{r}
-wellPanel(id = "envdat", style = "background-color:#daf1da",
+output$entry <- renderUI({
+  
+  # inputs
+  inptyp <- input$inptyp
+  
+  if(inptyp == 'Manual entry'){
     
-  # site area       
-  fluidRow(
-    column(4, h6('Area of site (km2)')),
-    column(2, numericInput('SA', NULL, value = 8.06, min = 0, width = '100%'))
-  ),
+    # splitlayout widths
+    wds <- 100
 
-  # site length
-  fluidRow(
-    column(4, h6('Length of site (km)')),
-    column(2, numericInput('SL', NULL, value = 6, min = 0, width = '100%'))
-  ),
-
-  # organic carb prop in sed (TOC)    
-  fluidRow(
-    column(4, h6('Organic carbon in sediment (kg/kg)')),
-    column(2, numericInput('ocsed', NULL, value = 0.0163, width = '100%'))
-  ),   
-  
-  # doc conc in water       
-  fluidRow(
-    column(4, h6('DOC conc. in water (kg/L)')),
-    column(2, numericInput('xdoc', NULL, value = 0.00000215, min = 0, width = '100%'))
-  ),
-  
-  # poc conc in water       
-  fluidRow(
-    column(4, h6('POC conc. in water (kg/L)')),
-    column(2, numericInput('xpoc', NULL, value = 0.00000157, min = 0, width = '100%'))
-  ),
-
-  # water temp     
-  fluidRow(
-    column(4, HTML('<h6>Mean water temperature (&deg;C)</h6>')),
-    column(2, numericInput('T', NULL, value = 17.4, width = '100%'))
-  ), 
-  
-  # salinity     
-  fluidRow(
-    column(4, h6('Water salinity (psu)')),
-    column(2, numericInput('salinity', NULL, value = 25.4, min = 0, width = '100%'))
-  ),
+    w1 <- wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da",
     
-  # dissolved oxygen       
-  fluidRow(
-    column(4, h6('Dissolved oxygen (mg/L)')),
-    column(2, numericInput('Cox', NULL, value = 8.09, min = 0, width = '100%'))
-  ),
+      # headers 1
+      fluidRow(
+        column(3, renderText(NULL)),
+        column(3, renderText(NULL)),
+        column(2, renderText(NULL)),
+        splitLayout(cellWidths = wds,
+          renderText(NULL),
+          h6('Chlordane (ng/g)'),
+          renderText(NULL),
+          h6('Dieldrin (ng/g)'),
+          renderText(NULL),
+          h6('DDT (ng/g)'),
+          renderText(NULL),
+          h6('PCB (ng/g)'),
+          renderText(NULL)
+        )
+      ),
+
+      # headers 2
+      fluidRow(
+        column(3, renderText(NULL)),
+        column(3, h6('Select species')),
+        column(2, h6('Portion seafood')),
+        splitLayout(cellWidths = wds,
+          h6('Lipid proportion'),
+          h6('Mean'),
+          h6('SE'),
+          h6('Mean'),
+          h6('SE'),
+          h6('Mean'),
+          h6('SE'),
+          h6('Mean'),
+          h6('SE')
+        )
+      ),
+
+      # indic 1
+      fluidRow(
+        column(3, h6('1 Piscivore')),
+        column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])
+               ),
+        column(2, numericInput('indic1seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
+          numericInput('indic1ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic1PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 2
+      fluidRow(
+        column(3, h6('2 Benthic diet with piscivory')),
+        column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']], selected = indic_lookup[['Indicator species 2']][14])),
+        column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'),
+          numericInput('indic2ChlordaneX', NULL, value = 2.0425, min = 0, width = '100%'),
+          numericInput('indic2ChlordaneSD', NULL, value = 0.909979488352973, min = 0, width = '100%'),
+          numericInput('indic2DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
+          numericInput('indic2DieldrinSD', NULL, value = 0, min = 0, width = '100%'),
+          numericInput('indic2DDTX', NULL, value = 2.40733333333333, min = 0, width = '100%'),
+          numericInput('indic2DDTSD', NULL, value = 1.30059647460184, min = 0, width = '100%'),
+          numericInput('indic2PCBX', NULL, value = 71.0791428571429, min = 0, width = '100%'),
+          numericInput('indic2PCBSD', NULL, value = 36.3098108973698, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 3
+      fluidRow(
+        column(3, h6('3 Benthic and pelagic with piscivory')),
+        column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])),
+        column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'),
+          numericInput('indic3ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic3PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 4
+      fluidRow(
+        column(3, h6('4 Benthic without piscivory')),
+        column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])),
+        column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'),
+          numericInput('indic4ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic4PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 5
+      fluidRow(
+        column(3, h6('5 Benthic and pelagic without piscivory')),
+        column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])),
+        column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'),
+          numericInput('indic5ChlordaneX', NULL, value = 2.5275, min = 0, width = '100%'),
+          numericInput('indic5ChlordaneSD', NULL, value = 0.4157433102288, min = 0, width = '100%'),
+          numericInput('indic5DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
+          numericInput('indic5DieldrinSD', NULL, value = 0, min = 0, width = '100%'),
+          numericInput('indic5DDTX', NULL, value = 7.283, min = 0, width = '100%'),
+          numericInput('indic5DDTSD', NULL, value = 2.51069636948402, min = 0, width = '100%'),
+          numericInput('indic5PCBX', NULL, value = 1.9195, min = 0, width = '100%'),
+          numericInput('indic5PCBSD', NULL, value = 0.976160911428029, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 6
+      fluidRow(
+        column(3, h6('6 Benthic with herbivory')),
+        column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])),
+        column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'),
+          numericInput('indic6ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic6PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 7
+      fluidRow(
+        column(3, h6('7 Benthic and pelagic with herbivory')),
+        column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])),
+        column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'),
+          numericInput('indic7ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic7PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 8
+      fluidRow(
+        column(3, h6('8 Pelagic with benthic herbivory')),
+        column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])),
+        column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'),
+          numericInput('indic8ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic8PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # indic 9
+      fluidRow(
+        column(3, h6('9 Benthic diet with piscivory: estuarine')),
+        column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])),
+        column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)),
+        splitLayout(cellWidths = wds,
+          numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
+          numericInput('indic9ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9ChlordaneSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9DieldrinX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9DieldrinSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9DDTX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9DDTSD', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9PCBX', NULL, value = NULL, min = 0, width = '100%'),
+          numericInput('indic9PCBSD', NULL, value = NULL, min = 0, width = '100%')
+        )
+      ),
+
+      # sediment contaminant concentration
+      fluidRow(
+        column(6, h5('Sediment contaminant concentration')),
+        # column(3, NULL),
+        column(2, NULL),
+        splitLayout(cellWidths = wds,
+          renderText(NULL),
+          numericInput('sedChlordaneX', NULL, value = 0.5, min = 0, width = '100%'),
+          numericInput('sedChlordaneSD', NULL, value = 0, min = 0, width = '100%'),
+          numericInput('sedDieldrinX', NULL, value = 0.5, min = 0, width = '100%'),
+          numericInput('sedDieldrinSD', NULL, value = 0, min = 0, width = '100%'),
+          numericInput('sedDDTX', NULL, value = 1.19166666666667, min = 0, width = '100%'),
+          numericInput('sedDDTSD', NULL, value = 0.765187658537288, min = 0, width = '100%'),
+          numericInput('sedPCBX', NULL, value = 1.33454545454546, min = 0, width = '100%'),
+          numericInput('sedPCBSD', NULL, value = 1.60216108332035, min = 0, width = '100%')
+        )
+      )
+      
+    )
+
+    w2 <- wellPanel(id = "envdat", style = "background-color:#daf1da",
+
+      # site area
+      fluidRow(
+        column(4, h6('Area of site (km2)')),
+        column(2, numericInput('SA', NULL, value = 8.06, min = 0, width = '100%'))
+      ),
+
+      # site length
+      fluidRow(
+        column(4, h6('Length of site (km)')),
+        column(2, numericInput('SL', NULL, value = 6, min = 0, width = '100%'))
+      ),
+
+      # organic carb prop in sed (TOC)
+      fluidRow(
+        column(4, h6('Organic carbon in sediment (kg/kg)')),
+        column(2, numericInput('ocsed', NULL, value = 0.0163, width = '100%'))
+      ),
+
+      # doc conc in water
+      fluidRow(
+        column(4, h6('DOC conc. in water (kg/L)')),
+        column(2, numericInput('xdoc', NULL, value = 0.00000215, min = 0, width = '100%'))
+      ),
+
+      # poc conc in water
+      fluidRow(
+        column(4, h6('POC conc. in water (kg/L)')),
+        column(2, numericInput('xpoc', NULL, value = 0.00000157, min = 0, width = '100%'))
+      ),
+
+      # water temp
+      fluidRow(
+        column(4, HTML('<h6>Mean water temperature (&deg;C)</h6>')),
+        column(2, numericInput('T', NULL, value = 17.4, width = '100%'))
+      ),
+
+      # salinity
+      fluidRow(
+        column(4, h6('Water salinity (psu)')),
+        column(2, numericInput('salinity', NULL, value = 25.4, min = 0, width = '100%'))
+      ),
+
+      # dissolved oxygen
+      fluidRow(
+        column(4, h6('Dissolved oxygen (mg/L)')),
+        column(2, numericInput('Cox', NULL, value = 8.09, min = 0, width = '100%'))
+      ),
+
+      # concentration of suspended solids
+      fluidRow(
+        column(4, h6('Conc. of suspended solids (kg/L)')),
+        column(2, numericInput('vss', NULL, value = 0.0000246, min = 0, width = '100%'))
+      )
+
+    )
+    
+    w3 <- wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
+
+      # headers
+      fluidRow(
+        column(2, NULL),
+        column(2, NULL),
+        column(2, 'Sediment (ng/g dry wt)'),
+        column(2, 'Dissolved surface water (pg/L)'),
+        column(2, 'Pore water (pg/L)')
+      ),
+
+      # Chlordane
+      fluidRow(
+      	column(2, h6('Chlordane')),
+      	column(2, h6('alphaChlordane')),
+      	column(2, numericInput('alphaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('alphaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('alphaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # Chlordane
+      fluidRow(
+      	column(2, h6('Chlordane')),
+      	column(2, h6('gammaChlordane')),
+      	column(2, numericInput('gammaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('gammaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('gammaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # Chlordane
+      fluidRow(
+      	column(2, h6('Chlordane')),
+      	column(2, h6('alphaNonachlor')),
+      	column(2, numericInput('alphaNonachlor_sed', NULL, value = 0.49, min = 0, width = '100%')),
+      	column(2, numericInput('alphaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('alphaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # Chlordane
+      fluidRow(
+      	column(2, h6('Chlordane')),
+      	column(2, h6('gammaNonachlor')),
+      	column(2, numericInput('gammaNonachlor_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('gammaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('gammaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # Chlordane
+      fluidRow(
+      	column(2, h6('Chlordane')),
+      	column(2, h6('Oxychlordane')),
+      	column(2, numericInput('Oxychlordane_sed', NULL, value = 0.23, min = 0, width = '100%')),
+      	column(2, numericInput('Oxychlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('Oxychlordane_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # Dieldrin
+      fluidRow(
+      	column(2, h6('Dieldrin')),
+      	column(2, h6('Dieldrin')),
+      	column(2, numericInput('Dieldrin_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('Dieldrin_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('Dieldrin_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('op-DDD')),
+      	column(2, numericInput('op-DDD_sed', NULL, value = 0.189302326, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDD_dis', NULL, value = 9.305665792, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('op-DDE')),
+      	column(2, numericInput('op-DDE_sed', NULL, value = 6.704795349, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDE_dis', NULL, value = 44.88585023, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDE_por', NULL, value = 63.87, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('op-DDT')),
+      	column(2, numericInput('op-DDT_sed', NULL, value = 1.2, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDT_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('op-DDT_por', NULL, value = 15.68, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('pp-DDD')),
+      	column(2, numericInput('pp-DDD_sed', NULL, value = 3.243651395, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDD_dis', NULL, value = 19.45333669, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('pp-DDE')),
+      	column(2, numericInput('pp-DDE_sed', NULL, value = 44.74623256, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDE_dis', NULL, value = 306.1044638, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDE_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # DDT
+      fluidRow(
+      	column(2, h6('DDT')),
+      	column(2, h6('pp-DDT')),
+      	column(2, numericInput('pp-DDT_sed', NULL, value = 1.099302326, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDT_dis', NULL, value = 8.092710587, min = 0, width = '100%')),
+      	column(2, numericInput('pp-DDT_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 8')),
+      	column(2, numericInput('PCB 8_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 8_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 8_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 11')),
+      	column(2, numericInput('PCB 11_sed', NULL, value = 0.36, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 11_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 11_por', NULL, value = 47.65, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 18')),
+      	column(2, numericInput('PCB 18_sed', NULL, value = 0.101054884, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 18_dis', NULL, value = 13.185837, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 18_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 27')),
+      	column(2, numericInput('PCB 27_sed', NULL, value = 0.44, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 27_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 27_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 28')),
+      	column(2, numericInput('PCB 28_sed', NULL, value = 0.166863488, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 28_dis', NULL, value = 11.43476661, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 28_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 29')),
+      	column(2, numericInput('PCB 29_sed', NULL, value = 0.72, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 29_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 29_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 31')),
+      	column(2, numericInput('PCB 31_sed', NULL, value = 0.13606575, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 31_dis', NULL, value = 6.363272245, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 31_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 33')),
+      	column(2, numericInput('PCB 33_sed', NULL, value = 0.36, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 33_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 33_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 37')),
+      	column(2, numericInput('PCB 37_sed', NULL, value = 0.42, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 37_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 37_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 44')),
+      	column(2, numericInput('PCB 44_sed', NULL, value = 0.405351163, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 44_dis', NULL, value = 16.2247466, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 44_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 49')),
+      	column(2, numericInput('PCB 49_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 49_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 49_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 52')),
+      	column(2, numericInput('PCB 52_sed', NULL, value = 0.5, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 52_dis', NULL, value = 17.33, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 52_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 56')),
+      	column(2, numericInput('PCB 56_sed', NULL, value = 0.54, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 56_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 56_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 60')),
+      	column(2, numericInput('PCB 60_sed', NULL, value = 0.61, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 60_dis', NULL, value = 65.32, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 60_por', NULL, value = 140.8, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 64')),
+      	column(2, numericInput('PCB 64_sed', NULL, value = 0.38, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 64_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 64_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 66')),
+      	column(2, numericInput('PCB 66_sed', NULL, value = 1.05, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 66_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 66_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 70')),
+      	column(2, numericInput('PCB 70_sed', NULL, value = 1.35, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 70_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 70_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 74')),
+      	column(2, numericInput('PCB 74_sed', NULL, value = 0.194457209, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 74_dis', NULL, value = 3.470400349, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 74_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 77')),
+      	column(2, numericInput('PCB 77_sed', NULL, value = 1.12, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 77_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 77_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 81')),
+      	column(2, numericInput('PCB 81_sed', NULL, value = 1.09, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 81_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 81_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 87')),
+      	column(2, numericInput('PCB 87_sed', NULL, value = 1.4, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 87_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 87_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 95')),
+      	column(2, numericInput('PCB 95_sed', NULL, value = 0.77, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 95_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 95_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 97')),
+      	column(2, numericInput('PCB 97_sed', NULL, value = 0.3636925, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 97_dis', NULL, value = 3.681928399, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 97_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 99')),
+      	column(2, numericInput('PCB 99_sed', NULL, value = 0.617086047, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 99_dis', NULL, value = 5.897746631, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 99_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 101')),
+      	column(2, numericInput('PCB 101_sed', NULL, value = 0.181250006, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 101_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 101_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 105')),
+      	column(2, numericInput('PCB 105_sed', NULL, value = 0.454006977, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 105_dis', NULL, value = 1.599129689, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 105_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 110')),
+      	column(2, numericInput('PCB 110_sed', NULL, value = 1.601034884, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 110_dis', NULL, value = 9.244741774, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 110_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 114')),
+      	column(2, numericInput('PCB 114_sed', NULL, value = 0.33, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 114_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 114_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 118')),
+      	column(2, numericInput('PCB 118_sed', NULL, value = 0.275000006, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 118_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 118_por', NULL, value = 17.98, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 119')),
+      	column(2, numericInput('PCB 119_sed', NULL, value = 0.41, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 119_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 119_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 123')),
+      	column(2, numericInput('PCB 123_sed', NULL, value = 0.63, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 123_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 123_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 126')),
+      	column(2, numericInput('PCB 126_sed', NULL, value = 0.38, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 126_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 126_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 128')),
+      	column(2, numericInput('PCB 128_sed', NULL, value = 0.71, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 128_dis', NULL, value = 96.32, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 128_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 132')),
+      	column(2, numericInput('PCB 132_sed', NULL, value = 0.33, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 132_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 132_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 137')),
+      	column(2, numericInput('PCB 137_sed', NULL, value = 0.56, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 137_dis', NULL, value = 165.6, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 137_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 138')),
+      	column(2, numericInput('PCB 138_sed', NULL, value = 0.25384615, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 138_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 138_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 141')),
+      	column(2, numericInput('PCB 141_sed', NULL, value = 0.29, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 141_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 141_por', NULL, value = 27.86, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 146')),
+      	column(2, numericInput('PCB 146_sed', NULL, value = 1.01, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 146_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 146_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 149')),
+      	column(2, numericInput('PCB 149_sed', NULL, value = 1.25, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 149_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 149_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 151')),
+      	column(2, numericInput('PCB 151_sed', NULL, value = 0.215226512, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 151_dis', NULL, value = 1.879261719, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 151_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 153')),
+      	column(2, numericInput('PCB 153_sed', NULL, value = 1.39244, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 153_dis', NULL, value = 5.251926401, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 153_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 156')),
+      	column(2, numericInput('PCB 156_sed', NULL, value = 0.148466047, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 156_dis', NULL, value = 0.319787514, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 156_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 157')),
+      	column(2, numericInput('PCB 157_sed', NULL, value = 0.56, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 157_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 157_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 158')),
+      	column(2, numericInput('PCB 158_sed', NULL, value = 1.3, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 158_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 158_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 167')),
+      	column(2, numericInput('PCB 167_sed', NULL, value = 0.74, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 167_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 167_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 168')),
+      	column(2, numericInput('PCB 168_sed', NULL, value = 0.21, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 168_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 168_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 169')),
+      	column(2, numericInput('PCB 169_sed', NULL, value = 1.11, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 169_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 169_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 170')),
+      	column(2, numericInput('PCB 170_sed', NULL, value = 0.330709302, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 170_dis', NULL, value = 0.569421342, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 170_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 174')),
+      	column(2, numericInput('PCB 174_sed', NULL, value = 0.322745, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 174_dis', NULL, value = 0.894510598, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 174_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 177')),
+      	column(2, numericInput('PCB 177_sed', NULL, value = 0.121874884, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 177_dis', NULL, value = 0.522629476, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 177_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 180')),
+      	column(2, numericInput('PCB 180_sed', NULL, value = 0.697543256, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 180_dis', NULL, value = 1.495032452, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 180_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 183')),
+      	column(2, numericInput('PCB 183_sed', NULL, value = 0.112256047, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 183_dis', NULL, value = 0.451321306, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 183_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 187')),
+      	column(2, numericInput('PCB 187_sed', NULL, value = 0.7125, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 187_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 187_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 189')),
+      	column(2, numericInput('PCB 189_sed', NULL, value = 0.64, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 189_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 189_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 194')),
+      	column(2, numericInput('PCB 194_sed', NULL, value = 0.19812907, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 194_dis', NULL, value = 0.238347374, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 194_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 195')),
+      	column(2, numericInput('PCB 195_sed', NULL, value = 0.066266, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 195_dis', NULL, value = 0.10184514, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 195_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 198')),
+      	column(2, numericInput('PCB 198_sed', NULL, value = 0.45, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 198_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 198_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 199')),
+      	column(2, numericInput('PCB 199_sed', NULL, value = 0.68, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 199_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 199_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 200')),
+      	column(2, numericInput('PCB 200_sed', NULL, value = 0.77, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 200_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 200_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 201')),
+      	column(2, numericInput('PCB 201_sed', NULL, value = 0.015007186, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 201_dis', NULL, value = 0.04712185, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 201_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 203')),
+      	column(2, numericInput('PCB 203_sed', NULL, value = 1.15, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 203_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 203_por', NULL, value = NULL, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 206')),
+      	column(2, numericInput('PCB 206_sed', NULL, value = 1.02, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 206_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 206_por', NULL, value = 125.7, min = 0, width = '100%'))
+      	),
+
+      # PCB
+      fluidRow(
+      	column(2, h6('PCB')),
+      	column(2, h6('PCB 209')),
+      	column(2, numericInput('PCB 209_sed', NULL, value = 0.86, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 209_dis', NULL, value = NULL, min = 0, width = '100%')),
+      	column(2, numericInput('PCB 209_por', NULL, value = NULL, min = 0, width = '100%'))
+      	)
+
+    )
+    
+    out <- div(
+      h3('Indicator guild species and sediment contaminant concentrations'), 
+      w1,
+      h3('Site and environmental data'), 
+      w2, 
+      h3('Contaminants'), 
+      w3
+      )
+      
+  }
   
-  # concentration of suspended solids      
-  fluidRow(
-    column(4, h6('Conc. of suspended solids (kg/L)')),
-    column(2, numericInput('vss', NULL, value = 0.0000246, min = 0, width = '100%'))
-  )
- 
-)
+  if(inptyp == 'File upload'){
+    
+    out <- NULL
+    
+  }
+  
+  return(out)
+  
+})
 ```
-
-### Contaminants
-
 ```{r}
-wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; background-color:#daf1da",
-
-  # headers
-  fluidRow(
-    column(2, NULL),
-    column(2, NULL),
-    column(2, 'Sediment (ng/g dry wt)'), 
-    column(2, 'Dissolved surface water (pg/L)'),
-    column(2, 'Pore water (pg/L)')
-  ),          
-
-  # Chlordane
-  fluidRow(
-  	column(2, h6('Chlordane')),
-  	column(2, h6('alphaChlordane')),
-  	column(2, numericInput('alphaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('alphaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('alphaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # Chlordane
-  fluidRow(
-  	column(2, h6('Chlordane')),
-  	column(2, h6('gammaChlordane')),
-  	column(2, numericInput('gammaChlordane_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('gammaChlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('gammaChlordane_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # Chlordane
-  fluidRow(
-  	column(2, h6('Chlordane')),
-  	column(2, h6('alphaNonachlor')),
-  	column(2, numericInput('alphaNonachlor_sed', NULL, value = 0.49, min = 0, width = '100%')),
-  	column(2, numericInput('alphaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('alphaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # Chlordane
-  fluidRow(
-  	column(2, h6('Chlordane')),
-  	column(2, h6('gammaNonachlor')),
-  	column(2, numericInput('gammaNonachlor_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('gammaNonachlor_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('gammaNonachlor_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # Chlordane
-  fluidRow(
-  	column(2, h6('Chlordane')),
-  	column(2, h6('Oxychlordane')),
-  	column(2, numericInput('Oxychlordane_sed', NULL, value = 0.23, min = 0, width = '100%')),
-  	column(2, numericInput('Oxychlordane_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('Oxychlordane_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # Dieldrin
-  fluidRow(
-  	column(2, h6('Dieldrin')),
-  	column(2, h6('Dieldrin')),
-  	column(2, numericInput('Dieldrin_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('Dieldrin_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('Dieldrin_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('op-DDD')),
-  	column(2, numericInput('op-DDD_sed', NULL, value = 0.189302326, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDD_dis', NULL, value = 9.305665792, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('op-DDE')),
-  	column(2, numericInput('op-DDE_sed', NULL, value = 6.704795349, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDE_dis', NULL, value = 44.88585023, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDE_por', NULL, value = 63.87, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('op-DDT')),
-  	column(2, numericInput('op-DDT_sed', NULL, value = 1.2, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDT_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('op-DDT_por', NULL, value = 15.68, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('pp-DDD')),
-  	column(2, numericInput('pp-DDD_sed', NULL, value = 3.243651395, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDD_dis', NULL, value = 19.45333669, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDD_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('pp-DDE')),
-  	column(2, numericInput('pp-DDE_sed', NULL, value = 44.74623256, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDE_dis', NULL, value = 306.1044638, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDE_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # DDT
-  fluidRow(
-  	column(2, h6('DDT')),
-  	column(2, h6('pp-DDT')),
-  	column(2, numericInput('pp-DDT_sed', NULL, value = 1.099302326, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDT_dis', NULL, value = 8.092710587, min = 0, width = '100%')),
-  	column(2, numericInput('pp-DDT_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 8')),
-  	column(2, numericInput('PCB 8_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 8_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 8_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 11')),
-  	column(2, numericInput('PCB 11_sed', NULL, value = 0.36, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 11_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 11_por', NULL, value = 47.65, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 18')),
-  	column(2, numericInput('PCB 18_sed', NULL, value = 0.101054884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 18_dis', NULL, value = 13.185837, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 18_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 27')),
-  	column(2, numericInput('PCB 27_sed', NULL, value = 0.44, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 27_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 27_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 28')),
-  	column(2, numericInput('PCB 28_sed', NULL, value = 0.166863488, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 28_dis', NULL, value = 11.43476661, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 28_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 29')),
-  	column(2, numericInput('PCB 29_sed', NULL, value = 0.72, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 29_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 29_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 31')),
-  	column(2, numericInput('PCB 31_sed', NULL, value = 0.13606575, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 31_dis', NULL, value = 6.363272245, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 31_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 33')),
-  	column(2, numericInput('PCB 33_sed', NULL, value = 0.36, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 33_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 33_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 37')),
-  	column(2, numericInput('PCB 37_sed', NULL, value = 0.42, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 37_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 37_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 44')),
-  	column(2, numericInput('PCB 44_sed', NULL, value = 0.405351163, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 44_dis', NULL, value = 16.2247466, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 44_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 49')),
-  	column(2, numericInput('PCB 49_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 49_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 49_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 52')),
-  	column(2, numericInput('PCB 52_sed', NULL, value = 0.5, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 52_dis', NULL, value = 17.33, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 52_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 56')),
-  	column(2, numericInput('PCB 56_sed', NULL, value = 0.54, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 56_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 56_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 60')),
-  	column(2, numericInput('PCB 60_sed', NULL, value = 0.61, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 60_dis', NULL, value = 65.32, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 60_por', NULL, value = 140.8, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 64')),
-  	column(2, numericInput('PCB 64_sed', NULL, value = 0.38, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 64_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 64_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 66')),
-  	column(2, numericInput('PCB 66_sed', NULL, value = 1.05, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 66_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 66_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 70')),
-  	column(2, numericInput('PCB 70_sed', NULL, value = 1.35, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 70_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 70_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 74')),
-  	column(2, numericInput('PCB 74_sed', NULL, value = 0.194457209, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 74_dis', NULL, value = 3.470400349, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 74_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 77')),
-  	column(2, numericInput('PCB 77_sed', NULL, value = 1.12, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 77_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 77_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 81')),
-  	column(2, numericInput('PCB 81_sed', NULL, value = 1.09, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 81_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 81_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 87')),
-  	column(2, numericInput('PCB 87_sed', NULL, value = 1.4, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 87_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 87_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 95')),
-  	column(2, numericInput('PCB 95_sed', NULL, value = 0.77, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 95_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 95_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 97')),
-  	column(2, numericInput('PCB 97_sed', NULL, value = 0.3636925, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 97_dis', NULL, value = 3.681928399, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 97_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 99')),
-  	column(2, numericInput('PCB 99_sed', NULL, value = 0.617086047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 99_dis', NULL, value = 5.897746631, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 99_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 101')),
-  	column(2, numericInput('PCB 101_sed', NULL, value = 0.181250006, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 101_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 101_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 105')),
-  	column(2, numericInput('PCB 105_sed', NULL, value = 0.454006977, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 105_dis', NULL, value = 1.599129689, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 105_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 110')),
-  	column(2, numericInput('PCB 110_sed', NULL, value = 1.601034884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 110_dis', NULL, value = 9.244741774, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 110_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 114')),
-  	column(2, numericInput('PCB 114_sed', NULL, value = 0.33, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 114_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 114_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 118')),
-  	column(2, numericInput('PCB 118_sed', NULL, value = 0.275000006, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 118_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 118_por', NULL, value = 17.98, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 119')),
-  	column(2, numericInput('PCB 119_sed', NULL, value = 0.41, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 119_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 119_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 123')),
-  	column(2, numericInput('PCB 123_sed', NULL, value = 0.63, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 123_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 123_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 126')),
-  	column(2, numericInput('PCB 126_sed', NULL, value = 0.38, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 126_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 126_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 128')),
-  	column(2, numericInput('PCB 128_sed', NULL, value = 0.71, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 128_dis', NULL, value = 96.32, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 128_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 132')),
-  	column(2, numericInput('PCB 132_sed', NULL, value = 0.33, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 132_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 132_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 137')),
-  	column(2, numericInput('PCB 137_sed', NULL, value = 0.56, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 137_dis', NULL, value = 165.6, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 137_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 138')),
-  	column(2, numericInput('PCB 138_sed', NULL, value = 0.25384615, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 138_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 138_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 141')),
-  	column(2, numericInput('PCB 141_sed', NULL, value = 0.29, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 141_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 141_por', NULL, value = 27.86, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 146')),
-  	column(2, numericInput('PCB 146_sed', NULL, value = 1.01, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 146_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 146_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 149')),
-  	column(2, numericInput('PCB 149_sed', NULL, value = 1.25, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 149_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 149_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 151')),
-  	column(2, numericInput('PCB 151_sed', NULL, value = 0.215226512, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 151_dis', NULL, value = 1.879261719, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 151_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 153')),
-  	column(2, numericInput('PCB 153_sed', NULL, value = 1.39244, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 153_dis', NULL, value = 5.251926401, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 153_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 156')),
-  	column(2, numericInput('PCB 156_sed', NULL, value = 0.148466047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 156_dis', NULL, value = 0.319787514, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 156_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 157')),
-  	column(2, numericInput('PCB 157_sed', NULL, value = 0.56, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 157_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 157_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 158')),
-  	column(2, numericInput('PCB 158_sed', NULL, value = 1.3, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 158_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 158_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 167')),
-  	column(2, numericInput('PCB 167_sed', NULL, value = 0.74, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 167_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 167_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 168')),
-  	column(2, numericInput('PCB 168_sed', NULL, value = 0.21, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 168_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 168_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 169')),
-  	column(2, numericInput('PCB 169_sed', NULL, value = 1.11, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 169_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 169_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 170')),
-  	column(2, numericInput('PCB 170_sed', NULL, value = 0.330709302, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 170_dis', NULL, value = 0.569421342, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 170_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 174')),
-  	column(2, numericInput('PCB 174_sed', NULL, value = 0.322745, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 174_dis', NULL, value = 0.894510598, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 174_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 177')),
-  	column(2, numericInput('PCB 177_sed', NULL, value = 0.121874884, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 177_dis', NULL, value = 0.522629476, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 177_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 180')),
-  	column(2, numericInput('PCB 180_sed', NULL, value = 0.697543256, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 180_dis', NULL, value = 1.495032452, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 180_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 183')),
-  	column(2, numericInput('PCB 183_sed', NULL, value = 0.112256047, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 183_dis', NULL, value = 0.451321306, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 183_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 187')),
-  	column(2, numericInput('PCB 187_sed', NULL, value = 0.7125, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 187_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 187_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 189')),
-  	column(2, numericInput('PCB 189_sed', NULL, value = 0.64, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 189_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 189_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 194')),
-  	column(2, numericInput('PCB 194_sed', NULL, value = 0.19812907, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 194_dis', NULL, value = 0.238347374, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 194_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 195')),
-  	column(2, numericInput('PCB 195_sed', NULL, value = 0.066266, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 195_dis', NULL, value = 0.10184514, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 195_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 198')),
-  	column(2, numericInput('PCB 198_sed', NULL, value = 0.45, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 198_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 198_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 199')),
-  	column(2, numericInput('PCB 199_sed', NULL, value = 0.68, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 199_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 199_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 200')),
-  	column(2, numericInput('PCB 200_sed', NULL, value = 0.77, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 200_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 200_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 201')),
-  	column(2, numericInput('PCB 201_sed', NULL, value = 0.015007186, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 201_dis', NULL, value = 0.04712185, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 201_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 203')),
-  	column(2, numericInput('PCB 203_sed', NULL, value = 1.15, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 203_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 203_por', NULL, value = NULL, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 206')),
-  	column(2, numericInput('PCB 206_sed', NULL, value = 1.02, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 206_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 206_por', NULL, value = 125.7, min = 0, width = '100%'))
-  	),
-  
-  # PCB
-  fluidRow(
-  	column(2, h6('PCB')),
-  	column(2, h6('PCB 209')),
-  	column(2, numericInput('PCB 209_sed', NULL, value = 0.86, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 209_dis', NULL, value = NULL, min = 0, width = '100%')),
-  	column(2, numericInput('PCB 209_por', NULL, value = NULL, min = 0, width = '100%'))
-  	)
-
-)
+uiOutput('entry')
 ```
 
 ## Food Web calculations {.tabset .tabset-pills}
