@@ -209,6 +209,32 @@ MCSres <- eventReactive(input$runmcs,
   )
 )
 
+# site linkage plot from mcsres
+mcspl <- reactive({
+  
+  # input
+  MCSres <- MCSres()
+  
+  # plot
+  p <- mcs_plo(MCSres)
+  
+  return(p)
+
+})
+
+# all mcs results long format
+mcsres <- reactive({
+  
+  # input
+  MCSres <- MCSres()
+  
+  totab <- MCSres %>% 
+    spread(contam, sitsedlnk) 
+  
+  return(totab)
+
+})
+
 # summarize MCres to get percentiles of site linkage values
 MCSsum <- reactive({
   
@@ -262,6 +288,47 @@ output$dltabbsaf <- downloadHandler(
   }
 )
 
+# dl table for sqo summary
+output$dlsqosum <- downloadHandler(
+  filename = function(){'dlsqosum.csv'},
+  content = function(file){
+    write.csv(sqosum(), file, quote = T, row.names = F)
+  }
+)
+
+# dl table for mcs summary
+output$dlsqosum <- downloadHandler(
+  filename = function(){'dlmcssum.csv'},
+  content = function(file){
+    write.csv(MCSsum(), file, quote = T, row.names = F)
+  }
+)
+
+# dl plot for mcs summary
+output$dlmcspl <- downloadHandler(
+  filename = function(){'dlmcspl.png'},
+  content = function(file){
+    png(file, width = 800, height = 600, family = 'serif', units = 'px', res = 250)
+    print(mcspl())
+    dev.off()
+  }
+)
+
+# dl table for all mcs results
+output$dlmcsres <- downloadHandler(
+  filename = function(){'dlmcsres.csv'},
+  content = function(file){
+    write.csv(mcsres(), file, quote = T, row.names = F)
+  }
+)
+
+# dl table for all calculated contaminants
+output$dlcalccont <- downloadHandler(
+  filename = function(){'dlcalccont.csv'},
+  content = function(file){
+    write.csv(res$contamcalc, file, quote = T, row.names = F)
+  }
+)
 ```
 
 # {.tabset}
@@ -1308,65 +1375,55 @@ column(12,
 ```{r}
 
 # sqo assessment summary
-output$sqosum <- renderTable({
-  
-  totab <- sqosum()
-  
-  return(totab)
-  
-  })
+output$sqosum <- renderTable({sqosum()})
 
 # mcs summary table for site linkages
-output$mcssum <- renderTable({
-  
-  totab <- MCSsum()
-  
-  return(totab)
-  
-  })
+output$mcssum <- renderTable({MCSsum()})
 
 # MCS summary plot for cdf
-output$mcspl <- renderPlot({
-  
-  # input
-  MCSres <- MCSres()
-  
-  # plot
-  p <- mcs_plo(MCSres)
-  
-  return(p)
-  
-}, height = 600, width = 800)
+output$mcspl <- renderPlot({mcspl()}, height = 600, width = 800)
 
 # sediment site linkage values for all simulations
-output$mcsres <- renderTable({
-  
-  totab <- MCSres() %>% 
-    spread(contam, sitsedlnk) 
-  
-  return(totab)
-  
-  })
-
+output$mcsres <- renderTable({mcsres()})
 ```
 
 ### SQO assessment summary
 
 ```{r}
-tableOutput('sqosum')
+column(12, 
+  column(4, downloadButtonRmd('dlsqosum', 'Download table'))
+)
+column(12, 
+  tableOutput('sqosum')
+)
 ```
 
 ### MCS summary of sediment site linkages
 
 ```{r}
-tableOutput('mcssum')
-plotOutput('mcspl')
+column(12,
+  column(4, downloadButtonRmd('dlmcssum', 'Download table'))
+)
+column(12,
+  tableOutput('mcssum')
+)
+column(12,
+  column(4, downloadButtonRmd('dlmcspl', 'Download plot'))
+)
+column(12,
+  plotOutput('mcspl')
+)
 ```
 
 ### Detailed MCS output of sediment site linkages
 
 ```{r}
-tableOutput('mcsres')
+column(12, 
+  column(4, downloadButtonRmd('dlmcsres', 'Download table'))
+)
+column(12, 
+  tableOutput('mcsres')
+)
 ```
 
 ## Additional output {.tabset .tabset-pills}
@@ -1374,14 +1431,15 @@ tableOutput('mcsres')
 ### Calculated contaminants
 
 ```{r, context = 'server'}
-output$calccont <- renderDataTable({
-
-  res$contamcalc
-  
-})
+output$calccont <- renderDataTable({res$contamcalc})
 ```
 ```{r}
-dataTableOutput('calccont')
+column(12, 
+  column(4, downloadButtonRmd('dlcalccont', 'Download table'))
+)
+column(12, 
+  dataTableOutput('calccont')
+)
 ```
 
 
