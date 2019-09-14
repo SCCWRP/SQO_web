@@ -297,7 +297,7 @@ output$dlsqosum <- downloadHandler(
 )
 
 # dl table for mcs summary
-output$dlsqosum <- downloadHandler(
+output$dlmcssum <- downloadHandler(
   filename = function(){'dlmcssum.csv'},
   content = function(file){
     write.csv(MCSsum(), file, quote = T, row.names = F)
@@ -308,7 +308,7 @@ output$dlsqosum <- downloadHandler(
 output$dlmcspl <- downloadHandler(
   filename = function(){'dlmcspl.png'},
   content = function(file){
-    png(file, width = 800, height = 600, family = 'serif', units = 'px', res = 250)
+    png(file, width = 9, height = 7, family = 'serif', units = 'in', res = 250)
     print(mcspl())
     dev.off()
   }
