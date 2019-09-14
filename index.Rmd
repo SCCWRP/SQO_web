@@ -16,6 +16,13 @@ library(SQObioaccumulation)
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
 source('R/funcs.R')
+
+# rmd downloads
+downloadButtonRmd <- function (outputId, label = "Download", class = NULL, ...)  {
+  tags$a(id = outputId, class = paste("btn btn-default shiny-download-link", 
+                                      class), href = "", target = "_blank", download = NA, 
+         icon("download"), label, ...)
+}
 ```
 
 ```{r data}
@@ -118,6 +125,37 @@ indic_sum <- reactive({
   
 })
 
+# plot of bsaf and cbiota for selected contam
+plobsaf <- reactive({
+  
+  # input
+  bsaf <- bsaf()
+  cbiota <- cbiota()
+  cntbsaf <- input$cntbsaf
+ 
+  req(cntbsaf)
+  
+  p <- plo_bsaf(bsaf, cbiota, cntbsaf)
+  
+  return(p)  
+  
+})
+
+# table of bsaf and cbiota for all contaminants
+tabbsaf <- reactive({
+  
+  # input
+  bsaf <- bsaf()
+  cbiota <- cbiota()
+ 
+  req(bsaf)
+  
+  totab <- tab_bsaf(bsaf, cbiota)
+  
+  return(totab)
+  
+})
+
 # get weighted average observed tissue concentrations from input, by contaminant category
 wgtavg <- eventReactive(input$run, {
 
@@ -195,6 +233,35 @@ sqosum <- reactive({
   return(out)
   
 })
+```
+
+```{r downloadhandlers}
+# dl summary of contaminants across indicator guilds
+output$dlindicsum <- downloadHandler(
+  filename = function(){'indicsum.csv'},
+  content = function(file){
+    write.csv(indic_sum(), file, quote = T, row.names = F)
+  }
+)
+
+# dl plot for bsaf and cbiota for contaminant
+output$dlplobsaf <- downloadHandler(
+  filename = function(){'dlplobsaf.png'},
+  content = function(file){
+    png(file, width = 9, height = 7, family = 'serif', units = 'in', res = 250)
+    print(plobsaf())
+    dev.off()
+  }
+)
+
+# dl table for bsaf and cbiota for all contaminants
+output$dltabbsaf <- downloadHandler(
+  filename = function(){'dltabbsaf.csv'},
+  content = function(file){
+    write.csv(tabbsaf(), file, quote = T, row.names = F)
+  }
+)
+
 ```
 
 # {.tabset}
@@ -1185,73 +1252,55 @@ wellPanel(id = "contamdat", style = "overflow-y:scroll; max-height: 300px; backg
 
 ## Food Web calculations {.tabset .tabset-pills}
 
-```{r}
-output$cntbsaf <- renderUI({
-  
-  # input
-  contamcalc <- res$contamcalc
-
-  selectInput('cntbsaf', 'Select contaminant:', choices = contamcalc$Chem)
-  
-})
-```
-```{r}
-uiOutput('cntbsaf')
-```
-
-### Guild species results
+### Guild species results summary
 
 ```{r}
 # calculated and observed concentrations
 output$tabsum <- renderTable({indic_sum()})
 ```
 ```{r}
-tableOutput('tabsum')
+column(12, 
+  column(4, downloadButtonRmd('dlindicsum', 'Download table'))
+)
+column(12, 
+ tableOutput('tabsum')
+)
 ```
 
-### All food web species, plot
+### Plot all species by contaminant
 
 ```{r}
-output$plobsaf <- renderPlot({
+output$cntbsaf <- renderUI({
   
   # input
-  bsaf <- bsaf()
-  cbiota <- cbiota()
-  cntbsaf <- input$cntbsaf
- 
-  req(cntbsaf)
+  contamcalc <- res$contamcalc
+  selectInput('cntbsaf', 'Select contaminant:', choices = contamcalc$Chem)
   
-  p <- plo_bsaf(bsaf, cbiota, cntbsaf)
-  
-  return(p)
-  
-}, height = 600)
+})
+output$plobsaf <- renderPlot({plobsaf()}, height = 600)
 ```
 ```{r}
-plotOutput('plobsaf')
+column(12,  
+  column(4, downloadButtonRmd('dlplobsaf', 'Download plot')),
+  column(4, uiOutput('cntbsaf'))
+)
+column(12, 
+  plotOutput('plobsaf')
+)
 ```
 
-### All food web species table
+### All results table
 
 ```{r}
-output$tabbsaf <- renderTable({
-  
-  # input
-  bsaf <- bsaf()
-  cbiota <- cbiota()
-  cntbsaf <- input$cntbsaf
- 
-  req(cntbsaf)
-  
-  totab <- tab_bsaf(bsaf, cbiota, cntbsaf)
-  
-  return(totab)
-  
-  })#, options = list(dom = 't'))
-
+output$tabbsaf <- renderDataTable({tabbsaf()})
 ```
 ```{r}
-tableOutput('tabbsaf')
+column(12, 
+  column(4, downloadButtonRmd('dltabbsaf', 'Download table'))
+)
+column(12, 
+  dataTableOutput('tabbsaf')
+)
 ```
 
 ## Output summary {.tabset .tabset-pills}
