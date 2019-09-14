@@ -124,7 +124,7 @@ wgtavg <- eventReactive(input$run, {
   # format mcs inputs
   mcsparms <- formmcsinp(input, mcsparms)
   propseaf <- formpropseaf(input)
-  
+
   out <- wgt_avg_fun(mcsparms, propseaf)
 
   return(out)
