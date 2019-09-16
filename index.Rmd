@@ -84,13 +84,26 @@ observeEvent(input$run,
       
       if(inptyp == 'File upload'){
         
-        biota <<- input$biotaupl
-        constants <<- input$constantsupl
-        contam <<- input$contamupl
-        
+        # make sure all files are uploaded
+        req(!is.null(input$biotaupl))
+        req(!is.null(input$constantsupl))
+        req(!is.null(input$contamupl))
+        req(!is.null(input$mcsparmsupl))
         # validate(
-        #   need(any(e))
+        #   need(
+        #     !any(
+        #       is.null(input$biotaupl), 
+        #       is.null(input$constantsupl), 
+        #       is.null(input$contamupl),
+        #       is.null(input$mcsparmsupl)
+        #       ), 
+        #     'Upload all files before running model'
+        #   )
         # )
+      
+        biota <<- read.csv(input$biotaupl$datapath, stringsAsFactors = F)
+        constants <<- read.csv(input$constantsupl$datapath, stringsAsFactors = F)
+        contam <<-  read.csv(input$contamupl$datapath, stringsAsFactors = F)
         
       }
       
@@ -185,7 +198,7 @@ wgtavg <- eventReactive(input$run, {
     mcsparms <- formmcsinp(input, mcsparms)
   }
   if(inptyp == 'File upload'){
-    mcsparms <- input$mcsparmsupl
+    mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
   }
   
   propseaf <- formpropseaf(input)
@@ -230,7 +243,7 @@ MCSres <- eventReactive(input$runmcs,
       }
       
       if(inptyp == 'File upload'){
-        mcsparms <- input$mcsparmsupl
+        mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
       }
         
       ##
@@ -374,7 +387,7 @@ output$dlbiotatmpl <- downloadHandler(
 )
 
 # dl constants template
-output$dlconsantstmpl <- downloadHandler(
+output$dlconstantstmpl <- downloadHandler(
   filename = function(){'constants.csv'},
   content = function(file){
     fl <- read.csv('data/inptmp/constants.csv', stringsAsFactors = F)
@@ -383,7 +396,7 @@ output$dlconsantstmpl <- downloadHandler(
 )
 
 # dl contam template
-output$dlbiotatmpl <- downloadHandler(
+output$dlcontamtmpl <- downloadHandler(
   filename = function(){'contam.csv'},
   content = function(file){
     fl <- read.csv('data/inptmp/contam.csv', stringsAsFactors = F)
@@ -1401,28 +1414,36 @@ output$entry <- renderUI({
   
   if(inptyp == 'File upload'){
     
-    out <- div(
-      column(12, 
-        h3('Indicator guild species and sediment contaminant concentrations'), 
-        column(3, downloadButtonRmd('dlbiotatmpl', 'Download template')),
-        column(3, fileInput('biotaupl', NULL, accept = '.csv'))
-      ), 
-      column(12, 
-        h3('Site and environmental data'),
-        column(3, downloadButtonRmd('dlconstantstmpl', 'Download template')),
-        column(3, fileInput('constantsupl', NULL, accept = '.csv'))
-      ),
-      column(12, 
-        h3('Contaminants'), 
-        column(3, downloadButtonRmd('dlcontamtmpl', 'Download template')),
-        column(3, fileInput('contamupl', NULL, accept = '.csv'))
-      ), 
-      column(12,
-        h3('MCS parameters'),
-        column(3, downloadButtonRmd('dlmcsparmstmpl', 'Download template')),
-        column(3, fileInput('mcsparmsupl', NULL, accept = '.csv'))
-      )
+    w1 <- wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da",
+      column(3, downloadButtonRmd('dlbiotatmpl', 'Download template')),
+      column(4, fileInput('biotaupl', NULL, accept = '.csv'))
     )
+    
+    w2 <- wellPanel(id = "envdat", style = "overflow-x:scroll; background-color:#daf1da",    
+      column(3, downloadButtonRmd('dlconstantstmpl', 'Download template')),
+      column(4, fileInput('constantsupl', NULL, accept = '.csv'))
+    )
+    
+    w3 <- wellPanel(id = "contamdat", style = "overflow-x:scroll; background-color:#daf1da",  
+      column(3, downloadButtonRmd('dlcontamtmpl', 'Download template')),
+      column(4, fileInput('contamupl', NULL, accept = '.csv'))
+    )
+    
+    w4 <- wellPanel(id = "mcsparmsdat", style = "overflow-x:scroll; background-color:#daf1da",
+      column(3, downloadButtonRmd('dlmcsparmstmpl', 'Download template')),
+      column(4, fileInput('mcsparmsupl', NULL, accept = '.csv'))
+    )
+                        
+    out <- div(
+      h3('Indicator guild species and sediment contaminant concentrations'), 
+      w1,
+      h3('Site and environmental data'), 
+      w2, 
+      h3('Contaminants'), 
+      w3, 
+      h3('MCS parameters'), 
+      w4
+      )
     
   }
   
@@ -1455,9 +1476,10 @@ column(12,
 
 ```{r}
 output$cntbsaf <- renderUI({
-  
+
   # input
   contamcalc <- res$contamcalc
+
   selectInput('cntbsaf', 'Select contaminant:', choices = contamcalc$Chem)
   
 })
