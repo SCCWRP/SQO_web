@@ -55,6 +55,8 @@ column(12,
 ```
 <br></br>
 
+Please see the [technical report](http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf) for complete documentation. 
+
 ```{r reactives}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 
