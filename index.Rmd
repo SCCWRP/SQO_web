@@ -26,15 +26,17 @@ downloadButtonRmd <- function (outputId, label = "Download", class = NULL, ...) 
 ```
 
 ```{r data}
-# data inputs
+# data inputs, lookups
 tischmthr <- read.csv('data/tischmthr.csv', stringsAsFactors = FALSE)
 finalsiteassess <- read.csv('data/finalsiteassess.csv', stringsAsFactors = FALSE)
 indic_lookup <- read.csv('data/indic_lookup.csv', stringsAsFactors = FALSE)
-biota <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
-constants <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
-contam <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
 biota_preyprop <- read.csv('data/preyprop.csv', stringsAsFactors = FALSE, row.names = 1)
-mcsparms <- read.csv('data/mcsparms.csv', stringsAsFactors = F)
+
+# data inputs, with empty values to fill with user input
+biotaemp <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
+constantsemp <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
+contamemp <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
+mcsparmsemp <- read.csv('data/mcsparms.csv', stringsAsFactors = F)
 
 # indicator species lookup format for inputs
 indic_lookup <- indic_lookup %>% 
@@ -72,15 +74,15 @@ observeEvent(input$run,
       inptyp <- input$inptyp
       
       if(inptyp == 'Manual entry'){
-    
+        
         # format biota from input
-        biota <<- formsppinp(input, biota)
+        biota <- formsppinp(input, biotaemp)
       
         # format constants from input
-        constants <<- formcnsinp(input, constants)
+        constants <- formcnsinp(input, constantsemp)
         
         # format contams from input
-        contam <<- formcntinp(input, contam)
+        contam <- formcntinp(input, contamemp)
         
       }
       
@@ -103,14 +105,14 @@ observeEvent(input$run,
         #   )
         # )
       
-        biota <<- read.csv(input$biotaupl$datapath, stringsAsFactors = F)
-        constants <<- read.csv(input$constantsupl$datapath, stringsAsFactors = F)
-        contam <<-  read.csv(input$contamupl$datapath, stringsAsFactors = F)
+        biota <- read.csv(input$biotaupl$datapath, stringsAsFactors = F)
+        constants <- read.csv(input$constantsupl$datapath, stringsAsFactors = F)
+        contam <-  read.csv(input$contamupl$datapath, stringsAsFactors = F)
         
       }
       
       # calculated contaminant inputs
-      contamcalc <<- cntcalc(contam, constants)
+      contamcalc <- cntcalc(contam, constants)
     
       btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
     
@@ -197,7 +199,7 @@ wgtavg <- eventReactive(input$run, {
   
   # format mcs inputs
   if(inptyp == 'Manual entry'){
-    mcsparms <- formmcsinp(input, mcsparms)
+    mcsparms <- formmcsinp(input, mcsparmsemp)
   }
   if(inptyp == 'File upload'){
     mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
@@ -234,14 +236,14 @@ MCSres <- eventReactive(input$runmcs,
       indic_sum <- indic_sum()
     
       # format constants from input
-      constants <- formcnsinp(input, constants)
+      constants <- formcnsinp(input, constantsemp)
       
       # format seafood proportion of dieat
       propseaf <- formpropseaf(input)
       
       # format mcs inputs
       if(inptyp == 'Manual entry'){
-        mcsparms <- formmcsinp(input, mcsparms)
+        mcsparms <- formmcsinp(input, mcsparmsemp)
       }
       
       if(inptyp == 'File upload'){
