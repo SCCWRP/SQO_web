@@ -315,7 +315,7 @@ sqosum <- reactive({
 ```{r downloadhandlers}
 # dl summary of contaminants across indicator guilds
 output$dlindicsum <- downloadHandler(
-  filename = function(){'indicsum.csv'},
+  filename = function(){paste0(input$flprf, '_indicsum.csv')},
   content = function(file){
     write.csv(indic_sum(), file, quote = T, row.names = F)
   }
@@ -323,7 +323,7 @@ output$dlindicsum <- downloadHandler(
 
 # dl plot for bsaf and cbiota for contaminant
 output$dlplobsaf <- downloadHandler(
-  filename = function(){'dlplobsaf.png'},
+  filename = function(){paste0(input$flprf, '_', input$cntbsaf, '_plot.png')},
   content = function(file){
     png(file, width = 9, height = 7, family = 'serif', units = 'in', res = 250)
     print(plobsaf())
@@ -333,7 +333,7 @@ output$dlplobsaf <- downloadHandler(
 
 # dl table for bsaf and cbiota for all contaminants
 output$dltabbsaf <- downloadHandler(
-  filename = function(){'dltabbsaf.csv'},
+  filename = function(){paste0(input$flprf, '_allests.csv')},
   content = function(file){
     write.csv(tabbsaf(), file, quote = T, row.names = F)
   }
@@ -341,7 +341,7 @@ output$dltabbsaf <- downloadHandler(
 
 # dl table for sqo summary
 output$dlsqosum <- downloadHandler(
-  filename = function(){'dlsqosum.csv'},
+  filename = function(){paste0(input$flprf, '_sqosum.csv')},
   content = function(file){
     write.csv(sqosum(), file, quote = T, row.names = F)
   }
@@ -349,7 +349,7 @@ output$dlsqosum <- downloadHandler(
 
 # dl table for mcs summary
 output$dlmcssum <- downloadHandler(
-  filename = function(){'dlmcssum.csv'},
+  filename = function(){paste0(input$flprf, '_mcssum.csv')},
   content = function(file){
     write.csv(MCSsum(), file, quote = T, row.names = F)
   }
@@ -357,7 +357,7 @@ output$dlmcssum <- downloadHandler(
 
 # dl plot for mcs summary
 output$dlmcspl <- downloadHandler(
-  filename = function(){'dlmcspl.png'},
+  filename = function(){paste0(input$flprf, '_mcsplot.png')},
   content = function(file){
     png(file, width = 9, height = 7, family = 'serif', units = 'in', res = 250)
     print(mcspl())
@@ -367,7 +367,7 @@ output$dlmcspl <- downloadHandler(
 
 # dl table for all mcs results
 output$dlmcsres <- downloadHandler(
-  filename = function(){'dlmcsres.csv'},
+  filename = function(){paste0(input$flprf, '_mcsresults.csv')},
   content = function(file){
     write.csv(mcsres(), file, quote = T, row.names = F)
   }
@@ -375,7 +375,7 @@ output$dlmcsres <- downloadHandler(
 
 # dl table for all calculated contaminants
 output$dlcalccont <- downloadHandler(
-  filename = function(){'dlcalccont.csv'},
+  filename = function(){paste0(input$flprf, '_calccont.csv')},
   content = function(file){
     write.csv(res$contamcalc, file, quote = T, row.names = F)
   }
@@ -383,7 +383,7 @@ output$dlcalccont <- downloadHandler(
 
 # dl biota template
 output$dlbiotatmpl <- downloadHandler(
-  filename = function(){'biota.csv'},
+  filename = function(){paste0(input$flprf, '_biota.csv')},
   content = function(file){
     fl <- read.csv('data/inptmp/biota.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
@@ -392,7 +392,7 @@ output$dlbiotatmpl <- downloadHandler(
 
 # dl constants template
 output$dlconstantstmpl <- downloadHandler(
-  filename = function(){'constants.csv'},
+  filename = function(){paste0(input$flprf, '_constants.csv')},
   content = function(file){
     fl <- read.csv('data/inptmp/constants.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
@@ -401,7 +401,7 @@ output$dlconstantstmpl <- downloadHandler(
 
 # dl contam template
 output$dlcontamtmpl <- downloadHandler(
-  filename = function(){'contam.csv'},
+  filename = function(){paste0(input$flprf, '_contam.csv')},
   content = function(file){
     fl <- read.csv('data/inptmp/contam.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
@@ -410,7 +410,7 @@ output$dlcontamtmpl <- downloadHandler(
 
 # dl mcsparms template
 output$dlmcsparmstmpl <- downloadHandler(
-  filename = function(){'mcsparms.csv'},
+  filename = function(){paste0(input$flprf, '_mcsparms.csv')},
   content = function(file){
     fl <- read.csv('data/inptmp/mcsparms.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
@@ -424,7 +424,10 @@ output$dlmcsparmstmpl <- downloadHandler(
 ## Model inputs 
 
 ```{r}
-selectInput('inptyp', label = 'Select input type:', choices = c('Manual entry', 'File upload'))
+column(12,
+  column(3, selectInput('inptyp', label = 'Select input type:', choices = c('Manual entry', 'File upload'), selected = 'File upload')),
+  column(3, textInput('flprf', 'File prefix for downloads:', value = 'output1'))
+)         
 ```
 
 ```{r}
