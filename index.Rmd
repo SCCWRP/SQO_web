@@ -55,7 +55,7 @@ column(12,
 ```
 <br></br>
 
-Please see the [technical report](http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf) for complete documentation. 
+Please see the <a href="http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf" target="_blank">technical report</a> for complete documentation. A <a href="http://www.sccwrp.org/publications/" target="_blank">user guide</a> is also available (forthcoming). 
 
 ```{r reactives}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
@@ -90,7 +90,7 @@ observeEvent(input$run,
       
       # format contams from input
       contam <- formcntinp(input, contamemp, upload)
-      
+
       # calculated contaminant inputs
       contamcalc <- cntcalc(contam, constants)
     
@@ -238,7 +238,7 @@ mcspl <- reactive({
 })
 
 # all mcs results long format
-mcsres <- reactive({
+mcsreslng <- reactive({
   
   # input
   MCSres <- MCSres()
@@ -330,10 +330,10 @@ output$dlmcspl <- downloadHandler(
 )
 
 # dl table for all mcs results
-output$dlmcsres <- downloadHandler(
+output$dlmcsreslng <- downloadHandler(
   filename = function(){paste0(input$flprf, '_mcsresults.csv')},
   content = function(file){
-    write.csv(mcsres(), file, quote = T, row.names = F)
+    write.csv(mcsreslng(), file, quote = T, row.names = F)
   }
 )
 
@@ -1493,7 +1493,7 @@ output$mcssum <- renderTable({MCSsum()})
 output$mcspl <- renderPlot({mcspl()}, height = 600, width = 800)
 
 # sediment site linkage values for all simulations
-output$mcsres <- renderTable({mcsres()})
+output$mcsreslng <- renderTable({mcsreslng()})
 ```
 
 ### SQO assessment summary
@@ -1528,10 +1528,10 @@ column(12,
 
 ```{r}
 column(12, 
-  column(4, downloadButtonRmd('dlmcsres', 'Download table'))
+  column(4, downloadButtonRmd('dlmcsreslng', 'Download table'))
 )
 column(12, 
-  tableOutput('mcsres')
+  tableOutput('mcsreslng')
 )
 ```
 
