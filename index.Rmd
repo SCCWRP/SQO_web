@@ -69,45 +69,27 @@ observeEvent(input$run,
     {
          
       # input
-      inptyp <- input$inptyp
+      upload <- as.logical(input$upload)
       
-      if(inptyp == 'Manual entry'){
-        
-        # format biota from input
-        biota <- formsppinp(input, biotaemp)
-      
-        # format constants from input
-        constants <- formcnsinp(input, constantsemp)
-        
-        # format contams from input
-        contam <- formcntinp(input, contamemp)
-        
-      }
-      
-      if(inptyp == 'File upload'){
+      # sanity checks if file upload true and no files uploaded on execute
+      if(upload){
         
         # make sure all files are uploaded
         req(!is.null(input$biotaupl))
         req(!is.null(input$constantsupl))
         req(!is.null(input$contamupl))
         req(!is.null(input$mcsparmsupl))
-        # validate(
-        #   need(
-        #     !any(
-        #       is.null(input$biotaupl), 
-        #       is.null(input$constantsupl), 
-        #       is.null(input$contamupl),
-        #       is.null(input$mcsparmsupl)
-        #       ), 
-        #     'Upload all files before running model'
-        #   )
-        # )
       
-        biota <- read.csv(input$biotaupl$datapath, stringsAsFactors = F)
-        constants <- read.csv(input$constantsupl$datapath, stringsAsFactors = F)
-        contam <-  read.csv(input$contamupl$datapath, stringsAsFactors = F)
-        
       }
+
+      # format biota from input
+      biota <- formsppinp(input, biotaemp, upload)
+    
+      # format constants from input
+      constants <- formcnsinp(input, constantsemp, upload)
+      
+      # format contams from input
+      contam <- formcntinp(input, contamemp, upload)
       
       # calculated contaminant inputs
       contamcalc <- cntcalc(contam, constants)
@@ -193,15 +175,10 @@ tabbsaf <- reactive({
 wgtavg <- eventReactive(input$run, {
 
   # input
-  inptyp <- input$inptyp
+  upload <- as.logical(input$upload)
   
   # format mcs inputs
-  if(inptyp == 'Manual entry'){
-    mcsparms <- formmcsinp(input, mcsparmsemp)
-  }
-  if(inptyp == 'File upload'){
-    mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
-  }
+  mcsparms <- formmcsinp(input, mcsparmsemp, upload)
 
   out <- wgt_avg_fun(mcsparms)
 
@@ -226,7 +203,7 @@ MCSres <- eventReactive(input$runmcs,
       
       # number of sims
       nsim <- input$nsim
-      inptyp <- input$inptyp
+      upload <- as.logical(input$upload)
       
       # estimated tissue concentrations for site linkages
       indic_sum <- indic_sum()
@@ -235,14 +212,8 @@ MCSres <- eventReactive(input$runmcs,
       constants <- formcnsinp(input, constantsemp)
       
       # format mcs inputs
-      if(inptyp == 'Manual entry'){
-        mcsparms <- formmcsinp(input, mcsparmsemp)
-      }
-      
-      if(inptyp == 'File upload'){
-        mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
-      }
-      
+      mcsparms <- formmcsinp(input, mcsparmsemp, upload)
+
       ##
       # calcs
       out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
@@ -418,7 +389,7 @@ output$dlmcsparmstmpl <- downloadHandler(
 
 ```{r}
 column(12,
-  column(3, selectInput('inptyp', label = 'Select input type:', choices = c('Manual entry', 'File upload'), selected = 'File upload')),
+  column(3, selectInput('upload', label = 'Select input type:', choices = list('Manual entry' = FALSE, 'File upload' = TRUE), selected = TRUE)),
   column(3, textInput('flprf', 'File prefix for downloads:', value = 'output1'))
 )         
 ```
@@ -427,9 +398,9 @@ column(12,
 output$entry <- renderUI({
   
   # inputs
-  inptyp <- input$inptyp
-  
-  if(inptyp == 'Manual entry'){
+  upload <- as.logical(input$upload)
+
+  if(!upload){
     
     # splitlayout widths
     wds <- 100
@@ -1412,7 +1383,7 @@ output$entry <- renderUI({
       
   }
   
-  if(inptyp == 'File upload'){
+  if(upload){
     
     w1 <- wellPanel(id = "indicspec", style = "overflow-x:scroll; background-color:#daf1da",
       column(3, downloadButtonRmd('dlbiotatmpl', 'Download template')),
