@@ -11,9 +11,7 @@ formsppinp <- function(inps, biota, upload = FALSE){
   inps <- reactiveValuesToList(inps)
   
   # manual entry reactive inputs
-  if(!upload){
-    
-    # format names and lips as tibble
+  if(!upload)
     frminps <- inps %>% 
       enframe('Biota', 'value') %>% 
       filter(!grepl('selectized', Biota) & grepl('indic[0-9]lip', Biota)) %>% 
@@ -26,19 +24,18 @@ formsppinp <- function(inps, biota, upload = FALSE){
       ) %>% 
       spread(var, value) %>% 
       unnest
-    
-    # add frminps user input to biota
-    out <- biota %>% 
-      left_join(frminps, by = 'Biota') %>% 
-      mutate(lipid.x = ifelse(is.na(lipid.x), lipid.y, lipid.x)) %>% 
-      rename(lipid = lipid.x) %>% 
-      select(-lipid.y)
-    
-  }
   
   # file upload
   if(upload)
-    out <- read.csv(inps$biotaupl$datapath, stringsAsFactors = F)
+    frminps <- read.csv(inps$biotaupl$datapath, stringsAsFactors = F) %>% 
+      select(-Notes)
+  
+  # add frminps to biota
+  out <- biota %>% 
+    left_join(frminps, by = 'Biota') %>% 
+    mutate(lipid.x = ifelse(is.na(lipid.x), lipid.y, lipid.x)) %>% 
+    rename(lipid = lipid.x) %>% 
+    select(-lipid.y)
   
   return(out)
 
@@ -57,27 +54,24 @@ formcnsinp <- function(inps, constants, upload = FALSE){
   inps <- reactiveValuesToList(inps)
   
   # manual entry reactive inputs
-  if(!upload){
-    
-    # format names and lips as tibble
+  if(!upload)
     frminps <- inps %>% 
       enframe('Constant', 'Value') %>% 
       filter(Constant %in% c('SA', 'SL', 'Cox', 'T', 'salinity', 'ocsed', 'vss', 'xpoc', 'xdoc')) %>% 
       unnest
-    
-    # add frminps user input to constants
-    out <- constants %>% 
-      left_join(frminps, by = 'Constant') %>% 
-      mutate(Value.x = ifelse(is.na(Value.x), Value.y, Value.x)) %>% 
-      rename(Value = Value.x) %>% 
-      select(-Value.y)
-    
-  }
   
   # file upload
   if(upload)
-    out <- read.csv(inps$constantsupl$datapath, stringsAsFactors = F)
-
+    frminps <- read.csv(inps$constantsupl$datapath, stringsAsFactors = F) %>% 
+      select(-Notes)
+  
+  # add frminps to constants
+  out <- constants %>% 
+    left_join(frminps, by = 'Constant') %>% 
+    mutate(Value.x = ifelse(is.na(Value.x), Value.y, Value.x)) %>% 
+    rename(Value = Value.x) %>% 
+    select(-Value.y)
+  
   return(out)
   
 }
@@ -95,9 +89,7 @@ formcntinp <- function(inps, contam, upload = FALSE){
   inps <- reactiveValuesToList(inps)
   
   # manual entry reactive inputs
-  if(!upload){
-      
-    # format names and contams as tibble
+  if(!upload)
     frminps <- inps %>% 
       enframe('Chem', 'Value') %>% 
       filter(grepl('^alpha|^gamma|^Oxy|^Dieldrin|^op\\-|^pp\\-|^PCB', Chem)) %>% 
@@ -109,28 +101,27 @@ formcntinp <- function(inps, contam, upload = FALSE){
         `cd_ng.g` = dis,   # dissolved surface water concentration
         `cp_ng.g` = por    # porewater concentration
       )
-    
-    # add frminps user input to contaminants
-    out <- contam %>% 
-      left_join(frminps, by = 'Chem') %>% 
-      mutate(
-        cs_ng.g.x = ifelse(is.na(cs_ng.g.x), cs_ng.g.y, cs_ng.g.x),
-        cd_ng.g.x = ifelse(is.na(cd_ng.g.x), cd_ng.g.y, cd_ng.g.x),
-        cp_ng.g.x = ifelse(is.na(cp_ng.g.x), cp_ng.g.y, cp_ng.g.x)
-        ) %>% 
-      rename(
-        cs_ng.g = cs_ng.g.x,
-        cd_ng.g = cd_ng.g.x,
-        cp_ng.g = cp_ng.g.x
-        ) %>% 
-      select(-cs_ng.g.y, -cd_ng.g.y, -cp_ng.g.y)
-    
-  }
-  
+
   # file upload
   if(upload)
-    out <- read.csv(inps$contamupl$datapath, stringsAsFactors = F)
-  
+    frminps <- read.csv(inps$contamupl$datapath, stringsAsFactors = F) %>% 
+      select(Chem, cs_ng.g, cd_ng.g, cp_ng.g)
+
+  # add frminps user input to contaminants
+  out <- contam %>% 
+    left_join(frminps, by = 'Chem') %>% 
+    mutate(
+      cs_ng.g.x = ifelse(is.na(cs_ng.g.x), cs_ng.g.y, cs_ng.g.x),
+      cd_ng.g.x = ifelse(is.na(cd_ng.g.x), cd_ng.g.y, cd_ng.g.x),
+      cp_ng.g.x = ifelse(is.na(cp_ng.g.x), cp_ng.g.y, cp_ng.g.x)
+      ) %>% 
+    rename(
+      cs_ng.g = cs_ng.g.x,
+      cd_ng.g = cd_ng.g.x,
+      cp_ng.g = cp_ng.g.x
+      ) %>% 
+    select(-cs_ng.g.y, -cd_ng.g.y, -cp_ng.g.y)
+    
   return(out)
   
 }
@@ -148,31 +139,28 @@ formmcsinp <- function(inps, mcsparms, upload = FALSE){
   inps <- reactiveValuesToList(inps)
   
   # manual entry reactive inputs
-  if(!upload){
-    
-    # format names and input mean/sd as tibble
+  if(!upload)
     frminps <- inps %>% 
       enframe('MCSvar', 'Value') %>% 
-      filter(grepl('X$|SD$|indic[0-9]seaf$', MCSvar)) %>% 
+      filter(grepl('X$|SD$|indic[0-9]propseaf$', MCSvar)) %>% 
       unnest
-  
-    # default parameters from table
-    mcsparms <- mcsparms %>% 
-      dplyr::select(name, value) %>% 
-      rename(
-        MCSvar = name, 
-        Value = value
-      )
-    
-    # combine
-    out <- mcsparms %>% 
-      bind_rows(frminps)
-    
-  }
   
   # file upload
   if(upload)
-    out <- read.csv(inps$mcsparmsupl$datapath, stringsAsFactors = F)
+    frminps <- read.csv(inps$mcsparmsupl$datapath, stringsAsFactors = F) %>% 
+      select(MCSvar, Value)
+  
+  # default parameters from table
+  mcsparms <- mcsparms %>% 
+    dplyr::select(name, value) %>% 
+    rename(
+      MCSvar = name, 
+      Value = value
+    )
+
+  # combine
+  out <- mcsparms %>% 
+    bind_rows(frminps)
   
   return(out)
   

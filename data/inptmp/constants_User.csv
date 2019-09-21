@@ -1,0 +1,10 @@
+Constant,Value,Notes
+SA,8.06,site area (km2)
+SL,6,"site length (km), longest axis"
+ocsed,0.0163,organic carbon proportion in sediment (kg/kg)
+xdoc,2.15E-06,dissolved organic carbon concentration in water column (kg/L)
+T,17.4,water temperature (oC)
+salinity,25.4,water salinity (PSU)
+Cox,8.09,dissolved oxygen concentration (mg O2/L)
+vss,2.46E-05,concentration of suspended solids (kg/L)
+xpoc,1.57E-06,particulate organic carbon concentration in water column (kg/L)

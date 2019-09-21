@@ -31,10 +31,10 @@ downloadButtonRmd <- function (outputId, label = "Download", class = NULL, ...) 
 indic_lookup <- read.csv('data/indic_lookup.csv', stringsAsFactors = FALSE)
 
 # data inputs, with empty values to fill with user input
-biotaemp <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
-constantsemp <- read.csv('data/constants.csv', stringsAsFactors = FALSE)
-contamemp <- read.csv('data/contam.csv', stringsAsFactors = FALSE)
-mcsparmsemp <- read.csv('data/mcsparms.csv', stringsAsFactors = F)
+biotaemp <- read.csv('data/biotaemp.csv', stringsAsFactors = FALSE)
+constantsemp <- read.csv('data/constantsemp.csv', stringsAsFactors = FALSE)
+contamemp <- read.csv('data/contamemp.csv', stringsAsFactors = FALSE)
+mcsparmsemp <- read.csv('data/mcsparmsemp.csv', stringsAsFactors = F)
 
 # indicator species lookup format for inputs
 indic_lookup <- indic_lookup %>% 
@@ -127,7 +127,7 @@ cbiota <- reactive({
 
 # summary of contaminants across indicator guilds
 indic_sum <- reactive({
-  
+
   # input
   cbiota <- cbiota()
   contamcalc <- res$contamcalc
@@ -209,7 +209,7 @@ MCSres <- eventReactive(input$runmcs,
       indic_sum <- indic_sum()
     
       # format constants from input
-      constants <- formcnsinp(input, constantsemp)
+      constants <- formcnsinp(input, constantsemp, upload)
       
       # format mcs inputs
       mcsparms <- formmcsinp(input, mcsparmsemp, upload)
@@ -347,36 +347,36 @@ output$dlcalccont <- downloadHandler(
 
 # dl biota template
 output$dlbiotatmpl <- downloadHandler(
-  filename = function(){paste0(input$flprf, '_biota.csv')},
+  filename = function(){'biota_User.csv'},
   content = function(file){
-    fl <- read.csv('data/inptmp/biota.csv', stringsAsFactors = F)
+    fl <- read.csv('data/inptmp/biota_User.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
   }
 )
 
 # dl constants template
 output$dlconstantstmpl <- downloadHandler(
-  filename = function(){paste0(input$flprf, '_constants.csv')},
+  filename = function(){'constants_User.csv'},
   content = function(file){
-    fl <- read.csv('data/inptmp/constants.csv', stringsAsFactors = F)
+    fl <- read.csv('data/inptmp/constants_User.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
   }
 )
 
 # dl contam template
 output$dlcontamtmpl <- downloadHandler(
-  filename = function(){paste0(input$flprf, '_contam.csv')},
+  filename = function(){'contam_User.csv'},
   content = function(file){
-    fl <- read.csv('data/inptmp/contam.csv', stringsAsFactors = F)
+    fl <- read.csv('data/inptmp/contam_User.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
   }
 )
 
 # dl mcsparms template
 output$dlmcsparmstmpl <- downloadHandler(
-  filename = function(){paste0(input$flprf, '_mcsparms.csv')},
+  filename = function(){'mcsparms_User.csv'},
   content = function(file){
-    fl <- read.csv('data/inptmp/mcsparms.csv', stringsAsFactors = F)
+    fl <- read.csv('data/inptmp/mcsparms_User.csv', stringsAsFactors = F)
     write.csv(fl, file, quote = T, row.names = F)
   }
 )
@@ -448,7 +448,7 @@ output$entry <- renderUI({
         column(3, h6('1 Piscivore')),
         column(3, selectInput('indic1', NULL, choices = indic_lookup[['Indicator species 1']], selected = indic_lookup[['Indicator species 1']][1])
                ),
-        column(2, numericInput('indic1seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic1propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic1lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
           numericInput('indic1ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -466,9 +466,9 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('2 Benthic diet with piscivory')),
         column(3, selectInput('indic2', NULL, choices = indic_lookup[['Indicator species 2']], selected = indic_lookup[['Indicator species 2']][14])),
-        column(2, numericInput('indic2seaf', NULL, value = 0.5, min = 0, max = 1)),
+        column(2, numericInput('indic2propseaf', NULL, value = 0.5, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
-          numericInput('indic2lip', NULL, value = 0.0044, min = 0, max = 1, width = '100%'),
+          numericInput('indic2lip', NULL, value = 0.0069, min = 0, max = 1, width = '100%'),
           numericInput('indic2ChlordaneX', NULL, value = 2.0425, min = 0, width = '100%'),
           numericInput('indic2ChlordaneSD', NULL, value = 0.909979488352973, min = 0, width = '100%'),
           numericInput('indic2DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
@@ -484,7 +484,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('3 Benthic and pelagic with piscivory')),
         column(3, selectInput('indic3', NULL, choices = indic_lookup[['Indicator species 3']], selected = indic_lookup[['Indicator species 3']][6])),
-        column(2, numericInput('indic3seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic3propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic3lip', NULL, value = 0.0158, min = 0, max = 1, width = '100%'),
           numericInput('indic3ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -502,7 +502,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('4 Benthic without piscivory')),
         column(3, selectInput('indic4', NULL, choices = indic_lookup[['Indicator species 4']], selected = indic_lookup[['Indicator species 4']][10])),
-        column(2, numericInput('indic4seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic4propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic4lip', NULL, value = 0.0329, min = 0, max = 1, width = '100%'),
           numericInput('indic4ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -520,9 +520,9 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('5 Benthic and pelagic without piscivory')),
         column(3, selectInput('indic5', NULL, choices = indic_lookup[['Indicator species 5']], selected = indic_lookup[['Indicator species 5']][4])),
-        column(2, numericInput('indic5seaf', NULL, value = 0.5, min = 0, max = 1)),
+        column(2, numericInput('indic5propseaf', NULL, value = 0.5, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
-          numericInput('indic5lip', NULL, value = 0.0125, min = 0, max = 1, width = '100%'),
+          numericInput('indic5lip', NULL, value = 0.0109, min = 0, max = 1, width = '100%'),
           numericInput('indic5ChlordaneX', NULL, value = 2.5275, min = 0, width = '100%'),
           numericInput('indic5ChlordaneSD', NULL, value = 0.4157433102288, min = 0, width = '100%'),
           numericInput('indic5DieldrinX', NULL, value = 0.25, min = 0, width = '100%'),
@@ -538,7 +538,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('6 Benthic with herbivory')),
         column(3, selectInput('indic6', NULL, choices = indic_lookup[['Indicator species 6']], selected = indic_lookup[['Indicator species 6']][1])),
-        column(2, numericInput('indic6seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic6propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic6lip', NULL, value = 0.0356, min = 0, max = 1, width = '100%'),
           numericInput('indic6ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -556,7 +556,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('7 Benthic and pelagic with herbivory')),
         column(3, selectInput('indic7', NULL, choices = indic_lookup[['Indicator species 7']], selected = indic_lookup[['Indicator species 7']][2])),
-        column(2, numericInput('indic7seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic7propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic7lip', NULL, value = 0.0117, min = 0, max = 1, width = '100%'),
           numericInput('indic7ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -574,7 +574,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('8 Pelagic with benthic herbivory')),
         column(3, selectInput('indic8', NULL, choices = indic_lookup[['Indicator species 8']], selected = indic_lookup[['Indicator species 8']][2])),
-        column(2, numericInput('indic8seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic8propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic8lip', NULL, value = 0.0444, min = 0, max = 1, width = '100%'),
           numericInput('indic8ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
@@ -592,7 +592,7 @@ output$entry <- renderUI({
       fluidRow(
         column(3, h6('9 Benthic diet with piscivory: estuarine')),
         column(3, selectInput('indic9', NULL, choices = indic_lookup[['Indicator species 9']], selected = indic_lookup[['Indicator species 9']][1])),
-        column(2, numericInput('indic9seaf', NULL, value = 0, min = 0, max = 1)),
+        column(2, numericInput('indic9propseaf', NULL, value = 0, min = 0, max = 1)),
         splitLayout(cellWidths = wds,
           numericInput('indic9lip', NULL, value = 0.0036, min = 0, max = 1, width = '100%'),
           numericInput('indic9ChlordaneX', NULL, value = NULL, min = 0, width = '100%'),
