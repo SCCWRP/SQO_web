@@ -12,6 +12,7 @@ library(tidyverse)
 library(shiny)
 library(patchwork)
 library(SQObioaccumulation)
+# devtools::load_all('../SQObioaccumulation/')
 
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
@@ -27,10 +28,7 @@ downloadButtonRmd <- function (outputId, label = "Download", class = NULL, ...) 
 
 ```{r data}
 # data inputs, lookups
-tischmthr <- read.csv('data/tischmthr.csv', stringsAsFactors = FALSE)
-finalsiteassess <- read.csv('data/finalsiteassess.csv', stringsAsFactors = FALSE)
 indic_lookup <- read.csv('data/indic_lookup.csv', stringsAsFactors = FALSE)
-biota_preyprop <- read.csv('data/preyprop.csv', stringsAsFactors = FALSE, row.names = 1)
 
 # data inputs, with empty values to fill with user input
 biotaemp <- read.csv('data/biota.csv', stringsAsFactors = FALSE)
@@ -114,7 +112,7 @@ observeEvent(input$run,
       # calculated contaminant inputs
       contamcalc <- cntcalc(contam, constants)
     
-      btch <- bioaccum_batch(biota, contamcalc, biota_preyprop, constants)
+      btch <- bioaccum_batch(biota, contamcalc, constants)
     
       # append to reactive output
       res$cbiota <- btch$cbiota
@@ -204,10 +202,8 @@ wgtavg <- eventReactive(input$run, {
   if(inptyp == 'File upload'){
     mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
   }
-  
-  propseaf <- formpropseaf(input)
 
-  out <- wgt_avg_fun(mcsparms, propseaf)
+  out <- wgt_avg_fun(mcsparms)
 
   return(out)
   
@@ -238,9 +234,6 @@ MCSres <- eventReactive(input$runmcs,
       # format constants from input
       constants <- formcnsinp(input, constantsemp)
       
-      # format seafood proportion of dieat
-      propseaf <- formpropseaf(input)
-      
       # format mcs inputs
       if(inptyp == 'Manual entry'){
         mcsparms <- formmcsinp(input, mcsparmsemp)
@@ -249,10 +242,10 @@ MCSres <- eventReactive(input$runmcs,
       if(inptyp == 'File upload'){
         mcsparms <- read.csv(input$mcsparmsupl$datapath, stringsAsFactors = F)
       }
-        
+      
       ##
       # calcs
-      out <- mcs_fun(nsim, indic_sum, mcsparms, constants, propseaf)
+      out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
     
       return(out)
  
@@ -305,7 +298,7 @@ sqosum <- reactive({
   MCSres <- MCSres()
   wgtavg <- wgtavg()
   
-  out <- sqo_sum_fun(wgtavg, MCSres, tischmthr, constants, finalsiteassess)
+  out <- sqo_sum_fun(wgtavg, MCSres, constants)
   
   return(out)
   

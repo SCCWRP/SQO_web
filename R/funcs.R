@@ -107,9 +107,9 @@ formmcsinp <- function(inps, mcsparms){
   # format names and input mean/sd as tibble
   frminps <- reactiveValuesToList(inps) %>% 
     enframe('MCSvar', 'Value') %>% 
-    filter(grepl('X$|SD$', MCSvar)) %>% 
+    filter(grepl('X$|SD$|indic[0-9]seaf$', MCSvar)) %>% 
     unnest
-  
+
   # default parameters from table
   mcsparms <- mcsparms %>% 
     dplyr::select(name, value) %>% 
@@ -124,27 +124,4 @@ formmcsinp <- function(inps, mcsparms){
   
   return(out)
   
-}
-    
-# format seafood proportions in diet from user inputs ---------------------
-
-#' Format seafood proportions in diet from user inputs
-#'
-#' @param inps reactive input list
-#'
-formpropseaf <- function(inps){
-  
-  out <- reactiveValuesToList(inps) %>% 
-    enframe('Biota', 'value') %>% 
-    filter(!grepl('selectized', Biota) & grepl('indic[0-9]seaf$', Biota)) %>% 
-    unnest %>% 
-    mutate(
-      Biota = gsub('seaf$', '', Biota),
-      value = ifelse(is.na(value), 0, value)
-      ) %>% 
-    arrange(Biota) %>% 
-    pull(value)
-
-  return(out)
-
 }
