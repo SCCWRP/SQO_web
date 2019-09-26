@@ -23,7 +23,7 @@ formsppinp <- function(inps, biota, upload = FALSE){
         Biota = gsub('lip', '', Biota)
       ) %>% 
       spread(var, value) %>% 
-      unnest
+      unnest(lipid)
   
   # file upload
   if(upload)
@@ -58,7 +58,7 @@ formcnsinp <- function(inps, constants, upload = FALSE){
     frminps <- inps %>% 
       enframe('Constant', 'Value') %>% 
       filter(Constant %in% c('SA', 'SL', 'Cox', 'T', 'salinity', 'ocsed', 'vss', 'xpoc', 'xdoc')) %>% 
-      unnest
+      unnest(Value)
   
   # file upload
   if(upload)
@@ -93,7 +93,7 @@ formcntinp <- function(inps, contam, upload = FALSE){
     frminps <- inps %>% 
       enframe('Chem', 'Value') %>% 
       filter(grepl('^alpha|^gamma|^Oxy|^Dieldrin|^op\\-|^pp\\-|^PCB', Chem)) %>% 
-      unnest %>% 
+      unnest(Value) %>% 
       separate(Chem, c('Chem', 'loc'), sep = '_') %>% 
       spread(loc, Value) %>% 
       rename(
@@ -143,7 +143,7 @@ formmcsinp <- function(inps, mcsparms, upload = FALSE){
     frminps <- inps %>% 
       enframe('MCSvar', 'Value') %>% 
       filter(grepl('X$|SD$|indic[0-9]propseaf$', MCSvar)) %>% 
-      unnest
+      unnest(Value)
   
   # file upload
   if(upload)

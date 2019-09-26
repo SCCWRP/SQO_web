@@ -11,8 +11,8 @@ library(knitr)
 library(tidyverse)
 library(shiny)
 library(patchwork)
-library(SQObioaccumulation)
-# devtools::load_all('../SQObioaccumulation/')
+# library(SQObioaccumulation)
+devtools::load_all('../SQObioaccumulation/')
 
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
@@ -47,8 +47,7 @@ indic_lookup <- indic_lookup %>%
 ```{r}
 # top controllers
 column(12, 
-  column(3, actionButton("run", "Run food web model!")), 
-  column(3, actionButton("runmcs", "Run MC sims!")),
+  column(4, actionButton("run", "Run food web model and MCS!")),
   column(2, h6('Number of MC sims')), 
   column(2, numericInput('nsim', NULL, value = 1000, min = 1, max = 20000))
 )
@@ -64,7 +63,7 @@ res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
 observeEvent(input$run, 
   withProgress(
     message='Please wait',
-    detail='Running bioaccumulation model...',
+    detail='Running...',
     value = 0, 
     {
          
@@ -187,42 +186,32 @@ wgtavg <- eventReactive(input$run, {
 })
 
 # run MCS to get site linkage values for nsim
-MCSres <- eventReactive(input$runmcs,
-  withProgress(
-    message='Please wait',
-    detail='Running simulations..',
-    value = 0, {
+MCSres <- eventReactive(input$run, {
     
-      # validate from indic_sum
-      validate(
-        need(!is.null(res$contamcalc), "Run food web model before MCS!")
-      )
-    
-      ##
-      # inputs
-      
-      # number of sims
-      nsim <- input$nsim
-      upload <- as.logical(input$upload)
-      
-      # estimated tissue concentrations for site linkages
-      indic_sum <- indic_sum()
-    
-      # format constants from input
-      constants <- formcnsinp(input, constantsemp, upload)
-      
-      # format mcs inputs
-      mcsparms <- formmcsinp(input, mcsparmsemp, upload)
+  ##
+  # inputs
+  
+  # number of sims
+  nsim <- input$nsim
+  upload <- as.logical(input$upload)
+  
+  # estimated tissue concentrations for site linkages
+  indic_sum <- indic_sum()
 
-      ##
-      # calcs
-      out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
-    
-      return(out)
- 
-    }
-  )
-)
+  # format constants from input
+  constants <- formcnsinp(input, constantsemp, upload)
+  
+  # format mcs inputs
+  mcsparms <- formmcsinp(input, mcsparmsemp, upload)
+
+  ##
+  # calcs
+  out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
+
+  return(out)
+
+})
+
 
 # site linkage plot from mcsres
 mcspl <- reactive({
