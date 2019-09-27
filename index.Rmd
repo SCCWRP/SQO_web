@@ -402,7 +402,7 @@ This tool applies an assessment framework for evaluating the effects of sediment
 
 This objective focuses on the pathway of humans consuming seafood (fish or shellfish) that have accumulated contaminants from the sediment. The intent of this framework is to provide a standardized assessment approach for application to a variety of regulatory and monitoring programs. The assessment framework was adopted by the Water Board in 2018 and received final approval by the EPA in 2019. 
 
-Information for programmatic application of the framework is included in the [Water Quality Control Plan](https://www.waterboards.ca.gov/water_issues/programs/bptcp/docs/sediment/sed_qual_provs.pdf) for Enclosed Bays and Estuaries of California. A description of the development and conceptual approach for the framework can be found in [SCCWRP Technical Report 1000](http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf). The technical tools developed for the framework are currently applicable only for legacy organochlorine compounds: PCBs, DDTs, chlordanes, and dieldrin. This assessment tool applies the standardized Tier 2 assessment described in the Water Quality Control Plan.
+Information for programmatic application of the framework is included in the <a href="https://www.waterboards.ca.gov/water_issues/programs/bptcp/docs/sediment/sed_qual_provs.pdf" target="_blank">Water Quality Control Plan</a> for Enclosed Bays and Estuaries of California. A description of the development and conceptual approach for the framework can be found in <a href="http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf" target="_blank">SCCWRP Technical Report 1000</a>. The technical tools developed for the framework are currently applicable only for legacy organochlorine compounds: PCBs, DDTs, chlordanes, and dieldrin. This assessment tool applies the standardized Tier 2 assessment described in the Water Quality Control Plan.
 
 ```{r infograph, out.width = "60%", fig.align = 'center', fig.cap = "Conceptualized pathway of the movement of contaminants through the food web."}
 knitr::include_graphics('infograph.png')
@@ -419,11 +419,11 @@ Evaluation of HHSQO involves two assessment questions:
 * Do pollutant concentrations in seafood pose unacceptable health risks to human consumers?  
 * Is sediment contamination at a site a significant contributor to the seafood contamination?
 
-```{r assesscat, width = "100%", fig.align = 'center'}
+```{r assesscat, out.width = "75%", fig.align = 'center'}
 knitr::include_graphics('assesscat.png')
 ```
 
-These questions are evaluated using two indicators: Chemical Exposure and Site Linkage. For the chemical exposure indicator, seafood contamination measurements from the site are compared to thresholds based on OEHHA fish consumption advisory levels designed to protect human health. For the site linkage indicator, the seafood contamination measurements are compared to estimated seafood concentrations that would result from local site exposure. Estimated seafood concentrations are calculated using a steady state bioaccumulation model adapted from that developed for San Francisco Bay by [Gobas and Arnot (2010)](https://doi.org/10.1002/etc.164).
+These questions are evaluated using two indicators: Chemical Exposure and Site Linkage. For the chemical exposure indicator, seafood contamination measurements from the site are compared to thresholds based on OEHHA fish consumption advisory levels designed to protect human health. For the site linkage indicator, the seafood contamination measurements are compared to estimated seafood concentrations that would result from local site exposure. Estimated seafood concentrations are calculated using a steady state bioaccumulation model adapted from that developed for San Francisco Bay by <a href="https://doi.org/10.1002/etc.164" target="_blank"> Gobas and Arnot (2010)</a>.
 
 The outcome of the assessment is a categorical site impact assessment determined by the integration of the Chemical Exposure and Site Linkage results. Sites classified as Unimpacted or Likely Unimpacted meet the HHSQO.
 
