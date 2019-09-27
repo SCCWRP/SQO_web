@@ -431,10 +431,9 @@ The outcome of the assessment is a categorical site impact assessment determined
 
 Using the HHSQO assessment tool includes four steps, which must be followed in sequence:
 
-* Step 1: Input data for site-specific parameters, fish characteristics, and chemical concentration of sediment and tissue.
-* Step 2: Run the bioaccumulation model to calculate bioaccumulation factors and estimated tissue concentration for use in site linkage calculations.
-* Step 3: Perform Monte Carlo Simulations (MCS) to generate cumulative probability distributions of site linkage results.
-* Step 4: Review the SQO assessment results
+1) Input data for site-specific parameters, fish characteristics, and chemical concentration of sediment and tissue.
+1) Run the bioaccumulation model to calculate bioaccumulation factors and estimated tissue concentration for use in site linkage calculations. Perform Monte Carlo Simulations (MCS) to generate cumulative probability distributions of site linkage results. Both the model and simulations run when the top button is clicked.
+1) Review the SQO assessment results
 
 ### Attribution
 
@@ -459,16 +458,27 @@ Six types of site-specific data are required for the assessment:
 *	Sediment contaminants, including measured values of each chemical constituent in sediment and water column (contam.csv); pore water concentrations optional
 *	MCS parameters, including diet proportion and tissue concentration for selected fish indicator species, and sediment concentration for each contaminant group (mcsparms.csv)
 
-Data can be either uploaded as csv files (recommended) or manually entered using a computer keyboard. Be sure to specify the number of MCS simulations used in the analysis (min 1,000 for exploratory analyses; 10,000 for regulatory application). 
+Data can be either uploaded as csv files (recommended) or manually entered using a computer keyboard. For the former, template files can be downloaded for use with he the fild upload feature.  For the template files or manual entry inputs, values are provided from sample data to illustrate use of the tool.  These sample data are not "default" or standard values for southern California. 
 
 The tool results may be saved as a downloaded file. A user-determined file prefix should be entered, which will be included in the title of the download files. 
 
-Run the food web model once data input is complete. The model must be rerun each time any of the input data have been changed.
+Run the food web model once data input is complete. The model must be rerun each time any of the input data have been changed. Be sure to specify the number of MCS simulations used in the analysis (min 1,000 for exploratory analyses; 10,000 for regulatory application). 
 
-#### Entry Notes 
+#### Template files
 
-* `biota.csv` <br> The tissue lipid content of each of up to nine indicator species should be entered as kg/kg wet weight, which may need conversion from commonly reported percent data (eg., 2% lipid = 0.02 kg/kg). Fish species data are identified by indicator number (e.g., indic1, indic2, etc). Only lipid data for fish indicators having contaminant data should be entered; leave cell blank for unused species. Required indicator species list for regulatory application: indic1=California halibut; indic2=spotted sand bass; indic3=queenfish; indic4=white croaker; indic5=shiner perch; indic6=common carp; indic7=topsmelt; indic8=striped mullet; indic9=white catfish.  Additional information on the fish guilds is available in SCCWRP Technical Report 1000.
-     
+There are four template files that can be downloaded for use with the upload feature.  For each file, missing values can be specified with the "NA" value or left blank.  
+
+* `biota.csv` <br> The tissue lipid content of each of up to nine indicator species should be entered as kg/kg wet weight, which may need conversion from commonly reported percent data (eg., 2% lipid = 0.02 kg/kg). Fish species data are identified by indicator number (e.g., indic1, indic2, etc). Required indicator species list for regulatory application: indic1=California halibut; indic2=spotted sand bass; indic3=queenfish; indic4=white croaker; indic5=shiner perch; indic6=common carp; indic7=topsmelt; indic8=striped mullet; indic9=white catfish.  Additional information on the fish guilds is available in SCCWRP Technical Report 1000. Only lipid data for fish indicators having contaminant data should be entered.  If lipid data are unavailable for an indicator species, use the following default values (as proportions):  
+     * indic1 Piscivore: 0.0036
+     * indic2 Benthic diet with piscivory: 0.0069
+     * indic3 Benthic and pelagic with piscivory: 0.0158
+     * indic4 Benthic without piscivory: 0.0329
+     * indic5 Benthic and pelagic without piscivory: 0.0109
+     * indic6 Benthic with herbivory: 0.0356
+     * indic7 Bethic and pelagic with herbivory: 0.0117
+     * indic8 Pelagic with benthic herbivory: 0.0444
+     * indic9 Benthic diet with piscivory, estuarine: 0.0036
+
 *	`constants.csv` <br> A numeric value must be provided for each data type in the file. If a site-specific value is not available, then a default value, such as that included in the data file template, should be used. Measurement units must be the same as those specified in the csv file notes.
 
 *	`contam.csv` <br> This file lists each individual component of each of four chemical groups: chlordanes, dieldrin, DDTs, and PCBs. Average sediment and dissolved water column concentrations representative of the site are required and should be entered into columns cs_ng.g and cd_ng.g, respectively. If data are not available for some components (e.g., specific PCB congeners), then leave the cell blank. The tool will calculate dissolved chemical concentrations for the water column and pore water if the data are not present. Units must be ng/g dry weight for sediment and pg/L for water.
