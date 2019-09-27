@@ -1,8 +1,11 @@
 ---
 title: "Human health SQO assessment tool"
+subtitle: "HHSQO [v1.0](https://github.com/SCCWRP/SQO_web/releases/tag/v1.0)"
 author: ""
 output: 
-  html_document
+  html_document:
+    includes:
+      in_header: cssloaders_in_header.html
 runtime: shiny
 ---
 
@@ -11,8 +14,9 @@ library(knitr)
 library(tidyverse)
 library(shiny)
 library(patchwork)
-# library(SQObioaccumulation)
-devtools::load_all('../SQObioaccumulation/')
+library(shinycssloaders)
+library(SQObioaccumulation)
+# devtools::load_all('../SQObioaccumulation/')
 
 opts_chunk$set(warning = FALSE, message = FALSE, eval = T, echo = F)
 
@@ -53,8 +57,6 @@ column(12,
 )
 ```
 <br></br>
-
-Please see the <a href="http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf" target="_blank">technical report</a> for complete documentation. A <a href="http://www.sccwrp.org/publications/" target="_blank">user guide</a> is also available (forthcoming). 
 
 ```{r reactives}
 res <- reactiveValues(cbiota = NULL, bsaf = NULL, contamcalc = NULL)
@@ -108,7 +110,7 @@ observeEvent(input$run,
 bsaf <- reactive({
 
   # input
-  bsaf <-res$bsaf
+  bsaf <- res$bsaf
   
   return(bsaf)
   
@@ -130,9 +132,23 @@ indic_sum <- reactive({
   # input
   cbiota <- cbiota()
   contamcalc <- res$contamcalc
+  # upload <- input$upload
   
   req(!is.null(res$contamcalc))
 
+  # if(upload)
+  #   validate(
+  #     need(
+  #       !any(
+  #         is.null(input$biotaupl),
+  #         is.null(input$constantsupl),
+  #         is.null(input$contamupl),
+  #         is.null(input$mcsparmsupl)
+  #         ),
+  #       'Upload all files before running model'
+  #     )
+  #   )
+  
   out <- indic_sum_fun(cbiota, contamcalc)
   
   return(out)
@@ -186,32 +202,35 @@ wgtavg <- eventReactive(input$run, {
 })
 
 # run MCS to get site linkage values for nsim
-MCSres <- eventReactive(input$run, {
+MCSres <- eventReactive(input$run,
+  withProgress(
+    message='Please wait',
+    detail='Running...',
+    value = 0, 
+    {    
+      ##
+      # inputs
+      
+      # number of sims
+      nsim <- input$nsim
+      upload <- as.logical(input$upload)
+      
+      # estimated tissue concentrations for site linkages
+      indic_sum <- indic_sum()
     
-  ##
-  # inputs
-  
-  # number of sims
-  nsim <- input$nsim
-  upload <- as.logical(input$upload)
-  
-  # estimated tissue concentrations for site linkages
-  indic_sum <- indic_sum()
+      # format constants from input
+      constants <- formcnsinp(input, constantsemp, upload)
+      
+      # format mcs inputs
+      mcsparms <- formmcsinp(input, mcsparmsemp, upload)
+    
+      ##
+      # calcs
+      out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
+    
+      return(out)
 
-  # format constants from input
-  constants <- formcnsinp(input, constantsemp, upload)
-  
-  # format mcs inputs
-  mcsparms <- formmcsinp(input, mcsparmsemp, upload)
-
-  ##
-  # calcs
-  out <- mcs_fun(nsim, indic_sum, mcsparms, constants)
-
-  return(out)
-
-})
-
+}))
 
 # site linkage plot from mcsres
 mcspl <- reactive({
@@ -233,7 +252,8 @@ mcsreslng <- reactive({
   MCSres <- MCSres()
   
   totab <- MCSres %>% 
-    spread(contam, sitsedlnk) 
+    spread(contam, sitsedlnk) %>% 
+    mutate_if(is.numeric, round, 2)
   
   return(totab)
 
@@ -374,7 +394,88 @@ output$dlmcsparmstmpl <- downloadHandler(
 
 # {.tabset}
 
-## Model inputs 
+## Overview {.tabset .tabset-pills}
+
+### Background 
+
+This tool applies an assessment framework for evaluating the effects of sediment contaminants in enclosed bays and estuaries on human health. This framework was developed to assist the State Water Resources Control Board in implementing California’s narrative Sediment Quality Objective for human health (HHSQO) that states: Pollutants shall not be present in sediments at levels that will bioaccumulate in aquatic life to levels that are harmful to human health. 
+
+This objective focuses on the pathway of humans consuming seafood (fish or shellfish) that have accumulated contaminants from the sediment. The intent of this framework is to provide a standardized assessment approach for application to a variety of regulatory and monitoring programs. The assessment framework was adopted by the Water Board in 2018 and received final approval by the EPA in 2019. 
+
+Information for programmatic application of the framework is included in the [Water Quality Control Plan](https://www.waterboards.ca.gov/water_issues/programs/bptcp/docs/sediment/sed_qual_provs.pdf) for Enclosed Bays and Estuaries of California. A description of the development and conceptual approach for the framework can be found in [SCCWRP Technical Report 1000](http://ftp.sccwrp.org/pub/download/DOCUMENTS/TechnicalReports/1000_SQOHumanHealthFramework.pdf). The technical tools developed for the framework are currently applicable only for legacy organochlorine compounds: PCBs, DDTs, chlordanes, and dieldrin. This assessment tool applies the standardized Tier 2 assessment described in the Water Quality Control Plan.
+
+```{r infograph, out.width = "60%", fig.align = 'center', fig.cap = "Conceptualized pathway of the movement of contaminants through the food web."}
+knitr::include_graphics('infograph.png')
+```
+
+### Approach
+
+The HHSQO assessment framework was developed based on a general conceptual model of sediment-associated contaminant exposure to humans, through the pathway of food web trophic transfer. In this conceptual model, contaminants in sediment and the water column transfer through a food web which includes invertebrates and finfish. Humans are then exposed to these contaminants when they consume the invertebrates or finfish. The assessment framework addresses food web bioaccumulation of contaminants using a mechanistic model of contaminant trophic transfer. To address the complexity of bioaccumulation in food webs, the framework includes nine fish dietary guilds to address variation in diets of commonly consumed fish. The bioaccumulation model uses a separate food web for each fish dietary guild.
+
+The conceptual model focuses on the sediment as a potential route of exposure to biota, rather than other potential routes, such as watershed loading, atmospheric deposition, or discharges from upstream water bodies. 
+
+Evaluation of HHSQO involves two assessment questions:
+
+* Do pollutant concentrations in seafood pose unacceptable health risks to human consumers?  
+* Is sediment contamination at a site a significant contributor to the seafood contamination?
+
+```{r assesscat, width = "100%", fig.align = 'center'}
+knitr::include_graphics('assesscat.png')
+```
+
+These questions are evaluated using two indicators: Chemical Exposure and Site Linkage. For the chemical exposure indicator, seafood contamination measurements from the site are compared to thresholds based on OEHHA fish consumption advisory levels designed to protect human health. For the site linkage indicator, the seafood contamination measurements are compared to estimated seafood concentrations that would result from local site exposure. Estimated seafood concentrations are calculated using a steady state bioaccumulation model adapted from that developed for San Francisco Bay by [Gobas and Arnot (2010)](https://doi.org/10.1002/etc.164).
+
+The outcome of the assessment is a categorical site impact assessment determined by the integration of the Chemical Exposure and Site Linkage results. Sites classified as Unimpacted or Likely Unimpacted meet the HHSQO.
+
+### Assessment Steps
+
+Using the HHSQO assessment tool includes four steps, which must be followed in sequence:
+
+* Step 1: Input data for site-specific parameters, fish characteristics, and chemical concentration of sediment and tissue.
+* Step 2: Run the bioaccumulation model to calculate bioaccumulation factors and estimated tissue concentration for use in site linkage calculations.
+* Step 3: Perform Monte Carlo Simulations (MCS) to generate cumulative probability distributions of site linkage results.
+* Step 4: Review the SQO assessment results
+
+### Attribution
+
+The assessment framework conceptual approach and methods were developed by Steven M. Bay, Ben K. Greenfield, Aroon R. Melwani, and Ashley N. Parks, with review and input from members of the SQO Scientific Steering Committee, Sediment Quality Advisory Committee, and SCCWRP staff. The bioaccumulation model core functions were adapted by Marcus Beck from code written by Michelle Lent in 2010 and edited by Ben Greenfield and Michelle Lent. This work was supported by the State Water Resources Control Board.
+
+All site content by [Marcus Beck](mailto:marcusb@sccwrp.org) and [Steven Bay](steveb@sccwrp.org)
+
+```{r logo, out.width = "15%", fig.align = 'left'}
+knitr::include_graphics('sccwrp_logo.png')
+```
+
+## Model inputs {.tabset .tabset-pills}
+
+### Description
+
+Six types of site-specific data are required for the assessment:
+
+* Number of Monte Carlo simulations
+* Download file prefix
+*	Indicator guild species lipid content (biota.csv)
+*	Site and environmental data, including site dimensions, water and sediment organic content, and water quality characteristics (constants.csv)
+*	Sediment contaminants, including measured values of each chemical constituent in sediment and water column (contam.csv); pore water concentrations optional
+*	MCS parameters, including diet proportion and tissue concentration for selected fish indicator species, and sediment concentration for each contaminant group (mcsparms.csv)
+
+Data can be either uploaded as csv files (recommended) or manually entered using a computer keyboard. Be sure to specify the number of MCS simulations used in the analysis (min 1,000 for exploratory analyses; 10,000 for regulatory application). 
+
+The tool results may be saved as a downloaded file. A user-determined file prefix should be entered, which will be included in the title of the download files. 
+
+Run the food web model once data input is complete. The model must be rerun each time any of the input data have been changed.
+
+#### Entry Notes 
+
+* `biota.csv` <br> The tissue lipid content of each of up to nine indicator species should be entered as kg/kg wet weight, which may need conversion from commonly reported percent data (eg., 2% lipid = 0.02 kg/kg). Fish species data are identified by indicator number (e.g., indic1, indic2, etc). Only lipid data for fish indicators having contaminant data should be entered; leave cell blank for unused species. Required indicator species list for regulatory application: indic1=California halibut; indic2=spotted sand bass; indic3=queenfish; indic4=white croaker; indic5=shiner perch; indic6=common carp; indic7=topsmelt; indic8=striped mullet; indic9=white catfish.  Additional information on the fish guilds is available in SCCWRP Technical Report 1000.
+     
+*	`constants.csv` <br> A numeric value must be provided for each data type in the file. If a site-specific value is not available, then a default value, such as that included in the data file template, should be used. Measurement units must be the same as those specified in the csv file notes.
+
+*	`contam.csv` <br> This file lists each individual component of each of four chemical groups: chlordanes, dieldrin, DDTs, and PCBs. Average sediment and dissolved water column concentrations representative of the site are required and should be entered into columns cs_ng.g and cd_ng.g, respectively. If data are not available for some components (e.g., specific PCB congeners), then leave the cell blank. The tool will calculate dissolved chemical concentrations for the water column and pore water if the data are not present. Units must be ng/g dry weight for sediment and pg/L for water.
+
+* `mcsparms.csv` <br> This file contains three types of data needed to perform the MCS routine: proportion of the seafood diet represented by each fish type (propseaf), mean and SE of tissue concentration for each chemical group by indicator number, and mean and SE of sediment concentration for chemical group. Leave the cell blank if data are not available. <br><br> The "propseaf" value indicates the proportion (ranging from 0 to 1) of the human diet represented by a given indicator species. Note that the propseaf values for all indicator species must sum to exactly 1 for the analysis to run correctly. A default assumption of approximately equal proportions should be used unless site-specific data is available. For example, using three indicators: indic1propseaf=0.33; indic3propseaf=0.33; indic5propseaf=0.34. <br><br> Tissue contaminant data should be the mean and standard error of at least three measurements and entered in units of ng/g wet wt. Enter a value of zero (0) if the SE is not available. <br><br> Sediment contaminant data should be the mean and standard error of at least three measurements and entered in units of ng/g dry wt. Enter a value of zero (0) if the SE is not available.
+
+### Inputs
 
 ```{r}
 column(12,
@@ -1362,11 +1463,11 @@ output$entry <- renderUI({
     )
     
     out <- div(
-      h3('Indicator guild species and sediment contaminant concentrations'), 
+      h3('Indicator guild species lipid content'), 
       w1,
       h3('Site and environmental data'), 
       w2, 
-      h3('Contaminants'), 
+      h3('Sediment contaminants'), 
       w3
       )
       
@@ -1395,11 +1496,11 @@ output$entry <- renderUI({
     )
                         
     out <- div(
-      h3('Indicator guild species and sediment contaminant concentrations'), 
+      h3('Indicator guild species lipid content'), 
       w1,
       h3('Site and environmental data'), 
       w2, 
-      h3('Contaminants'), 
+      h3('Sediment contaminants'), 
       w3, 
       h3('MCS parameters'), 
       w4
@@ -1417,7 +1518,21 @@ uiOutput('entry')
 
 ## Food Web calculations {.tabset .tabset-pills}
 
-### Guild species results summary
+### Description
+
+Several types of results are obtained once the bioaccumulation model has been run. The bioaccumulation integrates six key metabolic processes in each component of the fish’s food web to determine a steady state contaminant concentration in the tissue. 
+
+```{r bioaccum, out.width = "50%", fig.align = 'center'}
+knitr::include_graphics('bioaccum.png')
+```
+
+A summary of the bioaccumulation model results is shown in the __Guild species summary__ table. This table lists the estimated total concentration by chemical group for each indicator species used in the analysis. Also listed is the BSAF, defined as: tissue conc_(ww) / sediment conc_(dw).
+
+The estimated tissue concentration and BSAF for each individual member of the model’s food web can be plotted for a single chemical type (__Species by contaminant plot__). Use the drop down box to select a single contaminant to plot and download as an image file.
+
+The __All results table__ is a searchable listing of the estimated tissue concentration for each constituent and food web component, including the indicator fish species. The values correspond to the plot for a single contaminant. 
+
+### Guild species summary table
 
 ```{r}
 # calculated and observed concentrations
@@ -1432,7 +1547,7 @@ column(12,
 )
 ```
 
-### Plot all species by contaminant
+### Species by contaminant plot
 
 ```{r}
 output$cntbsaf <- renderUI({
@@ -1485,6 +1600,27 @@ output$mcspl <- renderPlot({mcspl()}, height = 600, width = 800)
 output$mcsreslng <- renderTable({mcsreslng()})
 ```
 
+### Description
+
+The MCS routine is run after and every time the bioaccumulation model is run.  As for the bioaccumulation model, be sure to rerun the entire model every time the input data have changed or else the results will not be accurate.
+
+Three types of output are produced.
+
+The __SQO assessment summary__ provides the final HHSQO assessment results for the site. These results are based on the integration of the Chemical Exposure category (based on observed tissue conc.) and Sediment Linkage category (based on percentile distribution of sediment linkage values from the MCS). One of five site assessment categories is determined based on the logic matrix shown below. The category type corresponds to whether the site meets or fails the HHSQO. A separate assessment is obtained for each chemical group (chlordanes, dieldrin, DDTs, PCBs).
+
+```{r exposetab, out.width = "70%", fig.align = 'center'}
+knitr::include_graphics('exposetab.png')
+```
+
+* __Meet SQO__: Unimpacted (U) or Likely Unimpacted (LU)
+* __Fail SQO__: Possibly Impacted (PI), Likely Impacted (LI), Clearly Impacted (CI)
+
+Additional details on the site linkage MCS results is presented on the __MCS summary of sediment site linkages__ page. A table listing site linkage values for various percentiles of the cumulative distribution is shown.  
+
+A plot of the site linkage cumulative distribution describes the uncertainty associated with the site linkage calculation and gives the basis for the site linkage category result. The site linkage category is determined by the percentile at which the site linkage crosses a threshold value of 0.5 (dashed vertical line on plot). For example, a distribution where a linkage value of 0.5 is exceeded for 75% or more of the data is classified as having "High" linkage.
+
+The __Detailed MCS output__ table shows the results of every MCS iteration used in the analysis. This table can be used to support alternative graphical or statistical analyses of the data.
+
 ### SQO assessment summary
 
 ```{r}
@@ -1503,13 +1639,13 @@ column(12,
   column(4, downloadButtonRmd('dlmcssum', 'Download table'))
 )
 column(12,
-  tableOutput('mcssum')
+  tableOutput('mcssum') %>% withSpinner()
 )
 column(12,
   column(4, downloadButtonRmd('dlmcspl', 'Download plot'))
 )
 column(12,
-  plotOutput('mcspl')
+  plotOutput('mcspl') %>% withSpinner()
 )
 ```
 
@@ -1525,6 +1661,10 @@ column(12,
 ```
 
 ## Additional output {.tabset .tabset-pills}
+
+### Description
+
+This page documents additional chemical values used in the bioaccumulation model, such as measured sediment contaminant concentrations, octanol-water partition coefficients, and estimated values for water column and pore water concentrations. No assessment results are contained in this table. 
 
 ### Calculated contaminants
 
